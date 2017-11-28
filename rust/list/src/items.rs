@@ -169,4 +169,3 @@ pub unsafe extern "C" fn item_label_at(label_list: *const Vec<Label>, index: siz
     let label = Box::new(label_list[index].clone());
     Box::into_raw(label)
 }
-
