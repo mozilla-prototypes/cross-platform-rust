@@ -28,7 +28,15 @@ xcuserdata
 
 ## Rust
 NDK/
-*/cargo/target/*/release/.fingerprint/
-*/cargo/target/*/release/deps/
-*/cargo/target/
+cargo/target/*/release/.fingerprint/
+cargo/target/*/release/deps/
+cargo/target/
+Cargo.lock
 
+## Swap files and such.
+*.bak
+*.rs.bak
+*.rs.bk
+*~
+.*.sw*
+.s*
