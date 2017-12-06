@@ -1,0 +1,63 @@
+:root {
+  --border-radius: 3px;
+}
+
+body {
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+h1 {
+  user-select: none;
+  margin: 10px 0;
+}
+
+input {
+  border: 1px solid grey;
+  border-radius: var(--border-radius);
+}
+
+.app {
+  display: flex;
+}
+
+.labels {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  height: 30px;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+}
+
+.label-name {
+  flex: 1;
+}
+
+button {
+  border: 1px solid grey;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #e0dede;
+}
+
+button:hover:active {
+  background-color: #cccccc;
+}
+
+.edit-labels-button {
+  margin: 15px;
+  width: 100px;
+  height: 35px;
+}

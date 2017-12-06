@@ -1,0 +1,9 @@
+.add-todo-form {
+  display: flex;
+}
+
+.add-todo-input {
+  height: 25px;
+  padding: 5px 10px;
+  flex: 1;
+}

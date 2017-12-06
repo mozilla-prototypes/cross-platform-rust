@@ -1,0 +1,11 @@
+.todo-dropdown-menu .labels {
+  min-width: 150px;
+}
+
+.label:not(.checked) .label-checkmark {
+  visibility: hidden;
+}
+
+.todo-dropdown-menu .label {
+  cursor: pointer;
+}

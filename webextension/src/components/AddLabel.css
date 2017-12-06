@@ -1,0 +1,36 @@
+.add-label-form {
+  display: flex;
+  position: relative;
+  margin-right: 21px;
+}
+
+.add-label-input {
+  flex: 1;
+  height: 20px;
+  padding: 5px;
+}
+
+.color-popover {
+  position: absolute;
+  z-index: 2;
+  top: 26px;
+  left: -7px;
+}
+
+.color-swatch-wrapper {
+  padding: 2px;
+  border: 1px solid grey;
+  padding: 5px;
+  background: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.1);
+  display: inline-block;
+  cursor: pointer;
+}
+
+.color-swatch {
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--border-radius);
+}

@@ -1,0 +1,6 @@
+.todo-list {
+  width: 500px;
+  background-color: rgb(226, 228, 230);
+  border-radius: var(--border-radius);
+  padding: 5px 10px;
+}
