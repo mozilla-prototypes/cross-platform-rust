@@ -28,3 +28,29 @@ pub mod strings {
         CString::new(r_string).unwrap().into_raw()
     }
 }
+
+#[doc(hidden)]
+pub mod android_ffi;
+
+pub mod log {
+    use std::ffi::CString;
+
+    use android_ffi;
+
+    // #[cfg(test)]
+    pub fn d(message: &str) {}
+
+    // #[cfg(target_os="ios")]
+    // pub fn d(message: &str) {
+    //     println!(message);
+    // }
+
+    // #[cfg(target_os="android")]
+    // pub fn d(message: &str) {
+    //     let message = CString::new(message).unwrap();
+    //     let message = message.as_ptr();
+    //     let tag = CString::new("RustyToodle").unwrap();
+    //     let tag = tag.as_ptr();
+    //     unsafe { android_ffi::__android_log_write(android_ffi::ANDROID_LOG_DEBUG, tag, message) };
+    // }
+}

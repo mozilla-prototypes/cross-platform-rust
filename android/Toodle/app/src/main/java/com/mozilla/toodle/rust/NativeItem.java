@@ -3,7 +3,6 @@ package com.mozilla.toodle.rust;
 import com.sun.jna.Structure;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +25,6 @@ public class NativeItem extends Structure implements Closeable {
 
     @Override
     public void close() {
-        JNA.INSTANCE.item_jna_destroy(this.getPointer());
+        JNA.INSTANCE.item_c_destroy(this.getPointer());
     }
 }

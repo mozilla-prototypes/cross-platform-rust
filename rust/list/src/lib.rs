@@ -21,9 +21,10 @@ extern crate uuid;
 
 extern crate ffi_utils;
 
-use libc::size_t;
+use libc::{ size_t, time_t };
 use std::os::raw::c_char;
 use std::sync::Arc;
+use std::ffi::CString;
 use mentat::query::{
     IntoResult,
     QueryExecutionResult,
@@ -41,13 +42,23 @@ pub mod errors;
 
 use errors as list_errors;
 use ffi_utils::strings::c_char_to_string;
-use items::Item;
+use ffi_utils::log;
 use labels::Label;
+use items::{
+    Item,
+    Items,
+    ItemC,
+    ItemsC
+};
 use store::{
     Store,
     ToInner,
     ToTypedValue,
 };
+
+// TODO this is pretty horrible and rather crafty, but I couldn't get this to live
+// inside a ListManager struct and be able to mutate it...
+static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 #[derive(Debug)]
 #[repr(C)]
@@ -201,6 +212,19 @@ impl ListManager {
             .map_err(|e| e.into())
     }
 
+    pub fn fetch_items(&self) -> Result<Items, list_errors::Error> {
+        let query = r#"[:find ?eid ?uuid ?name
+                        :where
+                        [?eid :item/uuid ?uuid]
+                        [?eid :item/name ?name]
+        ]"#;
+        self.store
+            .query(query)
+            .into_rel_result()
+            .map(|rows| Items::new(rows.iter().filter_map(|row| Item::from_row(&row)).collect()))
+            .map_err(|e| e.into())
+    }
+
     pub fn fetch_item(&self, uuid: &Uuid) -> Result<Option<Item> , list_errors::Error>{
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
@@ -346,10 +370,73 @@ pub unsafe extern "C" fn list_manager_get_all_labels(manager: *const ListManager
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn list_manager_create_item(manager: *mut ListManager, item: *const Item) {
+pub unsafe extern "C" fn list_manager_create_item(manager: *mut ListManager, name: *const c_char, due_date: *const time_t) {
+    let name = c_char_to_string(name);
+    log::d(&format!("Creating item: {:?}, {:?}, {:?}", name, due_date, manager)[..]);
+
     let manager = &mut*manager;
-    let item = &*item;
-    let _ = manager.create_item(&item);
+    let mut item = Item::default();
+
+    item.name = name;
+    item.due_date = Some(Timespec::new(due_date as i64, 0));
+
+    manager.create_item(&item);
+ 
+    // Let whoever's listening know that there are new items!
+    match CHANGED_CALLBACK {
+        Some(f) => f(),
+        None => ()
+    }
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct ItemCSet {
+    items: Box<[ItemC]>
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn list_manager_on_items_changed(callback: extern fn()) {
+    CHANGED_CALLBACK = Some(callback);
+    callback();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn list_manager_all_items(manager: *mut ListManager, callback: extern "C" fn(Option<&ItemCSet>)) {
+    let manager = &*manager;
+    let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
+
+    // TODO there's bound to be a better way. Ideally this should just return an empty set,
+    // but I ran into problems while doing that.
+    let count = items.vec.len();
+
+    let set = ItemCSet {
+        items: items.vec.into_boxed_slice()
+    };
+
+    let res = match count > 0 {
+        // NB: we're lending a set, it will be cleaned up automatically once 'callback' returns
+        true => Some(&set),
+        false => None
+    };
+
+    callback(res);
+
+    // TODO can we just clean up after ourselves here, instead of in item_c_destroy?
+}
+
+// TODO this is pretty crafty... Currently this setup means that ItemJNA could only be used
+// together with something like list_manager_all_items - a function that will clear up ItemJNA itself.
+#[no_mangle]
+pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
+    let item = Box::from_raw(item);
+
+    // Reclaim our strings and let Rust clear up their memory.
+    let _ = CString::from_raw(item.name);
+
+    // Prevent Rust from clearing out item itself. It's already managed by list_manager_all_items.
+    // If we'll let Rust clean up entirely here, we'll get an NPE in list_manager_all_items.
+    Box::into_raw(item)
 }
 
 #[no_mangle]

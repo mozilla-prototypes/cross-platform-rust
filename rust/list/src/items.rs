@@ -35,6 +35,12 @@ use store::{
     ToInner
 };
 
+#[repr(C)]
+#[derive(Debug)]
+pub struct ItemC {
+    pub name: *mut c_char
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Item {
     pub id: Option<Entity>,
@@ -43,6 +49,65 @@ pub struct Item {
     pub due_date: Option<Timespec>,
     pub completion_date: Option<Timespec>,
     pub labels: Vec<Label>,
+}
+
+impl From<ItemC> for Item {
+    fn from(item_c: ItemC) -> Self {
+        Item {
+            id: None,
+            uuid: Uuid::nil(),
+            name: c_char_to_string(item_c.name),
+            due_date: None,
+            completion_date: None,
+            labels: vec![]
+        }
+    }
+}
+
+impl From<Item> for ItemC {
+    fn from(item: Item) -> Self {
+        ItemC {
+            name: string_to_c_char(item.name.clone())
+        }
+    }
+}
+
+// Wrapper structs so that we can have nice From traits.
+// We can only implement Traits for structs that we own.
+pub struct Items {
+    pub vec: Vec<Item>
+}
+
+impl Items {
+    pub fn new(vec: Vec<Item>) -> Items {
+        Items {
+            vec: vec
+        }
+    }
+}
+
+pub struct ItemsC {
+    pub vec: Vec<ItemC>
+}
+
+impl ItemsC {
+    pub fn new(vec: Vec<ItemC>) -> ItemsC {
+        ItemsC {
+            vec: vec
+        }
+    }
+}
+
+impl From<Items> for ItemsC {
+    fn from(items: Items) -> Self {
+        ItemsC::new(items.vec.into_iter().map(|item| item.into()).collect())
+    }
+}
+
+impl From<Vec<Item>> for ItemsC {
+    fn from(items: Vec<Item>) -> Self {
+        ItemsC::new(items.into_iter().map(|item| item.into()).collect())
+    }
 }
 
 impl Drop for Item {

@@ -13,7 +13,7 @@ public class ListManager extends RustObject {
     }
 
     public void createItem(Item item) {
-        JNA.INSTANCE.list_manager_create_item_direct(
+        JNA.INSTANCE.list_manager_create_item(
                 rawPointer,
                 item.name(),
                 item.dueDate()
@@ -22,10 +22,6 @@ public class ListManager extends RustObject {
 
     public void registerChangedItemsCallback(NativeItemsChangedCallback callback) {
         JNA.INSTANCE.list_manager_on_items_changed(callback);
-    }
-
-    public void getAllUuids(NativeItemUuidsCallback callback) {
-        JNA.INSTANCE.list_manager_all_uuids(rawPointer, callback);
     }
 
     public void getAllItems(NativeItemsCallback callback) {

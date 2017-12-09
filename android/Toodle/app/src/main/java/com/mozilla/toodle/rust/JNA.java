@@ -22,11 +22,10 @@ public interface JNA extends Library {
     Pointer toodle_list(Pointer toodle);
     void toodle_list_destroy(Pointer listManager);
 
-    void list_manager_create_item_direct(Pointer listManager, String name, long dueDate);
+    void list_manager_create_item(Pointer listManager, String name, long dueDate);
     void list_manager_on_items_changed(NativeItemsChangedCallback callback);
-    void list_manager_all_uuids(Pointer listManager, NativeItemUuidsCallback callback);
     void list_manager_all_items(Pointer listManager, NativeItemsCallback callback);
-    void item_jna_destroy(Pointer item);
+    void item_c_destroy(Pointer item);
 
     // TODO...
     // void a_item_set_name(String uuid, String name);
