@@ -26,10 +26,4 @@ public interface JNA extends Library {
     void list_manager_on_items_changed(NativeItemsChangedCallback callback);
     void list_manager_all_items(Pointer listManager, NativeItemsCallback callback);
     void item_c_destroy(Pointer item);
-
-    // TODO...
-    // void a_item_set_name(String uuid, String name);
-    // void a_item_set_due_date(String uuid, long dueDate);
-    // get items
-    // get labels..?
 }
