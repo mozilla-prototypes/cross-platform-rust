@@ -380,12 +380,15 @@ pub unsafe extern "C" fn list_manager_create_item(manager: *mut ListManager, nam
     item.name = name;
     item.due_date = Some(Timespec::new(due_date as i64, 0));
 
-    manager.create_item(&item);
- 
-    // Let whoever's listening know that there are new items!
-    match CHANGED_CALLBACK {
-        Some(f) => f(),
-        None => ()
+    match manager.create_item(&item) {
+        Ok(_) => {
+            // Let whoever's listening know that there are new items!
+            match CHANGED_CALLBACK {
+                Some(f) => f(),
+                None => ()
+            }
+        },
+        Err(e) => panic!("Failed to create item. TODO this should be an error callback: {}", e)
     }
 }
 
