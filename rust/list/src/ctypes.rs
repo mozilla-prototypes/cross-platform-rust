@@ -68,3 +68,9 @@ impl From<ItemC> for Item {
         }
     }
 }
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct ItemCSet {
+    pub items: Box<[ItemC]>
+}

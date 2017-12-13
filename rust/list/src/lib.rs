@@ -51,7 +51,8 @@ use items::{
 };
 use ctypes::{
     ItemC,
-    ItemsC
+    ItemsC,
+    ItemCSet
 };
 use store::{
     Store,
@@ -383,22 +384,13 @@ pub unsafe extern "C" fn list_manager_create_item(manager: *mut ListManager, nam
     item.name = name;
     item.due_date = Some(Timespec::new(due_date as i64, 0));
 
-    match manager.create_item(&item) {
-        Ok(_) => {
-            // Let whoever's listening know that there are new items!
-            match CHANGED_CALLBACK {
-                Some(f) => f(),
-                None => ()
+    let _ = manager.create_item(&item)
+        .map(|_| {
+            if let Some(callback) = CHANGED_CALLBACK {
+                callback();
             }
-        },
-        Err(e) => panic!("Failed to create item. TODO this should be an error callback: {}", e)
-    }
-}
-
-#[repr(C)]
-#[derive(Debug)]
-pub struct ItemCSet {
-    items: Box<[ItemC]>
+        })
+        .map_err(|e| panic!("Failed to create item. TODO propagate error: {}", e));
 }
 
 #[no_mangle]
