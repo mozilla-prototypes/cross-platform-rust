@@ -221,13 +221,13 @@ class ItemViewController: UIViewController {
         let labels: [Label] = []
 
         guard let currentItem = self.item else {
-            if let item = ToodleLib.sharedInstance.list.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels) {
+            if let item = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels) {
                 self.delegate?.itemCreated(item: item)
             }
             return
         }
 
-        ToodleLib.sharedInstance.list.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
+        ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
         currentItem.name = description
 //        currentItem.isComplete = (self.statusValueLabel.text ?? "") != "Complete"
 

@@ -31,7 +31,7 @@ class ToDoListLabelsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Toodle"
-        labels = self.dbStore.list.allLabels()
+        labels = []//self.dbStore.list.allLabels()
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "ListCell")
          self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(newLabel))
     }
@@ -67,7 +67,7 @@ class ToDoListLabelsViewController: UITableViewController {
     }
 
     fileprivate func createLabel(labelName: String) {
-        let label = self.dbStore.list.createLabel(withName: labelName, color: UIColor.gray  )
+        let label = self.dbStore.createLabel(withName: labelName, color: UIColor.gray  )
         self.labels.append(label)
         self.tableView.reloadData()
     }

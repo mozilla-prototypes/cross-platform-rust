@@ -16,7 +16,7 @@ class ToDoListItemsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.items = ToodleLib.sharedInstance.list.allItems()
+        self.items = ToodleLib.sharedInstance.allItems()
 
         self.title = "All Items"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(newItem))
@@ -73,7 +73,7 @@ extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate 
             return itemCreated(item: item)
         }
         self.items[index] = item
-        self.items = ToodleLib.sharedInstance.list.allItems()
+        self.items = ToodleLib.sharedInstance.allItems()
         self.tableView.reloadData()
     }
 }

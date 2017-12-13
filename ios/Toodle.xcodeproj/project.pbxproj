@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		285DB58B1FD8956600154A8B /* libtoodle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 285DB5891FD8955E00154A8B /* libtoodle.a */; };
 		7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */; };
 		7B2BA8C71F97B24E0093D191 /* ToDoListItemsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */; };
-		7B47BBD61F9A3E7A00FCA5AA /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */; };
 		7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */; };
+		7B6202021FE1E63F00F8BA6C /* libtoodle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 285DB5891FD8955E00154A8B /* libtoodle.a */; };
 		7B89922A1FE16F9A007B0BE2 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992291FE16F9A007B0BE2 /* Label.swift */; };
 		7B8992321FE176C6007B0BE2 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */; };
 		7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */; };
@@ -31,11 +30,10 @@
 		285DB5891FD8955E00154A8B /* libtoodle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoodle.a; path = ../rust/target/universal/release/libtoodle.a; sourceTree = "<group>"; };
 		7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToodleLib.swift; sourceTree = "<group>"; };
 		7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItemsTableViewController.swift; sourceTree = "<group>"; };
-		7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListManager.swift; sourceTree = "<group>"; };
 		7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewController.swift; sourceTree = "<group>"; };
+		7B6201F81FE1D23300F8BA6C /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../rust/items.h; sourceTree = "<group>"; };
+		7B6201F91FE1D24400F8BA6C /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../../../rust/labels.h; sourceTree = "<group>"; };
 		7B8992291FE16F9A007B0BE2 /* Label.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
-		7B89922C1FE171F6007B0BE2 /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../../../rust/list/labels.h; sourceTree = "<group>"; };
-		7B89922D1FE17204007B0BE2 /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../rust/list/items.h; sourceTree = "<group>"; };
 		7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Utils.swift"; sourceTree = "<group>"; };
 		7B8992311FE176C5007B0BE2 /* Date+Int64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Int64.swift"; sourceTree = "<group>"; };
@@ -60,7 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B9F01281F794F3B000407E5 /* libresolv.tbd in Frameworks */,
-				285DB58B1FD8956600154A8B /* libtoodle.a in Frameworks */,
+				7B6202021FE1E63F00F8BA6C /* libtoodle.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +69,6 @@
 			isa = PBXGroup;
 			children = (
 				7B8992281FE16F9A007B0BE2 /* Labels */,
-				7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */,
 				7BB2204B1F8F975F00ACD7AF /* Items */,
 			);
 			path = List;
@@ -102,7 +99,7 @@
 		7B8992281FE16F9A007B0BE2 /* Labels */ = {
 			isa = PBXGroup;
 			children = (
-				7B89922C1FE171F6007B0BE2 /* labels.h */,
+				7B6201F91FE1D24400F8BA6C /* labels.h */,
 				7B8992291FE16F9A007B0BE2 /* Label.swift */,
 			);
 			path = Labels;
@@ -164,7 +161,7 @@
 		7BB2204B1F8F975F00ACD7AF /* Items */ = {
 			isa = PBXGroup;
 			children = (
-				7B89922D1FE17204007B0BE2 /* items.h */,
+				7B6201F81FE1D23300F8BA6C /* items.h */,
 				7BB2204C1F8F976C00ACD7AF /* Item.swift */,
 			);
 			path = Items;
@@ -249,7 +246,6 @@
 				7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */,
 				7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */,
 				7B2BA8C71F97B24E0093D191 /* ToDoListItemsTableViewController.swift in Sources */,
-				7B47BBD61F9A3E7A00FCA5AA /* ListManager.swift in Sources */,
 				7B9F013B1F827A23000407E5 /* ToDoListLabelsViewController.swift in Sources */,
 				7B89922A1FE16F9A007B0BE2 /* Label.swift in Sources */,
 				7B9F01101F794DB2000407E5 /* AppDelegate.swift in Sources */,
@@ -394,7 +390,7 @@
 				DEVELOPMENT_TEAM = 8BHJ767F4Y;
 				INFOPLIST_FILE = Toodle/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../cargo/target/universal/release";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../rust/target/universal/release";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mozilla.Toodle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Toodle/Toodle-Bridging-Header.h";
@@ -411,7 +407,7 @@
 				DEVELOPMENT_TEAM = 8BHJ767F4Y;
 				INFOPLIST_FILE = Toodle/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../cargo/target/universal/release";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../rust/target/universal/release";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mozilla.Toodle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Toodle/Toodle-Bridging-Header.h";
