@@ -231,7 +231,34 @@ pub struct StoreConnection {
     pub store: Store,
 }
 
+impl StoreConnection {
+    pub fn query(&self, query: &str) -> mentat::query::QueryExecutionResult {
+        self.store.conn.read().unwrap().q_once(&self.handle, query, None)
+    }
+
+    pub fn query_args(&self, query: &str, inputs: Vec<(Variable, TypedValue)>) -> mentat::query::QueryExecutionResult {
+        let i = QueryInputs::with_value_sequence(inputs);
+        self.store.conn.read().unwrap().q_once(&self.handle, query, i)
+    }
+
+    pub fn transact(&mut self, transaction: &str) -> Result<TxReport, store_errors::Error> {
+        Ok(self.store.conn.write().unwrap().transact(&mut self.handle, transaction)?)
+    }
+
+    pub fn fetch_schema(&self) -> edn::Value {
+        self.store.conn.read().unwrap().current_schema().to_edn_value()
+    }
+
+    pub fn new_connection(&self) -> store_errors::Result<StoreConnection> {
+        Ok(StoreConnection {
+            handle: new_connection(&self.store.uri)?,
+            store: self.store.clone(),
+        })
+    }
+}
+
 /// Store containing a SQLite connection
+#[derive(Clone)]
 pub struct Store {
     conn: Arc<RwLock<Conn>>,
     uri: String,
@@ -267,26 +294,5 @@ impl Store {
             conn:Arc::new(RwLock::new(c)),
             uri: uri,
         })
-    }
-
-    pub fn query(&self, connection: &Connection, query: &str) -> mentat::query::QueryExecutionResult {
-        self.conn.read().unwrap().q_once(&connection, query, None)
-    }
-
-    pub fn query_args(&self, connection: &Connection, query: &str, inputs: Vec<(Variable, TypedValue)>) -> mentat::query::QueryExecutionResult {
-        let i = QueryInputs::with_value_sequence(inputs);
-        self.conn.read().unwrap().q_once(&connection, query, i)
-    }
-
-    pub fn transact(&mut self, connection: &mut Connection, transaction: &str) -> Result<TxReport, store_errors::Error> {
-        Ok(self.conn.write().unwrap().transact(connection, transaction)?)
-    }
-
-    pub fn fetch_schema(&self) -> edn::Value {
-        self.conn.read().unwrap().current_schema().to_edn_value()
-    }
-
-    pub fn new_connection(&self) -> store_errors::Result<Connection> {
-        Ok(new_connection(&self.uri)?)
     }
 }
