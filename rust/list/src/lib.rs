@@ -52,7 +52,7 @@ use items::{
 use ctypes::{
     ItemC,
     ItemsC,
-    ItemCSet
+    ItemCList
 };
 use store::{
     Store,
@@ -400,7 +400,7 @@ pub unsafe extern "C" fn list_manager_on_items_changed(callback: extern fn()) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn list_manager_all_items(manager: *mut ListManager, callback: extern "C" fn(Option<&ItemCSet>)) {
+pub unsafe extern "C" fn list_manager_all_items(manager: *mut ListManager, callback: extern "C" fn(Option<&ItemCList>)) {
     let manager = &*manager;
     let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
 
@@ -408,7 +408,7 @@ pub unsafe extern "C" fn list_manager_all_items(manager: *mut ListManager, callb
     // but I ran into problems while doing that.
     let count = items.vec.len();
 
-    let set = ItemCSet {
+    let set = ItemCList {
         items: items.vec.into_boxed_slice()
     };
 

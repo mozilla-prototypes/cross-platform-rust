@@ -71,6 +71,6 @@ impl From<ItemC> for Item {
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct ItemCSet {
+pub struct ItemCList {
     pub items: Box<[ItemC]>
 }
