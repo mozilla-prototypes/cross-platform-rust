@@ -419,8 +419,6 @@ pub unsafe extern "C" fn list_manager_all_items(manager: *mut ListManager, callb
     };
 
     callback(res);
-
-    // TODO can we just clean up after ourselves here, instead of in item_c_destroy?
 }
 
 // TODO this is pretty crafty... Currently this setup means that ItemJNA could only be used
