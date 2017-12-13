@@ -39,6 +39,7 @@ use time::Timespec;
 pub mod labels;
 pub mod items;
 pub mod errors;
+pub mod ctypes;
 
 use errors as list_errors;
 use ffi_utils::strings::c_char_to_string;
@@ -46,7 +47,9 @@ use ffi_utils::log;
 use labels::Label;
 use items::{
     Item,
-    Items,
+    Items
+};
+use ctypes::{
     ItemC,
     ItemsC
 };
