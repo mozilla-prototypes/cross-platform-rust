@@ -8,10 +8,9 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#![allow(dead_code)]
+use mentat;
 
 use store::errors as store_error;
-use list::errors as list_error;
 
 error_chain! {
     types {
@@ -20,6 +19,13 @@ error_chain! {
 
     links {
         StoreError(store_error::Error, store_error::ErrorKind);
-        ListError(list_error::Error, list_error::ErrorKind);
+        MentatError(mentat::errors::Error, mentat::errors::ErrorKind);
+    }
+
+    errors {
+        UnexpectedResultType(message: String) {
+            description("An unexpected Result type was encountered")
+            display("{}", message)
+        }
     }
 }

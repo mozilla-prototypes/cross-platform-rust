@@ -10,14 +10,34 @@ description = "Cross Platform Library for providing To Do List data"
 name = "toodle"
 crate-type = ["staticlib", "cdylib"]
 
+[target.'cfg(target_os="android")'.dependencies]
+jni = { version = "0.5", default-features = false }
+
 [dependencies]
 error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
+libc = "0.2.32"
+time = "0.1.38"
+uuid = { version = "0.5", features = ["v4"] }
 
-[dependencies.ffi-utils]
-path = "ffi-utils"
+[dependencies.edn]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
+
+[dependencies.mentat]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
+
+[dependencies.mentat_core]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
 
 [dependencies.store]
 path = "store"
 
-[dependencies.list]
-path = "list"
+[dependencies.ffi-utils]
+path = "ffi-utils"
+
+[dependencies.rusqlite]
+version = "0.12"
+# System sqlite might be very old.
+features = ["bundled", "limits"]

@@ -45,6 +45,7 @@ pub struct Item {
     pub labels: Vec<Label>,
 }
 
+#[derive(Debug)]
 pub struct Items {
     pub vec: Vec<Item>
 }
@@ -60,20 +61,6 @@ impl Items {
 impl Drop for Item {
     fn drop(&mut self) {
         println!("{:?} is being deallocated", self);
-    }
-}
-
-impl Item {
-    pub fn from_row(row: &Vec<TypedValue>) -> Option<Item> {
-        let item = Item {
-            id: row[0].clone().to_inner(),
-            uuid: row[1].clone().to_inner(),
-            name: row[2].clone().to_inner(),
-            due_date: row[3].clone().to_inner(),
-            completion_date: row[4].clone().to_inner(),
-            labels: vec![]
-        };
-        Some(item)
     }
 }
 

@@ -25,6 +25,10 @@ use std::os::raw::{
     c_char
 };
 use std::rc::Rc;
+use std::sync::{
+    Arc,
+    RwLock,
+};
 
 use edn::{
     DateTime,
@@ -221,11 +225,15 @@ impl<'a> ToInner<Uuid> for &'a TypedValue {
     }
 }
 
-#[repr(C)]
+#[derive(Debug)]
+pub struct StoreConnection {
+    pub handle: Connection,
+    pub store: Store,
+}
+
 /// Store containing a SQLite connection
 pub struct Store {
-    handle: Connection,
-    conn: Conn,
+    conn: Arc<RwLock<Conn>>,
     uri: String,
 }
 
@@ -242,53 +250,43 @@ impl fmt::Debug for Store {
 }
 
 impl Store {
-    pub fn new<T>(uri: T) -> Result<Self, store_errors::Error>
-    where T: Into<Option<String>> {
+    pub fn new_store<T>(uri: T) -> Result<StoreConnection, store_errors::Error>
+        where T: Into<Option<String>> {
         let uri_string = uri.into().unwrap_or(String::new());
-        let mut h = try!(new_connection(&uri_string));
-        let c = try!(Conn::connect(&mut h));
-        Ok(Store {
-            handle: h,
-            conn:c,
-            uri: uri_string,
+        let mut connection = new_connection(&uri_string)?;
+        let store = Store::new(uri_string, &mut connection)?;
+        Ok(StoreConnection {
+            handle: connection,
+            store: store,
         })
     }
 
-    pub fn open<T>(&mut self, uri: T) -> Result<(), store_errors::Error>
-    where T: Into<Option<String>> {
-        let uri_string = uri.into().unwrap_or(String::new());
-        self.handle = try!(new_connection(&uri_string));
-        self.conn = try!(Conn::connect(&mut self.handle));
-        self.uri = uri_string;
-        Ok(())
+    fn new(uri: String,  connection: &mut Connection) -> Result<Self, store_errors::Error> {
+        let c = Conn::connect(connection)?;
+        Ok(Store {
+            conn:Arc::new(RwLock::new(c)),
+            uri: uri,
+        })
     }
 
-    pub fn query(&self, query: &str) -> mentat::query::QueryExecutionResult {
-        self.conn.q_once(&self.handle, query, None)
+    pub fn query(&self, connection: &Connection, query: &str) -> mentat::query::QueryExecutionResult {
+        self.conn.read().unwrap().q_once(&connection, query, None)
     }
 
-    pub fn query_args(&self, query: &str, inputs: Vec<(Variable, TypedValue)>) -> mentat::query::QueryExecutionResult {
+    pub fn query_args(&self, connection: &Connection, query: &str, inputs: Vec<(Variable, TypedValue)>) -> mentat::query::QueryExecutionResult {
         let i = QueryInputs::with_value_sequence(inputs);
-        self.conn.q_once(&self.handle, query, i)
+        self.conn.read().unwrap().q_once(&connection, query, i)
     }
 
-    pub fn transact(&mut self, transaction: &str) -> Result<TxReport, store_errors::Error> {
-        Ok(self.conn.transact(&mut self.handle, transaction)?)
+    pub fn transact(&mut self, connection: &mut Connection, transaction: &str) -> Result<TxReport, store_errors::Error> {
+        Ok(self.conn.write().unwrap().transact(connection, transaction)?)
     }
 
     pub fn fetch_schema(&self) -> edn::Value {
-        self.conn.current_schema().to_edn_value()
+        self.conn.read().unwrap().current_schema().to_edn_value()
     }
-}
 
-#[no_mangle]
-pub extern "C" fn new_store(uri: *const c_char) -> *mut Store {
-    let uri = c_char_to_string(uri);
-    let store = Store::new(uri).expect("expected Store");
-    Box::into_raw(Box::new(store))
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn store_destroy(data: *mut Store) {
-    let _ = Box::from_raw(data);
+    pub fn new_connection(&self) -> store_errors::Result<Connection> {
+        Ok(new_connection(&self.uri)?)
+    }
 }
