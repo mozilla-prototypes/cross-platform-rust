@@ -11,19 +11,17 @@
 		7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */; };
 		7B2BA8C71F97B24E0093D191 /* ToDoListItemsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */; };
 		7B47BBD61F9A3E7A00FCA5AA /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */; };
-		7B47BBD81F9A3EDE00FCA5AA /* LoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B47BBD71F9A3EDE00FCA5AA /* LoginManager.swift */; };
 		7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */; };
+		7B89922A1FE16F9A007B0BE2 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992291FE16F9A007B0BE2 /* Label.swift */; };
+		7B8992321FE176C6007B0BE2 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */; };
+		7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */; };
+		7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992311FE176C5007B0BE2 /* Date+Int64.swift */; };
 		7B9F01101F794DB2000407E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F010F1F794DB2000407E5 /* AppDelegate.swift */; };
-		7B9F01121F794DB2000407E5 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F01111F794DB2000407E5 /* LoginViewController.swift */; };
 		7B9F01151F794DB2000407E5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B9F01131F794DB2000407E5 /* Main.storyboard */; };
 		7B9F01171F794DB2000407E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B9F01161F794DB2000407E5 /* Assets.xcassets */; };
 		7B9F011A1F794DB2000407E5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B9F01181F794DB2000407E5 /* LaunchScreen.storyboard */; };
 		7B9F01281F794F3B000407E5 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9F01271F794F3B000407E5 /* libresolv.tbd */; };
-		7B9F012D1F7950AE000407E5 /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F012C1F7950AE000407E5 /* Login.swift */; };
-		7B9F01311F7D13A5000407E5 /* NewLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F01301F7D13A5000407E5 /* NewLoginViewController.swift */; };
-		7B9F01351F7D1634000407E5 /* NSLayoutConstraint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F01341F7D1634000407E5 /* NSLayoutConstraint+Utils.swift */; };
-		7B9F013B1F827A23000407E5 /* ToDoListCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F013A1F827A23000407E5 /* ToDoListCategoryViewController.swift */; };
-		7B9F013E1F827D7B000407E5 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F013D1F827D7B000407E5 /* Category.swift */; };
+		7B9F013B1F827A23000407E5 /* ToDoListLabelsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F013A1F827A23000407E5 /* ToDoListLabelsViewController.swift */; };
 		7BB2204D1F8F976C00ACD7AF /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB2204C1F8F976C00ACD7AF /* Item.swift */; };
 		7BB220541F8FA72500ACD7AF /* RustObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB220531F8FA72500ACD7AF /* RustObject.swift */; };
 /* End PBXBuildFile section */
@@ -31,20 +29,19 @@
 /* Begin PBXFileReference section */
 		285DB5881FD8952000154A8B /* toodle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toodle.h; path = ../../../rust/src/toodle.h; sourceTree = "<group>"; };
 		285DB5891FD8955E00154A8B /* libtoodle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoodle.a; path = ../rust/target/universal/release/libtoodle.a; sourceTree = "<group>"; };
-		285DB58C1FD8958B00154A8B /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../rust/list/items.h; sourceTree = "<group>"; };
-		285DB58D1FD8958B00154A8B /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../rust/list/labels.h; sourceTree = "<group>"; };
-		7B1F2D6D1FB0D335000246C9 /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../cargo/list/items.h; sourceTree = "<group>"; };
-		7B1F2D6E1FB0D343000246C9 /* categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = categories.h; path = ../../../../../cargo/list/categories.h; sourceTree = "<group>"; };
 		7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToodleLib.swift; sourceTree = "<group>"; };
 		7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItemsTableViewController.swift; sourceTree = "<group>"; };
 		7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListManager.swift; sourceTree = "<group>"; };
-		7B47BBD71F9A3EDE00FCA5AA /* LoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginManager.swift; sourceTree = "<group>"; };
 		7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewController.swift; sourceTree = "<group>"; };
+		7B8992291FE16F9A007B0BE2 /* Label.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
+		7B89922C1FE171F6007B0BE2 /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../../../rust/list/labels.h; sourceTree = "<group>"; };
+		7B89922D1FE17204007B0BE2 /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../rust/list/items.h; sourceTree = "<group>"; };
+		7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
+		7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Utils.swift"; sourceTree = "<group>"; };
+		7B8992311FE176C5007B0BE2 /* Date+Int64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Int64.swift"; sourceTree = "<group>"; };
 		7B9D81B01FB0CFC30027C605 /* libtoodle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoodle.a; path = ../cargo/target/universal/release/libtoodle.a; sourceTree = "<group>"; };
-		7B9D81B61FB0D0750027C605 /* logins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logins.h; path = ../../../../cargo/logins/logins.h; sourceTree = "<group>"; };
 		7B9F010C1F794DB2000407E5 /* Toodle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Toodle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B9F010F1F794DB2000407E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7B9F01111F794DB2000407E5 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		7B9F01141F794DB2000407E5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7B9F01161F794DB2000407E5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B9F01191F794DB2000407E5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -52,11 +49,7 @@
 		7B9F01241F794ED6000407E5 /* Toodle-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toodle-Bridging-Header.h"; sourceTree = "<group>"; };
 		7B9F01271F794F3B000407E5 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		7B9F01291F794F49000407E5 /* libgreetings.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgreetings.a; path = ../cargo/target/universal/release/libgreetings.a; sourceTree = "<group>"; };
-		7B9F012C1F7950AE000407E5 /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
-		7B9F01301F7D13A5000407E5 /* NewLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLoginViewController.swift; sourceTree = "<group>"; };
-		7B9F01341F7D1634000407E5 /* NSLayoutConstraint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Utils.swift"; sourceTree = "<group>"; };
-		7B9F013A1F827A23000407E5 /* ToDoListCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListCategoryViewController.swift; sourceTree = "<group>"; };
-		7B9F013D1F827D7B000407E5 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		7B9F013A1F827A23000407E5 /* ToDoListLabelsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListLabelsViewController.swift; sourceTree = "<group>"; };
 		7BB2204C1F8F976C00ACD7AF /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		7BB220531F8FA72500ACD7AF /* RustObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustObject.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,9 +70,9 @@
 		7B1F2D6C1FB0D318000246C9 /* List */ = {
 			isa = PBXGroup;
 			children = (
+				7B8992281FE16F9A007B0BE2 /* Labels */,
 				7B47BBD51F9A3E7A00FCA5AA /* ListManager.swift */,
 				7BB2204B1F8F975F00ACD7AF /* Items */,
-				7B9F013C1F827D5D000407E5 /* Categories */,
 			);
 			path = List;
 			sourceTree = "<group>";
@@ -87,12 +80,9 @@
 		7B2BA8941F963C5C0093D191 /* Rust */ = {
 			isa = PBXGroup;
 			children = (
-				285DB58C1FD8958B00154A8B /* items.h */,
-				285DB58D1FD8958B00154A8B /* labels.h */,
 				285DB5881FD8952000154A8B /* toodle.h */,
 				7BB220531F8FA72500ACD7AF /* RustObject.swift */,
 				7B1F2D6C1FB0D318000246C9 /* List */,
-				7B9F012B1F795075000407E5 /* Logins */,
 				7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */,
 			);
 			path = Rust;
@@ -102,13 +92,30 @@
 			isa = PBXGroup;
 			children = (
 				7B9F01131F794DB2000407E5 /* Main.storyboard */,
-				7B9F01111F794DB2000407E5 /* LoginViewController.swift */,
-				7B9F01301F7D13A5000407E5 /* NewLoginViewController.swift */,
-				7B9F013A1F827A23000407E5 /* ToDoListCategoryViewController.swift */,
+				7B9F013A1F827A23000407E5 /* ToDoListLabelsViewController.swift */,
 				7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */,
 				7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		7B8992281FE16F9A007B0BE2 /* Labels */ = {
+			isa = PBXGroup;
+			children = (
+				7B89922C1FE171F6007B0BE2 /* labels.h */,
+				7B8992291FE16F9A007B0BE2 /* Label.swift */,
+			);
+			path = Labels;
+			sourceTree = "<group>";
+		};
+		7B89922E1FE176C5007B0BE2 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */,
+				7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */,
+				7B8992311FE176C5007B0BE2 /* Date+Int64.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		7B9F01031F794DB1000407E5 = {
@@ -131,14 +138,14 @@
 		7B9F010E1F794DB2000407E5 /* Toodle */ = {
 			isa = PBXGroup;
 			children = (
+				7B9F010F1F794DB2000407E5 /* AppDelegate.swift */,
+				7B47BBDF1F9A51A100FCA5AA /* Controllers */,
+				7B89922E1FE176C5007B0BE2 /* Extensions */,
 				7B2BA8941F963C5C0093D191 /* Rust */,
 				7B9F01241F794ED6000407E5 /* Toodle-Bridging-Header.h */,
-				7B9F010F1F794DB2000407E5 /* AppDelegate.swift */,
 				7B9F011B1F794DB2000407E5 /* Info.plist */,
-				7B47BBDF1F9A51A100FCA5AA /* Controllers */,
 				7B9F01161F794DB2000407E5 /* Assets.xcassets */,
 				7B9F01181F794DB2000407E5 /* LaunchScreen.storyboard */,
-				7B9F01341F7D1634000407E5 /* NSLayoutConstraint+Utils.swift */,
 			);
 			path = Toodle;
 			sourceTree = "<group>";
@@ -154,29 +161,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		7B9F012B1F795075000407E5 /* Logins */ = {
-			isa = PBXGroup;
-			children = (
-				7B9D81B61FB0D0750027C605 /* logins.h */,
-				7B9F012C1F7950AE000407E5 /* Login.swift */,
-				7B47BBD71F9A3EDE00FCA5AA /* LoginManager.swift */,
-			);
-			path = Logins;
-			sourceTree = "<group>";
-		};
-		7B9F013C1F827D5D000407E5 /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				7B1F2D6E1FB0D343000246C9 /* categories.h */,
-				7B9F013D1F827D7B000407E5 /* Category.swift */,
-			);
-			path = Categories;
-			sourceTree = "<group>";
-		};
 		7BB2204B1F8F975F00ACD7AF /* Items */ = {
 			isa = PBXGroup;
 			children = (
-				7B1F2D6D1FB0D335000246C9 /* items.h */,
+				7B89922D1FE17204007B0BE2 /* items.h */,
 				7BB2204C1F8F976C00ACD7AF /* Item.swift */,
 			);
 			path = Items;
@@ -254,20 +242,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B9F01351F7D1634000407E5 /* NSLayoutConstraint+Utils.swift in Sources */,
 				7BB220541F8FA72500ACD7AF /* RustObject.swift in Sources */,
-				7B9F012D1F7950AE000407E5 /* Login.swift in Sources */,
-				7B9F01311F7D13A5000407E5 /* NewLoginViewController.swift in Sources */,
 				7BB2204D1F8F976C00ACD7AF /* Item.swift in Sources */,
+				7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */,
 				7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */,
-				7B47BBD81F9A3EDE00FCA5AA /* LoginManager.swift in Sources */,
 				7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */,
-				7B9F01121F794DB2000407E5 /* LoginViewController.swift in Sources */,
+				7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */,
 				7B2BA8C71F97B24E0093D191 /* ToDoListItemsTableViewController.swift in Sources */,
 				7B47BBD61F9A3E7A00FCA5AA /* ListManager.swift in Sources */,
-				7B9F013B1F827A23000407E5 /* ToDoListCategoryViewController.swift in Sources */,
+				7B9F013B1F827A23000407E5 /* ToDoListLabelsViewController.swift in Sources */,
+				7B89922A1FE16F9A007B0BE2 /* Label.swift in Sources */,
 				7B9F01101F794DB2000407E5 /* AppDelegate.swift in Sources */,
-				7B9F013E1F827D7B000407E5 /* Category.swift in Sources */,
+				7B8992321FE176C6007B0BE2 /* UIColor+Hex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
