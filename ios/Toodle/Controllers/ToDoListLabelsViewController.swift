@@ -31,7 +31,7 @@ class ToDoListLabelsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Toodle"
-        labels = []//self.dbStore.list.allLabels()
+        labels = []   // TODO: Put this back when we add label support - self.dbStore.list.allLabels()
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "ListCell")
          self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(newLabel))
     }
@@ -57,6 +57,7 @@ class ToDoListLabelsViewController: UITableViewController {
         return cell
     }
 
+    // TODO: Put this back when we add label support
 //    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        let itemsVC = ToDoListItemsTableViewController(label: self.labels[indexPath.row])
 //        self.navigationController?.pushViewController(itemsVC, animated: true)

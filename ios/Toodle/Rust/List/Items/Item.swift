@@ -73,6 +73,7 @@ class Item {
         get {
             if _labels == nil {
                 _labels = []
+                // TODO: When we get labels in, put this back!
 //                let ls = item_get_labels(self.raw)
 //                _labels = []
 //                for index in 0..<item_labels_count(ls) {
