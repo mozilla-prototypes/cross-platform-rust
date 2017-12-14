@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.mozilla.toodle.rust.NativeItemSet;
 import com.mozilla.toodle.rust.NativeItemsCallback;
 import com.mozilla.toodle.rust.NativeItemsChangedCallback;
-import com.mozilla.toodle.rust.ListManager;
 import com.mozilla.toodle.rust.Toodle;
 
 import org.jetbrains.annotations.Nullable;
@@ -45,22 +44,20 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
             Log.i("RustyToodleJava", "Items changed!");
             try (final Toodle toodle = new Toodle(listAdapter.context)) {
-                try (final ListManager listManager = toodle.getListManager()) {
-                    listManager.getAllItems(new NativeItemsCallback() {
-                        @Override
-                        public void items(@Nullable NativeItemSet.ByReference itemSet) {
-                            if (itemSet == null) {
-                                Log.i("RustyToodleJava", "Got no items!");
-                                listAdapter.dataset = new ArrayList<>(0);
-                                return;
-                            }
-                            Log.i("RustyToodleJava", "Got " + itemSet.size() + " items!");
-                            listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
-                            listAdapter.notifyDataSetChanged();
-                            itemSet.close();
+                toodle.getAllItems(new NativeItemsCallback() {
+                    @Override
+                    public void items(@Nullable NativeItemSet.ByReference itemSet) {
+                        if (itemSet == null) {
+                            Log.i("RustyToodleJava", "Got no items!");
+                            listAdapter.dataset = new ArrayList<>(0);
+                            return;
                         }
-                    });
-                }
+                        Log.i("RustyToodleJava", "Got " + itemSet.size() + " items!");
+                        listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
+                        listAdapter.notifyDataSetChanged();
+                        itemSet.close();
+                    }
+                });
             }
         }
     }
@@ -75,9 +72,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         this.context = context;
 
         try (final Toodle toodle = new Toodle(context)) {
-            try (final ListManager listManager = toodle.getListManager()) {
-                listManager.registerChangedItemsCallback(nativeItemsChangedCallback);
-            }
+            toodle.registerChangedItemsCallback(nativeItemsChangedCallback);
         }
     }
 

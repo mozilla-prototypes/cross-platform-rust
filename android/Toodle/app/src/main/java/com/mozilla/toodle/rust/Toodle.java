@@ -7,6 +7,8 @@ package com.mozilla.toodle.rust;
 
 import android.content.Context;
 
+import com.mozilla.toodle.Item;
+
 public class Toodle extends RustObject {
     static {
         System.loadLibrary("toodle");
@@ -20,8 +22,20 @@ public class Toodle extends RustObject {
         );
     }
 
-    public ListManager getListManager() {
-        return new ListManager(this);
+    public void createItem(Item item) {
+        JNA.INSTANCE.toodle_create_item(
+                rawPointer,
+                item.name(),
+                item.dueDate()
+        );
+    }
+
+    public void registerChangedItemsCallback(NativeItemsChangedCallback callback) {
+        JNA.INSTANCE.toodle_on_items_changed(callback);
+    }
+
+    public void getAllItems(NativeItemsCallback callback) {
+        JNA.INSTANCE.toodle_get_all_items(rawPointer, callback);
     }
 
     @Override

@@ -19,11 +19,8 @@ public interface JNA extends Library {
     Pointer new_toodle(String dbPath);
     void toodle_destroy(Pointer toodle);
 
-    Pointer toodle_list(Pointer toodle);
-    void toodle_list_destroy(Pointer listManager);
-
-    void list_manager_create_item(Pointer listManager, String name, long dueDate);
-    void list_manager_on_items_changed(NativeItemsChangedCallback callback);
-    void list_manager_all_items(Pointer listManager, NativeItemsCallback callback);
+    void toodle_create_item(Pointer listManager, String name, long dueDate);
+    void toodle_on_items_changed(NativeItemsChangedCallback callback);
+    void toodle_get_all_items(Pointer listManager, NativeItemsCallback callback);
     void item_c_destroy(Pointer item);
 }

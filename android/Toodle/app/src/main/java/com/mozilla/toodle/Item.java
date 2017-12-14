@@ -7,7 +7,6 @@ package com.mozilla.toodle;
 
 import android.content.Context;
 
-import com.mozilla.toodle.rust.ListManager;
 import com.mozilla.toodle.rust.NativeItem;
 import com.mozilla.toodle.rust.Toodle;
 
@@ -59,9 +58,7 @@ public class Item {
 
     void create(Context context) {
         try (final Toodle toodle = new Toodle(context)) {
-            try (final ListManager listManager = toodle.getListManager()) {
-                listManager.createItem(this);
-            }
+            toodle.createItem(this);
         }
     }
 }
