@@ -60,7 +60,7 @@ impl Items {
 
 impl Drop for Item {
     fn drop(&mut self) {
-        println!("{:?} is being deallocated", self);
+        eprintln!("{:?} is being deallocated", self);
     }
 }
 

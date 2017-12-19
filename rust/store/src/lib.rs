@@ -246,7 +246,7 @@ pub struct Store {
 
 impl Drop for Store {
     fn drop(&mut self) {
-        println!("{:?} is being deallocated", self);
+        eprintln!("{:?} is being deallocated", self);
     }
 }
 

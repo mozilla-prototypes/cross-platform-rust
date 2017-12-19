@@ -871,7 +871,7 @@ mod test {
         match manager.update_item(&created_item, None, None, None, Some(&new_labels)) {
             Ok(()) => (),
             Err(e) => {
-                println!("e {:?}", e);
+                eprintln!("e {:?}", e);
                 assert!(false)
             }
         }
@@ -905,7 +905,7 @@ mod test {
         match manager.update_item(&created_item, None, None, None, Some(&new_labels)) {
             Ok(()) => (),
             Err(e) => {
-                println!("e {:?}", e);
+                eprintln!("e {:?}", e);
                 assert!(false)
             }
         }
@@ -938,7 +938,7 @@ mod test {
         match manager.update_item(&created_item, None, Some(date), None, None) {
             Ok(()) => (),
             Err(e) => {
-                println!("e {:?}", e);
+                eprintln!("e {:?}", e);
                 assert!(false)
             }
         }
@@ -969,7 +969,7 @@ mod test {
         match manager.update_item(&created_item, Some("new name".to_string()), None, None, None) {
             Ok(()) => (),
             Err(e) => {
-                println!("e {:?}", e);
+                eprintln!("e {:?}", e);
                 assert!(false)
             }
         }
@@ -1001,7 +1001,7 @@ mod test {
         match manager.update_item(&created_item, None, None, Some(date), None) {
             Ok(()) => (),
             Err(e) => {
-                println!("e {:?}", e);
+                eprintln!("e {:?}", e);
                 assert!(false)
             }
         }

@@ -56,7 +56,7 @@ pub mod log {
 
     #[cfg(all(target_os="ios", not(test)))]
     pub fn d(message: &str) {
-        println!("{}", message);
+        eprintln!("{}", message);
     }
 
     #[cfg(all(target_os="android", not(test)))]

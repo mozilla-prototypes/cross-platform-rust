@@ -33,7 +33,7 @@ pub struct Label {
 
 impl Drop for Label {
     fn drop(&mut self) {
-        println!("{:?} is being deallocated", self);
+        eprintln!("{:?} is being deallocated", self);
     }
 }
 
