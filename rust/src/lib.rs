@@ -35,17 +35,15 @@ use libc::{
     time_t,
 };
 
-use time::{
-    Timespec,
-};
-
 use mentat::{
     IntoResult,
     QueryExecutionResult,
     TypedValue,
-    Uuid,
     Variable,
 };
+
+pub use time::Timespec;
+pub use mentat::Uuid;
 
 pub mod labels;
 pub mod items;
@@ -85,7 +83,7 @@ pub struct Toodle {
 }
 
 impl Toodle {
-    fn new(uri: String) -> Result<Toodle, errors::Error> {
+    pub fn new(uri: String) -> Result<Toodle, errors::Error> {
         let store_result = Store::new_store(uri)?;
         let mut toodle = Toodle {
             connection: store_result,

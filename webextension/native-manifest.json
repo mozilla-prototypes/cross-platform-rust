@@ -1,0 +1,7 @@
+{
+  "name": "toodlext",
+  "description": "Bridge between the Toodle extension and Rust library",
+  "path": "/path/to/toodlext",
+  "type": "stdio",
+  "allowed_extensions": ["toodle@mozilla.com"]
+}

@@ -1,56 +1,56 @@
-import FakeApi from './fake_api';
+import Api from './api';
 
 export const populateTodos = () => ({
   type: 'POPULATE_TODOS',
-  payload: FakeApi.getTodos()
+  payload: Api.getTodos()
 });
 
 export const populateLabels = () => ({
   type: 'POPULATE_LABELS',
-  payload: FakeApi.getLabels()
+  payload: Api.getLabels()
 });
 
 export const addTodo = (text) => ({
   type: 'ADD_TODO',
-  payload: FakeApi.createTodo(text)
+  payload: Api.createTodo(text)
 });
 
 export const removeTodo = (uuid) => ({
   type: 'REMOVE_TODO',
-  payload: FakeApi.removeTodo(uuid)
+  payload: Api.removeTodo(uuid)
 });
 
 export const todoChangeName = (uuid, newTodoName) => ({
   type: 'TODO_CHANGE_NAME',
-  payload: FakeApi.todoChangeName(uuid, newTodoName)
+  payload: Api.todoChangeName(uuid, newTodoName)
 });
 
 export const todoChangeDueDate = (uuid, dueDate) => ({
   type: 'TODO_CHANGE_DUE_DATE',
-  payload: FakeApi.todoChangeDueDate(uuid, dueDate)
+  payload: Api.todoChangeDueDate(uuid, dueDate)
 });
 
 export const todoChangeCompletionDate = (uuid, completionDate) => ({
   type: 'TODO_CHANGE_COMPLETION_DATE',
-  payload: FakeApi.todoChangeCompletionDate(uuid, completionDate)
+  payload: Api.todoChangeCompletionDate(uuid, completionDate)
 });
 
 export const todoAddLabel = (uuid, labelName) => ({
   type: 'TODO_ADD_LABEL',
-  payload: FakeApi.todoAddLabel(uuid, labelName)
+  payload: Api.todoAddLabel(uuid, labelName)
 });
 
 export const todoRemoveLabel = (uuid, labelName) => ({
   type: 'TODO_REMOVE_LABEL',
-  payload: FakeApi.todoRemoveLabel(uuid, labelName)
+  payload: Api.todoRemoveLabel(uuid, labelName)
 });
 
 export const addLabel = (labelName, color) => ({
   type: 'ADD_LABEL',
-  payload: FakeApi.addLabel(labelName, color)
+  payload: Api.addLabel(labelName, color)
 });
 
 export const removeLabel = (labelName) => ({
   type: 'REMOVE_LABEL',
-  payload: FakeApi.removeLabel(labelName)
+  payload: Api.removeLabel(labelName)
 });

@@ -11,5 +11,16 @@
     "scripts": ["background.js"]
   },
 
-  "content_security_policy": "default-src 'self' 'unsafe-eval'"
+  "content_security_policy": "default-src 'self' 'unsafe-eval'",
+
+  "permissions": [
+    "nativeMessaging"
+  ],
+
+  "applications": {
+    "gecko": {
+      "id": "toodle@mozilla.com",
+      "strict_min_version": "57.0"
+    }
+  }
 }
