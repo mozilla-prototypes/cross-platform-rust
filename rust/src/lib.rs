@@ -379,10 +379,9 @@ impl Toodle {
 }
 
 #[no_mangle]
-pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Toodle {
+pub extern "C" fn new_toodle(uri: *const c_char) -> *mut ctypes::ResultC<Toodle> {
     let uri = c_char_to_string(uri);
-    let mut toodle = Toodle::new(uri).expect("expected a toodle");
-    Box::into_raw(Box::new(toodle))
+    Box::into_raw(Box::new(Toodle::new(uri).into()))
 }
 
 #[no_mangle]

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.mozilla.toodle.rust.NativeItemSet;
 import com.mozilla.toodle.rust.NativeItemsCallback;
 import com.mozilla.toodle.rust.NativeItemsChangedCallback;
+import com.mozilla.toodle.rust.NativeResultException;
 import com.mozilla.toodle.rust.Toodle;
 
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +61,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         itemSet.close();
                     }
                 });
+            } catch (NativeResultException e) {
+                UiUtils.showError(listAdapter.context, e.getMessage());
             }
         }
     }
@@ -70,12 +73,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             new WeakReference<>(this)
     );
 
-    ListAdapter(Context context) {
+    ListAdapter(Context context) throws NativeResultException {
         this.context = context;
 
         try (final Toodle toodle = new Toodle(context)) {
             toodle.registerChangedItemsCallback(nativeItemsChangedCallback);
-        }
+        };
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

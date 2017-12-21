@@ -12,6 +12,7 @@ use ffi_utils::strings::{
     string_to_c_char,
     c_char_to_string,
 };
+use std;
 use std::os::raw::c_char;
 use std::ptr;
 
@@ -21,6 +22,9 @@ use time::Timespec;
 use items::{
     Item, Items
 };
+
+use errors;
+use Toodle;
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -117,4 +121,28 @@ impl From<ItemC> for Item {
 pub struct ItemCList {
     pub items: Box<[ItemC]>,
     pub len: usize
+}
+
+pub struct ResultC<T> {
+    pub value: *const T,
+    pub error: *const c_char
+}
+
+impl From<std::result::Result<Toodle, errors::Error>> for ResultC<Toodle> {
+    fn from(result: std::result::Result<Toodle, errors::Error>) -> Self {
+        match result {
+            Ok(val) => {
+                ResultC::<Toodle> {
+                    value: Box::into_raw(Box::new(val)),
+                    error: string_to_c_char(String::from(""))
+                }
+            },
+            Err(e) => {
+                ResultC::<Toodle> {
+                    value: std::ptr::null(),
+                    error: string_to_c_char(e.description().into())
+                }
+            }
+        }
+    }
 }

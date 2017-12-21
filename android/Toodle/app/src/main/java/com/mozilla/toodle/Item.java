@@ -8,6 +8,7 @@ package com.mozilla.toodle;
 import android.content.Context;
 
 import com.mozilla.toodle.rust.NativeItem;
+import com.mozilla.toodle.rust.NativeResultException;
 import com.mozilla.toodle.rust.Toodle;
 
 import java.util.ArrayList;
@@ -60,6 +61,8 @@ public class Item {
     void create(Context context) {
         try (final Toodle toodle = new Toodle(context)) {
             toodle.createItem(this);
+        } catch (NativeResultException e) {
+            UiUtils.showError(context, e.getMessage());
         }
     }
 }

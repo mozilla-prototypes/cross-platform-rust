@@ -17,7 +17,7 @@ public interface JNA extends Library {
 
     JNA INSTANCE = (JNA) Native.loadLibrary(JNA_LIBRARY_NAME, JNA.class);
 
-    Pointer new_toodle(String dbPath);
+    NativeResult new_toodle(String dbPath);
     void toodle_destroy(Pointer toodle);
 
     void toodle_create_item(Pointer listManager, String name, Long dueDate);

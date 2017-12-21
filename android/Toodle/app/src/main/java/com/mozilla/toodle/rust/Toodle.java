@@ -9,7 +9,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mozilla.toodle.Item;
-import com.sun.jna.NativeLong;
+import android.text.TextUtils;
 
 public class Toodle extends RustObject {
     static {
@@ -18,10 +18,14 @@ public class Toodle extends RustObject {
 
     private static final String DB_NAME = "toodle.db";
 
-    public Toodle(Context context) {
-        this.rawPointer = JNA.INSTANCE.new_toodle(
+    public Toodle(Context context) throws NativeResultException {
+        final NativeResult result = JNA.INSTANCE.new_toodle(
                 context.getDatabasePath(DB_NAME).getAbsolutePath()
         );
+        if (!TextUtils.isEmpty(result.error)) {
+            throw new NativeResultException(result.error);
+        }
+        this.rawPointer = result.obj;
     }
 
     public void createItem(Item item) {

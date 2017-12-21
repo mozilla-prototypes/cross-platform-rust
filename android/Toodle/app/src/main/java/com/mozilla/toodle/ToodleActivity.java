@@ -13,6 +13,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.mozilla.toodle.rust.NativeResultException;
+
 public class ToodleActivity extends Activity {
     private RecyclerView listRecyclerView;
     private RecyclerView.Adapter listAdapter;
@@ -28,7 +30,11 @@ public class ToodleActivity extends Activity {
         layoutManager = new LinearLayoutManager(this);
         listRecyclerView.setLayoutManager(layoutManager);
 
-        listAdapter = new ListAdapter(getApplicationContext());
+        try {
+            listAdapter = new ListAdapter(getApplicationContext());
+        } catch (final NativeResultException e) {
+            finish();
+        }
         listRecyclerView.setAdapter(listAdapter);
 
         final FloatingActionButton newItemBtn = findViewById(R.id.newItem);
