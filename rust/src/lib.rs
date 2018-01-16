@@ -327,6 +327,28 @@ impl Toodle {
         self.fetch_item(&item_uuid)
     }
 
+    pub fn update_item_by_uuid(&mut self,
+                               uuid_string: &str,
+                               name: Option<String>,
+                               due_date: Option<Timespec>,
+                               completion_date: Option<Timespec>)
+                               -> Result<Item, list_errors::Error> {
+        let uuid = Uuid::parse_str(&uuid_string)?;
+        let item =
+            self.fetch_item(&uuid)
+                .ok()
+                .unwrap_or_default()
+                .ok_or_else(|| list_errors::ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+
+        let new_item =
+            self.update_item(&item, name, due_date, completion_date, None)
+                .and_then(|_| self.fetch_item(&uuid))
+                .unwrap_or_default()
+                .ok_or_else(|| list_errors::ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+
+        Ok(new_item)
+    }
+
     pub fn update_item(&mut self, item: &Item, name: Option<String>, due_date: Option<Timespec>, completion_date: Option<Timespec>, labels: Option<&Vec<Label>>) -> Result<(), list_errors::Error> {
         let item_id = item.id.to_owned().expect("item must have ID to be updated");
         let mut transaction = vec![];
@@ -523,16 +545,10 @@ pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const I
 pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
-    let item = manager.fetch_item(
-        &Uuid::from_str(c_char_to_string(uuid).as_str()).expect("parsed uuid")
-    ).expect("item from uuid").unwrap();
-    let _ = manager.update_item(
-        &item,
-        Some(c_char_to_string(name)),
-        optional_timespec(due_date),
-        optional_timespec(completion_date),
-        Some(&item.labels)
-    );
+    let _ = manager.update_item_by_uuid(c_char_to_string(uuid).as_str(),
+                                        Some(c_char_to_string(name)),
+                                        optional_timespec(due_date),
+                                        optional_timespec(completion_date));
 
     if let Some(callback) = CHANGED_CALLBACK {
         callback();

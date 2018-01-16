@@ -10,6 +10,7 @@
 
 use mentat;
 
+use mentat::edn::UuidParseError;
 use store;
 
 error_chain! {
@@ -22,7 +23,15 @@ error_chain! {
         MentatError(mentat::errors::Error, mentat::errors::ErrorKind);
     }
 
+    foreign_links {
+        InvalidUuid(UuidParseError);
+    }
+
     errors {
+        ItemNotFound(uuid: String) {
+            description("Item not found")
+            display("Item {} not found", uuid)
+        }
         UnexpectedResultType(message: String) {
             description("An unexpected Result type was encountered")
             display("{}", message)
