@@ -1,0 +1,26 @@
+[package]
+name = "toodle_ffi"
+version = "0.1.0"
+authors = ["Emily Toop <etoop@mozilla.com>"]
+
+[lib]
+name = "toodle"
+crate-type = ["staticlib", "cdylib"]
+
+[target.'cfg(target_os="android")'.dependencies]
+jni = { version = "0.5", default-features = false }
+
+[dependencies]
+libc = "0.2.32"
+time = "0.1.38"
+uuid = { version = "0.5", features = ["v4"] }
+
+[dependencies.mentat_core]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
+
+[dependencies.toodle]
+path = "../"
+
+[dependencies.ffi-utils]
+path = "../ffi-utils"

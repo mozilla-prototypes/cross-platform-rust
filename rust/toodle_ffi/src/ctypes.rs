@@ -24,9 +24,14 @@ use mentat::{
     Uuid,
 };
 
+<<<<<<< HEAD:rust/src/ctypes.rs
 use items::{
     Item,
     Items,
+=======
+use toodle::items::{
+    Item, Items
+>>>>>>> Extract FFI layer and library into separate crate. Update iOS project and android build script:rust/toodle_ffi/src/ctypes.rs
 };
 
 #[repr(C)]

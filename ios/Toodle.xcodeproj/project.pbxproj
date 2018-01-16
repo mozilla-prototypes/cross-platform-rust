@@ -28,11 +28,12 @@
 /* Begin PBXFileReference section */
 		285DB5881FD8952000154A8B /* toodle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toodle.h; path = ../../../rust/src/toodle.h; sourceTree = "<group>"; };
 		285DB5891FD8955E00154A8B /* libtoodle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoodle.a; path = ../rust/target/universal/release/libtoodle.a; sourceTree = "<group>"; };
+		7B100670200E44FF003A94B5 /* toodle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toodle.h; path = ../../../../rust/toodle_ffi/toodle.h; sourceTree = "<group>"; };
+		7B100671200E450C003A94B5 /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../../../rust/toodle_ffi/labels.h; sourceTree = "<group>"; };
+		7B100672200E451E003A94B5 /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../rust/toodle_ffi/items.h; sourceTree = "<group>"; };
 		7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToodleLib.swift; sourceTree = "<group>"; };
 		7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItemsTableViewController.swift; sourceTree = "<group>"; };
 		7B47BBDD1F9A518D00FCA5AA /* ItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewController.swift; sourceTree = "<group>"; };
-		7B6201F81FE1D23300F8BA6C /* items.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../../../../../rust/items.h; sourceTree = "<group>"; };
-		7B6201F91FE1D24400F8BA6C /* labels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labels.h; path = ../../../../../rust/labels.h; sourceTree = "<group>"; };
 		7B8992291FE16F9A007B0BE2 /* Label.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Utils.swift"; sourceTree = "<group>"; };
@@ -68,6 +69,7 @@
 		7B1F2D6C1FB0D318000246C9 /* List */ = {
 			isa = PBXGroup;
 			children = (
+				7B100670200E44FF003A94B5 /* toodle.h */,
 				7B8992281FE16F9A007B0BE2 /* Labels */,
 				7BB2204B1F8F975F00ACD7AF /* Items */,
 			);
@@ -77,7 +79,6 @@
 		7B2BA8941F963C5C0093D191 /* Rust */ = {
 			isa = PBXGroup;
 			children = (
-				285DB5881FD8952000154A8B /* toodle.h */,
 				7BB220531F8FA72500ACD7AF /* RustObject.swift */,
 				7B1F2D6C1FB0D318000246C9 /* List */,
 				7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */,
@@ -99,7 +100,7 @@
 		7B8992281FE16F9A007B0BE2 /* Labels */ = {
 			isa = PBXGroup;
 			children = (
-				7B6201F91FE1D24400F8BA6C /* labels.h */,
+				7B100671200E450C003A94B5 /* labels.h */,
 				7B8992291FE16F9A007B0BE2 /* Label.swift */,
 			);
 			path = Labels;
@@ -161,7 +162,7 @@
 		7BB2204B1F8F975F00ACD7AF /* Items */ = {
 			isa = PBXGroup;
 			children = (
-				7B6201F81FE1D23300F8BA6C /* items.h */,
+				7B100672200E451E003A94B5 /* items.h */,
 				7BB2204C1F8F976C00ACD7AF /* Item.swift */,
 			);
 			path = Items;
