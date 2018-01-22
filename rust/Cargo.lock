@@ -1128,7 +1128,7 @@ dependencies = [
  "ffi-utils 0.1.0",
  "jni 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "toodle 0.1.0",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
