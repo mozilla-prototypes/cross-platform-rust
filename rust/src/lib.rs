@@ -544,15 +544,11 @@ mod test {
     extern crate edn;
 
     use super::{
-        Store,
-        StoreConnection,
         Toodle,
         Label,
         Item,
         create_uuid,
     };
-
-    use std::sync::Arc;
 
     use mentat_core::Uuid;
     use time::now_utc;
