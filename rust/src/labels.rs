@@ -10,15 +10,18 @@
 
 use std::os::raw::c_char;
 
-use mentat_core::TypedValue;
-
 use ffi_utils::strings::{
     string_to_c_char,
     c_char_to_string,
 };
+
+use mentat::{
+    TypedValue,
+};
+
 use store::{
     Entity,
-    ToInner
+    ToInner,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -10,56 +10,39 @@
 
 #[macro_use] extern crate error_chain;
 
-extern crate mentat;
-extern crate edn;
-extern crate mentat_query;
-extern crate mentat_core;
-extern crate mentat_db;
-extern crate ordered_float;
+extern crate ffi_utils;
 extern crate rusqlite;
 extern crate time;
-extern crate ffi_utils;
+
+extern crate mentat;
 
 use std::fmt;
-use std::rc::Rc;
 use std::sync::{
     Arc,
     RwLock,
 };
-
-use edn::{
-    DateTime,
-    FromMicros,
-    NamespacedKeyword,
-    Utc,
-};
-
-use mentat::{
-    new_connection,
-};
-
-use mentat::conn::Conn;
-
-use mentat_core::{
-    Entid,
-    TypedValue,
-    Uuid,
-};
-
-use mentat_db::types::TxReport;
-
-use mentat::query::{
-    QueryInputs,
-    Variable,
-};
-
-use ordered_float::OrderedFloat;
 
 use rusqlite::{
     Connection
 };
 
 use time::Timespec;
+
+use mentat::{
+    NamespacedKeyword,
+    new_connection,
+    //IntoResult,
+    TxReport,
+    Entid,
+    TypedValue,
+    Uuid,
+    Conn,
+    QueryExecutionResult,
+    QueryInputs,
+    Variable,
+};
+
+use mentat::edn;
 
 pub mod errors;
 
@@ -71,13 +54,13 @@ pub trait ToTypedValue {
 
 impl ToTypedValue for String {
     fn to_typed_value(&self) -> TypedValue {
-        TypedValue::String(Rc::new(self.clone()))
+        self.clone().into()
     }
 }
 
 impl<'a> ToTypedValue for &'a str {
     fn to_typed_value(&self) -> TypedValue {
-        TypedValue::String(Rc::new(self.to_string()))
+        self.to_string().into()
     }
 }
 
@@ -130,14 +113,15 @@ impl ToTypedValue for i64 {
 
 impl ToTypedValue for f64 {
     fn to_typed_value(&self) -> TypedValue {
-        TypedValue::Double(OrderedFloat(*self))
+        (*self).into()
     }
 }
 
 impl ToTypedValue for Timespec {
     fn to_typed_value(&self) -> TypedValue {
+        // TODO: shouldn't that be / 1000?!
         let micro_seconds = (self.sec * 1000000) + i64::from((self.nsec * 1000));
-        TypedValue::Instant(DateTime::<Utc>::from_micros(micro_seconds))
+        TypedValue::instant(micro_seconds)
     }
 }
 
@@ -232,7 +216,7 @@ impl StoreConnection {
         self.store.conn.read().unwrap().q_once(&self.handle, query, None)
     }
 
-    pub fn query_args(&self, query: &str, inputs: Vec<(Variable, TypedValue)>) -> mentat::query::QueryExecutionResult {
+    pub fn query_args(&self, query: &str, inputs: Vec<(Variable, TypedValue)>) -> QueryExecutionResult {
         let i = QueryInputs::with_value_sequence(inputs);
         self.store.conn.read().unwrap().q_once(&self.handle, query, i)
     }
