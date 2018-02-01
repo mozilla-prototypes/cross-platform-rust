@@ -6,8 +6,7 @@ workspace = ".."
 
 [dependencies]
 error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
-ordered-float = "0.5"
-time = "0.1.38"
+time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [target.'cfg(target_os="android")'.dependencies]
@@ -20,23 +19,7 @@ features = ["bundled", "limits"]
 
 [dependencies.mentat]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
-
-[dependencies.edn]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
-
-[dependencies.mentat_query]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
-
-[dependencies.mentat_core]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
-
-[dependencies.mentat_db]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "rnewman/simplify-keywords"
 
 [dependencies.ffi-utils]
 path = "../ffi-utils"

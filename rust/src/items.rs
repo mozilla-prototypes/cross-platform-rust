@@ -8,27 +8,29 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use libc::size_t;
 use std::os::raw::{
     c_char,
     c_int,
 };
 use std::ptr;
 
-pub use edn::{
-    DateTime,
-    Utc,
-};
-use mentat_core::{
-    Uuid,
-};
-use time::Timespec;
-
 use ffi_utils::strings::{
     string_to_c_char,
     c_char_to_string,
 };
-use labels::Label;
+
+use libc::size_t;
+
+use time::Timespec;
+
+use mentat::{
+    Uuid,
+};
+
+use labels::{
+    Label,
+};
+
 use store::{
     Entity,
 };

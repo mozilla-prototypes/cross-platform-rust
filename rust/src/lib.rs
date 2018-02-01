@@ -10,30 +10,42 @@
 
 #[macro_use] extern crate error_chain;
 
+extern crate ffi_utils;
 extern crate libc;
-extern crate edn;
-extern crate mentat;
-extern crate mentat_core;
 extern crate rusqlite;
-extern crate store;
 extern crate time;
 extern crate uuid;
 
-extern crate ffi_utils;
+extern crate mentat;
 
-use libc::{ c_int, time_t };
-use std::os::raw::c_char;
+extern crate store;
+
 use std::ffi::CString;
-use mentat::query::{
+use std::os::raw::c_char;
+use std::str::FromStr;
+
+use ffi_utils::log;
+use ffi_utils::strings::{
+    c_char_to_string,
+    optional_timespec,
+};
+
+use libc::{
+    c_int,
+    time_t,
+};
+
+use time::{
+    Timespec,
+};
+
+use mentat::{
     IntoResult,
     QueryExecutionResult,
-    Variable,
-};
-use mentat_core::{
     TypedValue,
     Uuid,
+    Variable,
 };
-use time::Timespec;
 
 pub mod labels;
 pub mod items;
@@ -41,28 +53,26 @@ pub mod errors;
 pub mod ctypes;
 
 use errors as list_errors;
-use ffi_utils::strings::{
-    c_char_to_string,
-    optional_timespec
-};
-use ffi_utils::log;
+
 use labels::Label;
+
 use items::{
     Item,
-    Items
+    Items,
 };
+
 use ctypes::{
     ItemC,
     ItemsC,
     ItemCList
 };
+
 use store::{
     Store,
     StoreConnection,
     ToInner,
     ToTypedValue,
 };
-use std::str::FromStr;
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
 // inside a Toodle struct and be able to mutate it...
@@ -95,8 +105,8 @@ fn create_uuid() -> Uuid {
 
 fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>, list_errors::Error> {
     results.into_scalar_result()
-            .map(|o| o.and_then(|ts| ts.to_inner()))
-            .map_err(|e| e.into())
+           .map(|o| o.and_then(|ts| ts.to_inner()))
+           .map_err(|e| e.into())
 }
 
 impl Toodle {
@@ -230,7 +240,7 @@ impl Toodle {
                         [?eid :item/uuid ?uuid]
                         [?eid :item/name ?name]
         ]"#;
-        
+
         self.connection
             .query(query)
             .into_rel_result()
@@ -541,8 +551,6 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Toodle, name: *const 
 
 #[cfg(test)]
 mod test {
-    extern crate edn;
-
     use super::{
         Toodle,
         Label,
@@ -550,8 +558,14 @@ mod test {
         create_uuid,
     };
 
-    use mentat_core::Uuid;
-    use time::now_utc;
+    use time::{
+        now_utc,
+    };
+
+    use mentat::{
+        Uuid,
+    };
+    use mentat::edn;
 
     fn toodle() -> Toodle {
         Toodle::new(String::new()).expect("Expected a Toodle")

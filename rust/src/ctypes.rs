@@ -8,18 +8,25 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+use std::os::raw::c_char;
+use std::ptr;
+
 use ffi_utils::strings::{
     string_to_c_char,
     c_char_to_string,
 };
-use std::os::raw::c_char;
-use std::ptr;
 
-use mentat_core::Uuid;
-use time::Timespec;
+use time::{
+    Timespec,
+};
+
+use mentat::{
+    Uuid,
+};
 
 use items::{
-    Item, Items
+    Item,
+    Items,
 };
 
 #[repr(C)]
