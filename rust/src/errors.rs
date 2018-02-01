@@ -10,7 +10,7 @@
 
 use mentat;
 
-use store::errors as store_error;
+use store;
 
 error_chain! {
     types {
@@ -18,7 +18,7 @@ error_chain! {
     }
 
     links {
-        StoreError(store_error::Error, store_error::ErrorKind);
+        StoreError(store::errors::Error, store::errors::ErrorKind);
         MentatError(mentat::errors::Error, mentat::errors::ErrorKind);
     }
 
