@@ -38,6 +38,12 @@ pub struct ItemC {
     pub completion_date: *mut i64,
 }
 
+impl Drop for ItemC {
+    fn drop(&mut self) {
+        eprintln!("{:?} is being deallocated", self);
+    }
+}
+
 impl From<Item> for ItemC {
     fn from(item: Item) -> Self {
         let due = match item.due_date {

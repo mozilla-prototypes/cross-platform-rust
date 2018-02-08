@@ -12,10 +12,8 @@ use std::os::raw::{
     c_char,
     c_int,
 };
-use std::ptr;
 
 use ffi_utils::strings::{
-    string_to_c_char,
     c_char_to_string,
 };
 
@@ -65,41 +63,9 @@ impl Drop for Item {
 }
 
 #[no_mangle]
-pub extern "C" fn item_new() -> *mut Item {
-    let item = Item::default();
-    let boxed_item = Box::new(item);
-    Box::into_raw(boxed_item)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_destroy(item: *mut Item) {
-    let _ = Box::from_raw(item);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_name(item: *const Item) -> *mut c_char {
-    let item = &*item;
-    string_to_c_char(item.name.clone())
-}
-
-#[no_mangle]
 pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
     let item = &mut*item;
     item.name = c_char_to_string(name);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_due_date(item: *const Item) -> *mut i64 {
-    let item = &*item;
-    match item.due_date {
-        Some(date) => {
-            Box::into_raw(Box::new(date.sec))
-        },
-        None => {
-            ptr::null_mut()
-        }
-    }
-
 }
 
 #[no_mangle]
@@ -110,20 +76,6 @@ pub unsafe extern "C" fn item_set_due_date(item: *mut Item, due_date: *const siz
     } else {
         item.due_date = None;
     }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_completion_date(item: *const Item) -> *mut i64 {
-    let item = &*item;
-    match item.completion_date {
-        Some(date) => {
-            Box::into_raw(Box::new(date.sec))
-        },
-        None => {
-            ptr::null_mut()
-        }
-    }
-
 }
 
 #[no_mangle]

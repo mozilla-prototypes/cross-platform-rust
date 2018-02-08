@@ -77,6 +77,13 @@ class ToodleLib: RustObject {
                                                   UnsafeMutablePointer<OpaquePointer>(&pointerArray))!)
     }
 
+    func item(withUuid uuid: String) -> Item? {
+        guard let new_item = toodle_item_for_uuid(self.raw, uuid) else {
+            return nil
+        }
+        return Item(raw: new_item)
+    }
+
     func update(item: Item, name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) {
         var dd: AutoreleasingUnsafeMutablePointer<Int64>? = nil
         if let due = dueDate{
@@ -89,12 +96,16 @@ class ToodleLib: RustObject {
             cd = AutoreleasingUnsafeMutablePointer<Int64>(&c)
         }
         var pointerArray = self.toPointerArray(list: labels as [RustObject])
-        toodle_update_item(raw,
-                                 item.raw,
-                                 name,
-                                 dd,
-                                 cd,
-                                 UnsafeMutablePointer<OpaquePointer>(&pointerArray))
+        if let uuid = item.uuid {
+            toodle_update_item_by_uuid(self.raw, uuid, name, dd, cd)
+        } else {
+            toodle_update_item(self.raw,
+                                     item.raw,
+                                     name,
+                                     dd,
+                                     cd,
+                                     UnsafeMutablePointer<OpaquePointer>(&pointerArray))
+        }
     }
 }
 
