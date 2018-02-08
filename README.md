@@ -44,4 +44,28 @@ You should now be able to build and run your iOS app.
 * Load the `android/Toodle` project in Android Studio, and run it on an API26 emulator
 
 # WebExtension
-{TODO}
+[WebExtensions](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/What_are_WebExtensions) can't directly bind to native code. Instead, we use the [native messaging API](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging) to send requests to a helper application, or "bridge", that embeds the Toodle library. The bridge manages a single `Toodle` store, translates requests into method calls, and communicates with the WebExtension via length-prefixed JSON messages over standard input and output. The WebExtension runtime automatically launches and terminates the bridge.
+
+To build the bridge:
+
+```
+cd toodlext
+cargo update
+cargo build
+```
+
+The WebExtension runtime requires a [native messaging manifest](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_manifests) to allow the WebExtension to talk to the bridge. There's a helper Node script that installs a native manifest for a debug build of the bridge on macOS. This only needs to be done once. Please note that Windows and Linux use different locations, but the install script doesn't handle them yet.
+
+```
+cd webextension
+./install-native-manifest.js
+```
+
+Then, to launch the WebExtension in a dedicated Firefox profile:
+
+```
+npm install
+npm run dev
+```
+
+This also watches for source file changes, rebuilds, and automatically reloads the extension.
