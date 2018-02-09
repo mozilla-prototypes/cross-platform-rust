@@ -69,7 +69,7 @@ class ItemViewController: UIViewController {
     var dueDatePickerHeightConstraint: NSLayoutConstraint?
     var dueDatePickerTopAnchorConstraint: NSLayoutConstraint?
 
-    var item:Item?
+    var item: Item?
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -80,6 +80,7 @@ class ItemViewController: UIViewController {
     init(item: Item) {
         self.item = item
         super.init(nibName: nil, bundle: nil)
+        self.dueDateButton.setTitle("Set", for: .normal)
 
         self.descriptionField.text = item.name
         if let dueDate = item.dueDate {
@@ -200,6 +201,7 @@ class ItemViewController: UIViewController {
         self.save()
         if let _ = self.item {
             self.navigationController?.popViewController(animated: true)
+            self.item = nil
         } else {
             self.close()
         }
@@ -228,15 +230,9 @@ class ItemViewController: UIViewController {
         }
 
         ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
-        currentItem.name = description
-//        currentItem.isComplete = (self.statusValueLabel.text ?? "") != "Complete"
-
-//        if let _ = currentItem.id {
-//            try? ToodleLib.sharedInstance.list.update(item: currentItem)
-//        } else {
-//            ToodleLib.sharedInstance.list.add(item: currentItem, toCategory: category)
-//        }
-        self.delegate?.itemUpdated(item: currentItem)
+        if let new_item = ToodleLib.sharedInstance.item(withUuid: currentItem.uuid!) {
+            self.delegate?.itemUpdated(item: new_item)
+        }
     }
 
 }

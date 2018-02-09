@@ -22,7 +22,6 @@ extern crate store;
 
 use std::ffi::CString;
 use std::os::raw::c_char;
-use std::str::FromStr;
 
 use ffi_utils::log;
 use ffi_utils::strings::{
@@ -526,13 +525,29 @@ pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const c_char) -> *mut ItemC {
+    let uuid_string = c_char_to_string(uuid);
+    let uuid = Uuid::parse_str(&uuid_string).unwrap();
+    eprintln!("fetching item {:?}", uuid);
+    let manager = &mut*manager;
+
+    if let Ok(Some(i)) = manager.fetch_item(&uuid) {
+        eprintln!("returning item with uuid {:?}", i.uuid);
+        let c_item: ItemC = i.into();
+        return Box::into_raw(Box::new(c_item));
+    }
+    return std::ptr::null_mut();
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t, labels: *const Vec<Label>) {
+    let name = c_char_to_string(name);
     let manager = &mut*manager;
     let item = &*item;
     let labels = &*labels;
     let _ = manager.update_item(
         &item,
-        Some(c_char_to_string(name)),
+        Some(name),
         optional_timespec(due_date),
         optional_timespec(completion_date),
         Some(&labels)
@@ -541,10 +556,11 @@ pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const I
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
+    let name = c_char_to_string(name);
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
     let _ = manager.update_item_by_uuid(c_char_to_string(uuid).as_str(),
-                                        Some(c_char_to_string(name)),
+                                        Some(name),
                                         optional_timespec(due_date),
                                         optional_timespec(completion_date));
 

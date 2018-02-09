@@ -16,7 +16,7 @@ class Item {
     }
 
     deinit {
-        item_destroy(raw)
+        item_c_destroy(raw)
     }
 
     var uuid: String? {

@@ -72,8 +72,7 @@ extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate 
         guard let index = self.items.index(where: { i in item.uuid == i.uuid }) else {
             return itemCreated(item: item)
         }
-        self.items[index] = item
-        self.items = ToodleLib.sharedInstance.allItems()
+        self.items[index] = self.items[index]
         self.tableView.reloadData()
     }
 }
