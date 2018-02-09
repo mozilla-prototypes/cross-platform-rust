@@ -100,11 +100,11 @@ class ToodleLib: RustObject {
             toodle_update_item_by_uuid(self.raw, uuid, name, dd, cd)
         } else {
             toodle_update_item(self.raw,
-                                     item.raw,
-                                     name,
-                                     dd,
-                                     cd,
-                                     UnsafeMutablePointer<OpaquePointer>(&pointerArray))
+                               item.raw,
+                               name,
+                               dd,
+                               cd,
+                               UnsafeMutablePointer<OpaquePointer>(&pointerArray))
         }
     }
 }
