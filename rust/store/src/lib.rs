@@ -119,8 +119,7 @@ impl ToTypedValue for f64 {
 
 impl ToTypedValue for Timespec {
     fn to_typed_value(&self) -> TypedValue {
-        // TODO: shouldn't that be / 1000?!
-        let micro_seconds = (self.sec * 1000000) + i64::from((self.nsec * 1000));
+        let micro_seconds = (self.sec * 1_000_000) + i64::from((self.nsec / 1_000));
         TypedValue::instant(micro_seconds)
     }
 }
@@ -274,5 +273,24 @@ impl Store {
             conn:Arc::new(RwLock::new(c)),
             uri: uri,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{
+        ToTypedValue,
+        TypedValue,
+        Timespec,
+    };
+
+    #[test]
+    fn test_timespec_to_typed_value() {
+        let timespec = Timespec {
+            sec: 1518434618,
+            nsec: 740993537,
+        };
+        let typed_value: TypedValue = timespec.to_typed_value();
+        assert_eq!(typed_value, TypedValue::instant(1518434618740993));
     }
 }
