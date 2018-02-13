@@ -11,7 +11,6 @@
 use mentat;
 
 use mentat::edn::UuidParseError;
-use store;
 
 error_chain! {
     types {
@@ -19,7 +18,6 @@ error_chain! {
     }
 
     links {
-        StoreError(store::errors::Error, store::errors::ErrorKind);
         MentatError(mentat::errors::Error, mentat::errors::ErrorKind);
     }
 
