@@ -22,7 +22,6 @@ extern crate store;
 
 use std::ffi::CString;
 use std::os::raw::c_char;
-use std::str::FromStr;
 
 use ffi_utils::log;
 use ffi_utils::strings::{
