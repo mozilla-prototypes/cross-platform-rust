@@ -8,15 +8,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#[macro_use] extern crate error_chain;
+#[macro_use]
+extern crate error_chain;
+
+#[macro_use(kw)]
+extern crate mentat;
 
 extern crate ffi_utils;
 extern crate libc;
 extern crate rusqlite;
 extern crate time;
 extern crate uuid;
-
-extern crate mentat;
 
 extern crate store;
 
@@ -41,7 +43,18 @@ use mentat::{
     QueryExecutionResult,
     QueryInputs,
     TypedValue,
+    ValueType,
     Variable,
+};
+
+use mentat::vocabulary::{
+    AttributeBuilder,
+    Definition,
+    VersionedStore,
+};
+
+use mentat::vocabulary::attribute::{
+    Unique
 };
 
 pub use time::Timespec;
@@ -79,45 +92,65 @@ use store::{
 static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<(), list_errors::Error> {
-    let schema = r#"[
-        {   :db/ident       :item/uuid
-            :db/valueType   :db.type/uuid
-            :db/cardinality :db.cardinality/one
-            :db/unique      :db.unique/value
-            :db/index true },
-        {   :db/ident       :item/name
-            :db/valueType   :db.type/string
-            :db/cardinality :db.cardinality/one
-            :db/index       true
-            :db/fulltext    true  },
-        {   :db/ident       :item/due_date
-            :db/valueType   :db.type/instant
-            :db/cardinality :db.cardinality/one  },
-        {   :db/ident       :item/completion_date
-            :db/valueType   :db.type/instant
-            :db/cardinality :db.cardinality/one  },
-        {  :db/ident     :item/label
-            :db/valueType :db.type/ref
-            :db/cardinality :db.cardinality/many }]"#;
-    in_progress.transact(schema)
+    in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:example/links),
+            version: 1,
+            attributes: vec![
+                (kw!(:item/uuid),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Uuid)
+                    .multival(false)
+                    .unique(Unique::Value)
+                    .index(true)
+                    .build()),
+                (kw!(:item/name),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:item/due_date),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:item/completion_date),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:item/label),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Ref)
+                    .multival(true)
+                    .build()),
+            ],
+        })
         .map_err(|e| e.into())
-        .map(|_| ())
+        .map(|_|())
 }
 
 fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<(), list_errors::Error> {
-    let schema = r#"[
-        {  :db/ident       :label/name
-            :db/valueType   :db.type/string
-            :db/cardinality :db.cardinality/one
-            :db/unique      :db.unique/identity
-            :db/index       true
-            :db/fulltext    true },
-        {  :db/ident       :label/color
-            :db/valueType   :db.type/string
-            :db/cardinality :db.cardinality/one }]"#;
-    in_progress.transact(schema)
+    in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:example/links),
+            version: 1,
+            attributes: vec![
+                (kw!(:label/name),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .unique(Unique::Identity)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:label/color),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .build()),
+            ],
+        })
         .map_err(|e| e.into())
-        .map(|_| ())
+        .map(|_|())
 }
 
 #[repr(C)]
@@ -131,6 +164,7 @@ impl Toodle {
         {
             // TODO proper error handling at the FFI boundary
             let mut in_progress = store_result.begin_transaction()?;
+            in_progress.verify_core_schema().expect("verified");
             transact_labels_vocabulary(&mut in_progress).expect("transacted");
             transact_items_vocabulary(&mut in_progress).expect("transacted");
             in_progress.commit()?;
