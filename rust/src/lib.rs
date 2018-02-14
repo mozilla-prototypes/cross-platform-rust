@@ -8,15 +8,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#[macro_use] extern crate error_chain;
+#[macro_use]
+extern crate error_chain;
+
+#[macro_use(kw)]
+extern crate mentat;
 
 extern crate ffi_utils;
 extern crate libc;
 extern crate rusqlite;
 extern crate time;
 extern crate uuid;
-
-extern crate mentat;
 
 extern crate store;
 
@@ -35,10 +37,24 @@ use libc::{
 };
 
 use mentat::{
+    InProgress,
     IntoResult,
+    Queryable,
     QueryExecutionResult,
+    QueryInputs,
     TypedValue,
+    ValueType,
     Variable,
+};
+
+use mentat::vocabulary::{
+    AttributeBuilder,
+    Definition,
+    VersionedStore,
+};
+
+use mentat::vocabulary::attribute::{
+    Unique
 };
 
 pub use time::Timespec;
@@ -49,7 +65,10 @@ pub mod items;
 pub mod errors;
 pub mod ctypes;
 
-use errors as list_errors;
+use errors::{
+    ErrorKind,
+    Result,
+};
 
 use labels::Label;
 
@@ -65,8 +84,8 @@ use ctypes::{
 };
 
 use store::{
+    new_store,
     Store,
-    StoreConnection,
     ToInner,
     ToTypedValue,
     errors as store_errors,
@@ -76,22 +95,88 @@ use store::{
 // inside a Toodle struct and be able to mutate it...
 static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
-#[derive(Debug)]
+fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
+    in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:example/links),
+            version: 1,
+            attributes: vec![
+                (kw!(:item/uuid),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Uuid)
+                    .multival(false)
+                    .unique(Unique::Value)
+                    .index(true)
+                    .build()),
+                (kw!(:item/name),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:item/due_date),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:item/completion_date),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:item/label),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Ref)
+                    .multival(true)
+                    .build()),
+            ],
+        })
+        .map_err(|e| e.into())
+        .and(Ok(()))
+}
+
+fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
+    in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:example/links),
+            version: 1,
+            attributes: vec![
+                (kw!(:label/name),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .unique(Unique::Identity)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:label/color),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .build()),
+            ],
+        })
+        .map_err(|e| e.into())
+        .and(Ok(()))
+}
+
 #[repr(C)]
 pub struct Toodle {
-    connection: StoreConnection,
+    connection: Store,
 }
 
 impl Toodle {
-    pub fn new(uri: String) -> Result<Toodle, errors::Error> {
-        let store_result = Store::new_store(uri)?;
-        let mut toodle = Toodle {
+    pub fn new(uri: String) -> Result<Toodle> {
+        let mut store_result = new_store(uri)?;
+        {
+            // TODO proper error handling at the FFI boundary
+            let mut in_progress = store_result.begin_transaction()?;
+            in_progress.verify_core_schema()?;
+            transact_labels_vocabulary(&mut in_progress)?;
+            transact_items_vocabulary(&mut in_progress)?;
+            in_progress.commit()?;
+        }
+
+        let toodle = Toodle {
             connection: store_result,
         };
-
-        // TODO proper error handling at the FFI boundary
-        toodle.transact_labels_vocabulary().expect("transacted");
-        toodle.transact_items_vocabulary().expect("transacted");
 
         Ok(toodle)
     }
@@ -101,105 +186,71 @@ fn create_uuid() -> Uuid {
     uuid::Uuid::new_v4()
 }
 
-fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>, list_errors::Error> {
+fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> {
     results.into_scalar_result()
            .map(|o| o.and_then(|ts| ts.to_inner()))
            .map_err(|e| e.into())
 }
 
 impl Toodle {
-    fn item_row_to_item(&self, row: Vec<TypedValue>) -> Item {
+    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
         let uuid = row[1].clone().to_inner();
-        Item {
-            id: row[0].clone().to_inner(),
-            uuid: uuid,
-            name: row[2].clone().to_inner(),
-            due_date: self.fetch_due_date_for_item( &uuid).unwrap_or(None),
-            completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
-            labels: self.fetch_labels_for_item(&uuid).unwrap_or(vec![]),
+        let item;
+        {
+            item = Item {
+                id: row[0].clone().to_inner(),
+                uuid: uuid,
+                name: row[2].clone().to_inner(),
+                due_date: self.fetch_due_date_for_item(&uuid).unwrap_or(None),
+                completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
+                labels: self.fetch_labels_for_item(&uuid).unwrap_or(vec![]),
+            }
         }
+        item
     }
 
-    pub fn transact_items_vocabulary(&mut self) -> Result<(), list_errors::Error> {
-        let schema = r#"[
-            {   :db/ident       :item/uuid
-                :db/valueType   :db.type/uuid
-                :db/cardinality :db.cardinality/one
-                :db/unique      :db.unique/value
-                :db/index true },
-            {   :db/ident       :item/name
-                :db/valueType   :db.type/string
-                :db/cardinality :db.cardinality/one
-                :db/index       true
-                :db/fulltext    true  },
-            {   :db/ident       :item/due_date
-                :db/valueType   :db.type/instant
-                :db/cardinality :db.cardinality/one  },
-            {   :db/ident       :item/completion_date
-                :db/valueType   :db.type/instant
-                :db/cardinality :db.cardinality/one  },
-            {  :db/ident     :item/label
-                :db/valueType :db.type/ref
-                :db/cardinality :db.cardinality/many }]"#;
-        self.connection
-            .transact(schema)
-            .map_err(|e| e.into())
-            .map(|_| ())
-    }
-
-    pub fn transact_labels_vocabulary(&mut self) -> Result<(), list_errors::Error> {
-        let schema = r#"[
-            {  :db/ident       :label/name
-               :db/valueType   :db.type/string
-               :db/cardinality :db.cardinality/one
-               :db/unique      :db.unique/identity
-               :db/index       true
-               :db/fulltext    true },
-            {  :db/ident       :label/color
-               :db/valueType   :db.type/string
-               :db/cardinality :db.cardinality/one }]"#;
-        self.connection
-            .transact(schema)
-            .map_err(|e| e.into())
-            .map(|_| ())
-    }
-
-    pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>, list_errors::Error> {
+    pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
         // TODO: better transact API.
         let query = format!("[{{ :label/name \"{0}\" :label/color \"{1}\" }}]", &name, &color);
-        self.connection
-            .transact(&query)?;
+        {
+            let mut in_progress = self.connection.begin_transaction()?;
+            in_progress.transact(&query)?;
+            in_progress.commit()?;
+        }
         self.fetch_label(&name)
     }
 
-    pub fn fetch_label(&self, name: &String) -> Result<Option<Label>, list_errors::Error> {
+    pub fn fetch_label(&mut self, name: &String) -> Result<Option<Label>> {
         let query = r#"[:find [?eid ?name ?color]
                         :in ?name
                         :where
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        self.connection
-            .query_args(query, vec![(Variable::from_valid_name("?name"), name.to_typed_value())])
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?name"), name.to_typed_value())]);
+        in_progress_read
+            .q_once(query, args)
             .into_tuple_result()
             .map(|o| o.as_ref().and_then(Label::from_row))
             .map_err(|e| e.into())
     }
 
-    pub fn fetch_labels(&self) -> Result<Vec<Label>, list_errors::Error> {
+    pub fn fetch_labels(&mut self) -> Result<Vec<Label>> {
         let query = r#"[:find ?eid ?name ?color
                         :where
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        self.connection
-            .query(query)
+        let in_progress_read = self.connection.begin_read()?;
+        in_progress_read
+            .q_once(query, None)
             .into_rel_result()
             .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
             .map_err(|e| e.into())
     }
 
-    pub fn fetch_labels_for_item(&self, item_uuid: &Uuid) -> Result<Vec<Label>, list_errors::Error> {
+    pub fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
         let query = r#"[:find ?l ?name ?color
                         :in ?item_uuid
                         :where
@@ -208,15 +259,17 @@ impl Toodle {
                         [?l :label/name ?name]
                         [?l :label/color ?color]
         ]"#;
-        self.connection
-            .query_args(query, vec![(Variable::from_valid_name("?item_uuid"), item_uuid.to_typed_value())])
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?item_uuid"), item_uuid.to_typed_value())]);
+        in_progress_read
+            .q_once(query, args)
             .into_rel_result()
             .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
             .map_err(|e| e.into())
     }
 
 
-    pub fn fetch_items_with_label(&self, label: &Label) -> Result<Vec<Item>, list_errors::Error> {
+    pub fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>> {
         let query = r#"[:find ?eid ?uuid ?name
                         :in ?label
                         :where
@@ -225,42 +278,58 @@ impl Toodle {
                         [?eid :item/uuid ?uuid]
                         [?eid :item/name ?name]
         ]"#;
-        self.connection
-            .query_args(query, vec![(Variable::from_valid_name("?label"), label.name.to_typed_value())])
-            .into_rel_result()
-            .map(|rows| rows.into_iter().map(|r| self.item_row_to_item(r)).collect())
-            .map_err(|e| e.into())
+        let rows;
+        {
+            let in_progress_read = self.connection.begin_read()?;
+            let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?label"), label.name.to_typed_value())]);
+            rows = in_progress_read
+                .q_once(query, args)
+                .into_rel_result()
+                .map_err(|e| e.into());
+        }
+        rows.map(|rows| rows.into_iter().map(|r| self.item_row_to_item(r)).collect())
     }
 
-    pub fn fetch_items(&self) -> Result<Items, list_errors::Error> {
+    pub fn fetch_items(&mut self) -> Result<Items> {
         let query = r#"[:find ?eid ?uuid ?name
                         :where
                         [?eid :item/uuid ?uuid]
                         [?eid :item/name ?name]
         ]"#;
 
-        self.connection
-            .query(query)
-            .into_rel_result()
-            .map(|rows| Items::new(rows.into_iter().map(|r| self.item_row_to_item(r)).collect()))
-            .map_err(|e| e.into())
+        let rows;
+        {
+            let in_progress_read = self.connection.begin_read()?;
+            rows = in_progress_read
+                .q_once(query, None)
+                .into_rel_result()
+                .map_err(|e| e.into());
+        }
+        rows.map(|rows| Items::new(rows.into_iter().map(|r| self.item_row_to_item(r)).collect()))
     }
 
-    pub fn fetch_item(&self, uuid: &Uuid) -> Result<Option<Item> , list_errors::Error>{
+    pub fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>>{
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
                         [?eid :item/uuid ?uuid]
                         [?eid :item/name ?name]
         ]"#;
-        self.connection
-            .query_args(query, vec![(Variable::from_valid_name("?uuid"), uuid.to_typed_value())])
-            .into_tuple_result()
-            .map(|o| o.map(|r| self.item_row_to_item(r)))
-            .map_err(|e| e.into())
+        let rows;
+        {
+            let in_progress_read = self.connection.begin_read()?;
+            let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), uuid.to_typed_value())]);
+            rows = in_progress_read
+                .q_once(query, args)
+                .into_tuple_result()
+                .map(|o| o.map(|r| r))
+                .map_err(|e| e.into());
+        }
+
+        rows.map(|row| row.map(|r| self.item_row_to_item(r)))
     }
 
-    fn fetch_completion_date_for_item(&self, item_id: &Uuid) -> Result<Option<Timespec>, list_errors::Error> {
+    fn fetch_completion_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
         let query = r#"[:find ?date .
             :in ?uuid
             :where
@@ -268,26 +337,29 @@ impl Toodle {
             [?eid :item/completion_date ?date]
         ]"#;
 
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]);
         return_date_field(
-            self.connection
-                .query_args(&query, vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]))
+            in_progress_read
+            .q_once(query, args))
     }
 
-    fn fetch_due_date_for_item(&self, item_id: &Uuid) -> Result<Option<Timespec>, list_errors::Error> {
+    fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
         let query = r#"[:find ?date .
             :in ?uuid
             :where
             [?eid :item/uuid ?uuid]
             [?eid :item/due_date ?date]
         ]"#;
-
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]);
         let date = return_date_field(
-            self.connection
-                .query_args(&query, vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]));
+            in_progress_read
+            .q_once(query, args));
         date
     }
 
-    pub fn create_item(&mut self, item: &Item) -> Result<Uuid, list_errors::Error> {
+    pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         // TODO: make this mapping better!
         let label_str = item.labels
                             .iter()
@@ -316,11 +388,13 @@ impl Toodle {
                 "#, &query, &label_str);
         }
         query = format!("{0}}}]", &query);
-        let _ = self.connection.transact(&query)?;
+        let mut in_progress = self.connection.begin_transaction()?;
+        in_progress.transact(&query)?;
+        in_progress.commit()?;
         Ok(item_uuid)
     }
 
-    pub fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>, list_errors::Error> {
+    pub fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
         let item_uuid = self.create_item(&item)?;
         self.fetch_item(&item_uuid)
     }
@@ -330,24 +404,28 @@ impl Toodle {
                                name: Option<String>,
                                due_date: Option<Timespec>,
                                completion_date: Option<Timespec>)
-                               -> Result<Item, list_errors::Error> {
+                               -> Result<Item> {
         let uuid = Uuid::parse_str(&uuid_string)?;
         let item =
             self.fetch_item(&uuid)
                 .ok()
                 .unwrap_or_default()
-                .ok_or_else(|| list_errors::ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
 
         let new_item =
             self.update_item(&item, name, due_date, completion_date, None)
                 .and_then(|_| self.fetch_item(&uuid))
                 .unwrap_or_default()
-                .ok_or_else(|| list_errors::ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
 
         Ok(new_item)
     }
 
-    pub fn update_item(&mut self, item: &Item, name: Option<String>, due_date: Option<Timespec>, completion_date: Option<Timespec>, labels: Option<&Vec<Label>>) -> Result<(), list_errors::Error> {
+    pub fn update_item(&mut self,
+                       item: &Item, name: Option<String>,
+                       due_date: Option<Timespec>,
+                       completion_date: Option<Timespec>,
+                       labels: Option<&Vec<Label>>) -> Result<()> {
         let item_id = item.id.to_owned().expect("item must have ID to be updated");
         let mut transaction = vec![];
 
@@ -378,7 +456,6 @@ impl Toodle {
 
         if let Some(new_labels) = labels {
             let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
-
             let labels_to_add = new_labels.iter()
                                         .filter(|label| !existing_labels.contains(label) && label.id.is_some() )
                                         .map(|label|  format!("{}", label.id.clone().map::<i64, _>(|e| e.into()).unwrap()) )
@@ -399,13 +476,16 @@ impl Toodle {
 
         // TODO: better transact API.
         let query = format!("[{0}]", transaction.join(""));
-        self.connection
-            .transact( &query)
-            .map(|_| ())
-            .map_err(|e| e.into())
+
+        let mut in_progress = self.connection.begin_transaction()?;
+        in_progress.transact(&query)?;
+        in_progress.commit()
+                   .map_err(|e| e.into())
+                   .and(Ok(()))
     }
 
     pub fn sync(&mut self, user_uuid: &Uuid) -> Result<(), store_errors::Error> {
+        // TODO this feels like a natural way to expose sync, but we'll see what mentat does.
         self.connection.sync(user_uuid)
     }
 }
@@ -423,8 +503,8 @@ pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_get_all_labels(manager: *const Toodle) -> *mut Vec<Label> {
-    let manager = &*manager;
+pub unsafe extern "C" fn toodle_get_all_labels(manager: *mut Toodle) -> *mut Vec<Label> {
+    let manager = &mut*manager;
     let label_list = Box::new(manager.fetch_labels().unwrap_or(vec![]));
     Box::into_raw(label_list)
 }
@@ -492,7 +572,7 @@ pub unsafe extern "C" fn item_list_count(item_list: *mut ItemCList) -> c_int {
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_all_items(manager: *mut Toodle, callback: extern "C" fn(Option<&ItemCList>)) {
-    let manager = &*manager;
+    let manager = &mut*manager;
     let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
 
     // TODO there's bound to be a better way. Ideally this should just return an empty set,
@@ -584,13 +664,14 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Toodle, name: *const 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_sync(manager: *mut Toodle, username: *const c_char) -> *mut ctypes::ResultC {
-    let username = c_char_to_string(username);
-    let uuid = Uuid::new_v4();
+pub unsafe extern "C" fn toodle_sync(manager: *mut Toodle, user_uuid: *const c_char) -> *mut ctypes::ResultC {
     let manager = &mut*manager;
-    Box::into_raw(Box::new(manager.sync(&uuid).into()))
+    let user_uuid = c_char_to_string(user_uuid);
+    match Uuid::from_str(user_uuid) {
+        Ok(uuid) => Box::into_raw(Box::new(manager.sync(&uuid).into())),
+        Err(e) => Box::into_raw(Box::new(e.into()))
+    }    
 }
-
 
 #[cfg(test)]
 mod test {
@@ -648,7 +729,8 @@ mod test {
     #[test]
     fn test_new_toodle() {
         let manager = toodle();
-        let schema = manager.connection.fetch_schema();
+        let conn = manager.connection.conn();
+        let schema = conn.current_schema().to_edn_value();
         assert_ident_present(schema.clone(), "label", "name");
         assert_ident_present(schema, "list", "name");
     }
