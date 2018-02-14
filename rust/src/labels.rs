@@ -31,12 +31,6 @@ pub struct Label {
     pub color: String
 }
 
-impl Drop for Label {
-    fn drop(&mut self) {
-        eprintln!("{:?} is being deallocated", self);
-    }
-}
-
 impl Label {
     pub fn from_row(row: &Vec<TypedValue>) -> Option<Label> {
         Some(Label {

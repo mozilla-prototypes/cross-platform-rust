@@ -16,6 +16,7 @@ extern crate mentat;
 
 extern crate ffi_utils;
 extern crate libc;
+extern crate mentat_core;
 extern crate rusqlite;
 extern crate time;
 extern crate uuid;
@@ -37,6 +38,7 @@ use libc::{
 };
 
 use mentat::{
+    HasSchema,
     InProgress,
     IntoResult,
     Queryable,
@@ -45,6 +47,15 @@ use mentat::{
     TypedValue,
     ValueType,
     Variable,
+};
+
+use mentat_core::{
+    KnownEntid,
+};
+
+use mentat::entity_builder::{
+    BuildTerms,
+    TermBuilder,
 };
 
 use mentat::vocabulary::{
@@ -209,11 +220,21 @@ impl Toodle {
     }
 
     pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
-        // TODO: better transact API.
-        let query = format!("[{{ :label/name \"{0}\" :label/color \"{1}\" }}]", &name, &color);
         {
             let mut in_progress = self.connection.begin_transaction()?;
-            in_progress.transact(&query)?;
+            let mut builder = TermBuilder::new();
+            let entid = builder.named_tempid("label".to_string());
+
+            let name_kw = kw!(:label/name);
+            let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
+            let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&name));
+
+            let color_kw = kw!(:label/color);
+            let color_ref = in_progress.get_entid(&color_kw).ok_or_else(|| ErrorKind::UnknownAttribute(color_kw))?;
+            let _ = builder.add(entid.clone(), color_ref, TypedValue::typed_string(&color));
+
+            let (terms, tempids) = builder.build()?;
+            let _ = in_progress.transact_terms(terms, tempids);
             in_progress.commit()?;
         }
         self.fetch_label(&name)
@@ -359,43 +380,49 @@ impl Toodle {
     }
 
     pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
-        // TODO: make this mapping better!
-        let label_str = item.labels
-                            .iter()
-                            .filter(|label| label.id.is_some() )
-                            .map(|label|  format!("{}", label.id.clone().map::<i64, _>(|e| e.into()).unwrap()) )
-                            .collect::<Vec<String>>()
-                            .join(", ");
         let item_uuid = create_uuid();
-        let uuid_string = item_uuid.hyphenated().to_string();
-        let mut query = format!(r#"[{{
-            :item/uuid #uuid {:?}
-            :item/name {:?}
-            "#, &uuid_string, &(item.name));
-        if let Some(due_date) = item.due_date {
-            let micro_seconds = due_date.sec * 1000000;
-            query = format!(r#"{}:item/due_date #instmicros {}
-                "#, &query, &micro_seconds);
-        }
-        if let Some(completion_date) = item.completion_date {
-            let micro_seconds = completion_date.sec * 1000000;
-            query = format!(r#"{}:item/completion_date #instmicros {}
-                "#, &query, &micro_seconds);
-        }
-        if !label_str.is_empty() {
-            query = format!(r#"{0}:item/label [{1}]
-                "#, &query, &label_str);
-        }
-        query = format!("{0}}}]", &query);
         let mut in_progress = self.connection.begin_transaction()?;
-        in_progress.transact(&query)?;
+        {
+            let mut builder = TermBuilder::new();
+            let entid = builder.named_tempid("item".to_string());
+
+            let uuid_kw = kw!(:item/uuid);
+            let uuid_ref = in_progress.get_entid(&uuid_kw).ok_or_else(|| ErrorKind::UnknownAttribute(uuid_kw))?;
+            let _ = builder.add(entid.clone(), uuid_ref, TypedValue::Uuid(item_uuid));
+
+            let name_kw = kw!(:item/name);
+            let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
+            let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&item.name));
+
+            if let Some(due_date) = item.due_date {
+                let due_date_kw = kw!(:item/due_date);
+                let due_date_ref = in_progress.get_entid(&due_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(due_date_kw))?;
+                let _ = builder.add(entid.clone(), due_date_ref, due_date.to_typed_value());
+            }
+            if let Some(completion_date) = item.completion_date {
+                let completion_date_kw = kw!(:item/completion_date);
+                let completion_date_ref = in_progress.get_entid(&completion_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(completion_date_kw))?;
+                let _ = builder.add(entid.clone(), completion_date_ref, completion_date.to_typed_value());
+            }
+
+            let item_labels_kw = kw!(:item/label);
+            let item_labels_ref = in_progress.get_entid(&item_labels_kw).ok_or_else(|| ErrorKind::UnknownAttribute(item_labels_kw))?;
+            for label in item.labels.iter() {
+                let label_id = label.id.clone().ok_or_else(|| ErrorKind::LabelNotFound(label.name.clone()))?;
+                let _ = builder.add(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label_id.id));
+            }
+
+            let (terms, tempids) = builder.build()?;
+            let _ = in_progress.transact_terms(terms, tempids);
+        }
         in_progress.commit()?;
         Ok(item_uuid)
     }
 
     pub fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
         let item_uuid = self.create_item(&item)?;
-        self.fetch_item(&item_uuid)
+        let item = self.fetch_item(&item_uuid);
+        item
     }
 
     pub fn update_item_by_uuid(&mut self,
@@ -425,59 +452,58 @@ impl Toodle {
                        due_date: Option<Timespec>,
                        completion_date: Option<Timespec>,
                        labels: Option<&Vec<Label>>) -> Result<()> {
-        let item_id = item.id.to_owned().expect("item must have ID to be updated");
-        let mut transaction = vec![];
-
-        if let Some(name) = name {
-            if item.name != name {
-                transaction.push(format!("[:db/add {0} :item/name \"{1}\"]", &item_id.id, name));
-            }
-        }
-        if item.due_date != due_date {
-            if let Some(date) = due_date {
-                let micro_seconds = date.sec * 1000000;
-                transaction.push(format!("[:db/add {:?} :item/due_date #instmicros {}]", &item_id.id, &micro_seconds));
-            } else {
-                let micro_seconds = item.due_date.unwrap().sec * 1000000;
-                transaction.push(format!("[:db/retract {:?} :item/due_date #instmicros {}]", &item_id.id, &micro_seconds));
-            }
-        }
-
-        if item.completion_date != completion_date {
-            if let Some(date) = completion_date {
-                let micro_seconds = date.sec * 1000000;
-                transaction.push(format!("[:db/add {:?} :item/completion_date #instmicros {}]", &item_id.id, &micro_seconds));
-            } else {
-                let micro_seconds = item.completion_date.unwrap().sec * 1000000;
-                transaction.push(format!("[:db/retract {:?} :item/completion_date #instmicros {}]", &item_id.id, &micro_seconds));
-            }
-        }
-
-        if let Some(new_labels) = labels {
-            let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
-            let labels_to_add = new_labels.iter()
-                                        .filter(|label| !existing_labels.contains(label) && label.id.is_some() )
-                                        .map(|label|  format!("{}", label.id.clone().map::<i64, _>(|e| e.into()).unwrap()) )
-                                        .collect::<Vec<String>>()
-                                        .join(", ");
-            if !labels_to_add.is_empty() {
-                transaction.push(format!("[:db/add {0} :item/label [{1}]]", &item_id.id, labels_to_add));
-            }
-            let labels_to_remove = existing_labels.iter()
-                                        .filter(|label| !new_labels.contains(label) && label.id.is_some() )
-                                        .map(|label|  format!("{}", label.id.clone().map::<i64, _>(|e| e.into()).unwrap()) )
-                                        .collect::<Vec<String>>()
-                                        .join(", ");
-            if !labels_to_remove.is_empty() {
-                transaction.push(format!("[:db/retract {0} :item/label [{1}]]", &item_id.id, labels_to_remove));
-            }
-        }
-
-        // TODO: better transact API.
-        let query = format!("[{0}]", transaction.join(""));
-
+        let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
+        let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
         let mut in_progress = self.connection.begin_transaction()?;
-        in_progress.transact(&query)?;
+        {
+            let mut builder = TermBuilder::new();
+
+            if let Some(name) = name {
+                if item.name != name {
+                    let name_kw = kw!(:item/name);
+                    let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
+                    let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&name));
+                }
+            }
+
+            if item.due_date != due_date {
+                let due_date_kw = kw!(:item/due_date);
+                let due_date_ref = in_progress.get_entid(&due_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(due_date_kw))?;
+                if let Some(date) = due_date {
+                    let _ = builder.add(entid.clone(), due_date_ref, date.to_typed_value());
+                } else if let Some(date) = item.due_date {
+                    let _ = builder.retract(entid.clone(), due_date_ref, date.to_typed_value());
+                }
+            }
+
+            if item.completion_date != completion_date {
+                let completion_date_kw = kw!(:item/completion_date);
+                let completion_date_ref = in_progress.get_entid(&completion_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(completion_date_kw))?;
+                if let Some(date) = completion_date {
+                    let _ = builder.add(entid.clone(), completion_date_ref, date.to_typed_value());
+                } else if let Some(date) = item.completion_date {
+                    let _ = builder.retract(entid.clone(), completion_date_ref, date.to_typed_value());
+                }
+            }
+
+            if let Some(new_labels) = labels {
+                let item_labels_kw = kw!(:item/label);
+                let item_labels_ref = in_progress.get_entid(&item_labels_kw).ok_or_else(|| ErrorKind::UnknownAttribute(item_labels_kw))?;
+                for label in new_labels {
+                    if !existing_labels.contains(&label) && label.id.is_some() {
+                        let _ = builder.add(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label.id.clone().unwrap().id));
+                    }
+                }
+                for label in existing_labels {
+                    if !new_labels.contains(&label) && label.id.is_some() {
+                        let _ = builder.retract(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label.id.clone().unwrap().id));
+                    }
+                }
+            }
+
+            let (terms, tempids) = builder.build()?;
+            let _ = in_progress.transact_terms(terms, tempids);
+        }
         in_progress.commit()
                    .map_err(|e| e.into())
                    .and(Ok(()))
@@ -607,11 +633,9 @@ pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
 pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const c_char) -> *mut ItemC {
     let uuid_string = c_char_to_string(uuid);
     let uuid = Uuid::parse_str(&uuid_string).unwrap();
-    eprintln!("fetching item {:?}", uuid);
     let manager = &mut*manager;
 
     if let Ok(Some(i)) = manager.fetch_item(&uuid) {
-        eprintln!("returning item with uuid {:?}", i.uuid);
         let c_item: ItemC = i.into();
         return Box::into_raw(Box::new(c_item));
     }

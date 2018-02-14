@@ -987,6 +987,7 @@ dependencies = [
  "jni 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "mentat 0.6.0 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
  "rusqlite 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "store 0.1.0",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",

@@ -56,12 +56,6 @@ impl Items {
     }
 }
 
-impl Drop for Item {
-    fn drop(&mut self) {
-        eprintln!("{:?} is being deallocated", self);
-    }
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
     let item = &mut*item;
