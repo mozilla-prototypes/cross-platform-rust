@@ -30,7 +30,7 @@ use items::{
     Items,
 };
 
-use store::errors as store_errors;
+use errors;
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -133,8 +133,8 @@ pub struct ResultC {
     pub error: *const c_char
 }
 
-impl From<std::result::Result<(), store_errors::Error>> for ResultC {
-    fn from(result: std::result::Result<(), store_errors::Error>) -> Self {
+impl From<errors::Result<()>> for ResultC {
+    fn from(result: errors::Result<()>) -> Self {
         match result {
             Ok(_) => {
                 ResultC {

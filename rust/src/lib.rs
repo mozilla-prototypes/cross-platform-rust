@@ -24,10 +24,13 @@ extern crate store;
 
 use std::ffi::CString;
 use std::os::raw::c_char;
+use std::str::FromStr;
+use std::error::Error;
 
 use ffi_utils::log;
 use ffi_utils::strings::{
     c_char_to_string,
+    string_to_c_char,
     optional_timespec,
 };
 
@@ -88,7 +91,6 @@ use store::{
     Store,
     ToInner,
     ToTypedValue,
-    errors as store_errors,
 };
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
@@ -484,9 +486,10 @@ impl Toodle {
                    .and(Ok(()))
     }
 
-    pub fn sync(&mut self, user_uuid: &Uuid) -> Result<(), store_errors::Error> {
+    pub fn sync(&mut self, user_uuid: &Uuid) -> Result<()> {
         // TODO this feels like a natural way to expose sync, but we'll see what mentat does.
-        self.connection.sync(user_uuid)
+        // self.connection.sync(user_uuid)
+        Ok(())
     }
 }
 
@@ -667,9 +670,11 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Toodle, name: *const 
 pub unsafe extern "C" fn toodle_sync(manager: *mut Toodle, user_uuid: *const c_char) -> *mut ctypes::ResultC {
     let manager = &mut*manager;
     let user_uuid = c_char_to_string(user_uuid);
-    match Uuid::from_str(user_uuid) {
+    match Uuid::from_str(&user_uuid) {
         Ok(uuid) => Box::into_raw(Box::new(manager.sync(&uuid).into())),
-        Err(e) => Box::into_raw(Box::new(e.into()))
+        Err(e) => Box::into_raw(Box::new(ctypes::ResultC {
+            error: string_to_c_char(e.description().into())
+        }))
     }    
 }
 

@@ -22,7 +22,6 @@ use mentat::{
     Entid,
     TypedValue,
     Uuid,
-    Syncer,
 };
 
 pub use mentat::{
