@@ -18,8 +18,7 @@ version = "0.12"
 features = ["bundled", "limits"]
 
 [dependencies.mentat]
-#git = "https://github.com/mozilla/mentat.git"
-path = "/home/grisha/Code/mentat"
+git = "https://github.com/mozilla/mentat.git"
 branch = "master"
 
 [dependencies.ffi-utils]
