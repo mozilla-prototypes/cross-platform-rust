@@ -28,6 +28,6 @@ public class NativeResult extends Structure implements Closeable {
 
     @Override
     public void close() throws IOException {
-
+        // TODO do we need to make sure the error string is memory managed properly?
     }
 }
