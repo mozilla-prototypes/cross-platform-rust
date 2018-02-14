@@ -69,6 +69,7 @@ use store::{
     StoreConnection,
     ToInner,
     ToTypedValue,
+    errors as store_errors,
 };
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
@@ -403,6 +404,10 @@ impl Toodle {
             .map(|_| ())
             .map_err(|e| e.into())
     }
+
+    pub fn sync(&mut self, user_uuid: &Uuid) -> Result<(), store_errors::Error> {
+        self.connection.sync(user_uuid)
+    }
 }
 
 #[no_mangle]
@@ -576,6 +581,14 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Toodle, name: *const 
     let color = c_char_to_string(color);
     let label = Box::new(manager.create_label(name, color).unwrap_or(None));
     Box::into_raw(label)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn toodle_sync(manager: *mut Toodle, username: *const c_char) -> *mut ctypes::ResultC {
+    let username = c_char_to_string(username);
+    let uuid = Uuid::new_v4();
+    let manager = &mut*manager;
+    Box::into_raw(Box::new(manager.sync(&uuid).into()))
 }
 
 

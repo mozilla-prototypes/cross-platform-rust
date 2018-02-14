@@ -40,6 +40,7 @@ use mentat::{
     QueryExecutionResult,
     QueryInputs,
     Variable,
+    Syncer,
 };
 
 use mentat::edn;
@@ -226,6 +227,10 @@ impl StoreConnection {
 
     pub fn fetch_schema(&self) -> edn::Value {
         self.store.conn.read().unwrap().current_schema().to_edn_value()
+    }
+
+    pub fn sync(&mut self, user_uuid: &Uuid) -> store_errors::Result<()> {
+        Ok(Syncer::flow(&mut self.handle, user_uuid).unwrap())
     }
 
     pub fn new_connection(&self) -> store_errors::Result<StoreConnection> {

@@ -26,4 +26,6 @@ public interface JNA extends Library {
     void toodle_on_items_changed(NativeItemsChangedCallback callback);
     void toodle_all_items(Pointer listManager, NativeItemsCallback callback);
     void item_c_destroy(Pointer item);
+
+    NativeResult toodle_sync(Pointer toodle, String username);
 }
