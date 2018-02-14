@@ -8,6 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+use std;
 use std::os::raw::c_char;
 use std::ptr;
 
@@ -28,6 +29,8 @@ use items::{
     Item,
     Items,
 };
+
+use errors;
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -124,4 +127,25 @@ impl From<ItemC> for Item {
 pub struct ItemCList {
     pub items: Box<[ItemC]>,
     pub len: usize
+}
+
+pub struct ResultC {
+    pub error: *const c_char
+}
+
+impl From<errors::Result<()>> for ResultC {
+    fn from(result: errors::Result<()>) -> Self {
+        match result {
+            Ok(_) => {
+                ResultC {
+                    error: std::ptr::null(),
+                }
+            },
+            Err(e) => {
+                ResultC {
+                    error: string_to_c_char(e.description().into())
+                }
+            }
+        }
+    }
 }

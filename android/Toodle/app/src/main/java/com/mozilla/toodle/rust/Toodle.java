@@ -58,6 +58,10 @@ public class Toodle extends RustObject {
         JNA.INSTANCE.toodle_all_items(rawPointer, callback);
     }
 
+    public NativeResult sync(String username) {
+        return JNA.INSTANCE.toodle_sync(rawPointer, username);
+    }
+
     @Override
     public void close() {
         Log.i("Toodle", "close");
