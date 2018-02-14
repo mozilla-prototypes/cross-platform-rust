@@ -25,7 +25,8 @@ time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-git = "https://github.com/mozilla/mentat.git"
+#git = "https://github.com/mozilla/mentat.git"
+path = "/home/grisha/Code/mentat"
 branch = "master"
 
 [dependencies.store]
