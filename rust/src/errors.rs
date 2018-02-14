@@ -8,8 +8,9 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use mentat;
+use rusqlite;
 
+use mentat::errors as mentat;
 use mentat::edn::UuidParseError;
 
 error_chain! {
@@ -18,10 +19,11 @@ error_chain! {
     }
 
     links {
-        MentatError(mentat::errors::Error, mentat::errors::ErrorKind);
+        MentatError(mentat::Error, mentat::ErrorKind);
     }
 
     foreign_links {
+        Rusqlite(rusqlite::Error);
         InvalidUuid(UuidParseError);
     }
 
