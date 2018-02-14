@@ -8,45 +8,29 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#[macro_use] extern crate error_chain;
-
 extern crate ffi_utils;
-extern crate rusqlite;
 extern crate time;
 
 extern crate mentat;
 
 use std::fmt;
-use std::sync::{
-    Arc,
-    RwLock,
-};
-
-use rusqlite::{
-    Connection
-};
 
 use time::Timespec;
 
 use mentat::{
     NamespacedKeyword,
-    new_connection,
-    //IntoResult,
-    TxReport,
     Entid,
     TypedValue,
     Uuid,
-    Conn,
-    QueryExecutionResult,
-    QueryInputs,
-    Variable,
 };
 
-use mentat::edn;
+pub use mentat::{
+    Store,
+};
 
-pub mod errors;
-
-use errors as store_errors;
+use mentat::errors::{
+    Result,
+};
 
 pub trait ToTypedValue {
     fn to_typed_value(&self) -> TypedValue;
@@ -204,76 +188,9 @@ impl<'a> ToInner<Uuid> for &'a TypedValue {
     }
 }
 
-#[derive(Debug)]
-pub struct StoreConnection {
-    pub handle: Connection,
-    pub store: Store,
-}
-
-impl StoreConnection {
-    pub fn query(&self, query: &str) -> mentat::query::QueryExecutionResult {
-        self.store.conn.read().unwrap().q_once(&self.handle, query, None)
-    }
-
-    pub fn query_args(&self, query: &str, inputs: Vec<(Variable, TypedValue)>) -> QueryExecutionResult {
-        let i = QueryInputs::with_value_sequence(inputs);
-        self.store.conn.read().unwrap().q_once(&self.handle, query, i)
-    }
-
-    pub fn transact(&mut self, transaction: &str) -> Result<TxReport, store_errors::Error> {
-        Ok(self.store.conn.write().unwrap().transact(&mut self.handle, transaction)?)
-    }
-
-    pub fn fetch_schema(&self) -> edn::Value {
-        self.store.conn.read().unwrap().current_schema().to_edn_value()
-    }
-
-    pub fn new_connection(&self) -> store_errors::Result<StoreConnection> {
-        Ok(StoreConnection {
-            handle: new_connection(&self.store.uri)?,
-            store: self.store.clone(),
-        })
-    }
-}
-
-/// Store containing a SQLite connection
-#[derive(Clone)]
-pub struct Store {
-    conn: Arc<RwLock<Conn>>,
-    uri: String,
-}
-
-impl Drop for Store {
-    fn drop(&mut self) {
-        eprintln!("{:?} is being deallocated", self);
-    }
-}
-
-impl fmt::Debug for Store {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Store at {:?}", self.uri)
-    }
-}
-
-impl Store {
-    pub fn new_store<T>(uri: T) -> Result<StoreConnection, store_errors::Error>
-        where T: Into<Option<String>> {
-        let uri_string = uri.into().unwrap_or(String::new());
-        let mut connection = new_connection(&uri_string)?;
-        let store = Store::new(uri_string, &mut connection)?;
-        Ok(StoreConnection {
-            handle: connection,
-            store: store,
-        })
-    }
-
-    fn new(uri: String,  connection: &mut Connection) -> Result<Self, store_errors::Error> {
-        let c = Conn::connect(connection)?;
-        Ok(Store {
-            conn:Arc::new(RwLock::new(c)),
-            uri: uri,
-        })
-    }
+pub fn new_store<T>(uri: T) -> Result<Store> where T: Into<Option<String>>  {
+    let uri_string = uri.into().unwrap_or(String::new());
+    Store::open(&uri_string)
 }
 
 #[cfg(test)]
