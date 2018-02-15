@@ -19,7 +19,7 @@ use mentat::{
     TypedValue,
 };
 
-use store::{
+use utils::{
     Entity,
     ToInner,
 };
@@ -29,12 +29,6 @@ pub struct Label {
     pub id: Option<Entity>,    // id should not be leaked outside of the library
     pub name: String,
     pub color: String
-}
-
-impl Drop for Label {
-    fn drop(&mut self) {
-        eprintln!("{:?} is being deallocated", self);
-    }
 }
 
 impl Label {

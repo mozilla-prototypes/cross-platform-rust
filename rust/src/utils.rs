@@ -1,4 +1,4 @@
-// Copyright 2016 Mozilla
+// Copyright 2018 Mozilla
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 // this file except in compliance with the License. You may obtain a copy of the
@@ -13,7 +13,11 @@ extern crate time;
 
 extern crate mentat;
 
-use std::fmt;
+use std::fmt::{
+    Display,
+    Formatter,
+    Result
+};
 
 use time::Timespec;
 
@@ -22,14 +26,6 @@ use mentat::{
     Entid,
     TypedValue,
     Uuid,
-};
-
-pub use mentat::{
-    Store,
-};
-
-use mentat::errors::{
-    Result,
 };
 
 pub trait ToTypedValue {
@@ -59,8 +55,8 @@ impl Entity {
     }
 }
 
-impl std::fmt::Display for Entity {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl Display for Entity {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{}", self.id)
     }
 }
@@ -186,11 +182,6 @@ impl<'a> ToInner<Uuid> for &'a TypedValue {
             _ => Uuid::nil(),
         }
     }
-}
-
-pub fn new_store<T>(uri: T) -> Result<Store> where T: Into<Option<String>>  {
-    let uri_string = uri.into().unwrap_or(String::new());
-    Store::open(&uri_string)
 }
 
 #[cfg(test)]

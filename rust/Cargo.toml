@@ -28,8 +28,9 @@ uuid = { version = "0.5", features = ["v4"] }
 git = "https://github.com/mozilla/mentat.git"
 branch = "master"
 
-[dependencies.store]
-path = "store"
+[dependencies.mentat_core]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
 
 [dependencies.ffi-utils]
 path = "ffi-utils"
