@@ -36,7 +36,6 @@ use libc::{
 };
 
 use mentat::{
-    HasSchema,
     InProgress,
     IntoResult,
     Queryable,
@@ -53,7 +52,6 @@ use mentat_core::{
 
 use mentat::entity_builder::{
     BuildTerms,
-    TermBuilder,
 };
 
 use mentat::vocabulary::{
@@ -219,21 +217,15 @@ impl Toodle {
 
     pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
         {
-            let mut in_progress = self.connection.begin_transaction()?;
-            let mut builder = TermBuilder::new();
-            let entid = builder.named_tempid("label".to_string());
+            let in_progress = self.connection.begin_transaction()?;
+            let mut builder = in_progress.builder().describe_tempid("label");
 
             let name_kw = kw!(:label/name);
-            let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
-            let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&name));
+            let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&name));
 
             let color_kw = kw!(:label/color);
-            let color_ref = in_progress.get_entid(&color_kw).ok_or_else(|| ErrorKind::UnknownAttribute(color_kw))?;
-            let _ = builder.add(entid.clone(), color_ref, TypedValue::typed_string(&color));
-
-            let (terms, tempids) = builder.build()?;
-            let _ = in_progress.transact_terms(terms, tempids);
-            in_progress.commit()?;
+            let _ = builder.add_kw(&color_kw, TypedValue::typed_string(&color));
+            builder.commit()?;
         }
         self.fetch_label(&name)
     }
@@ -379,41 +371,32 @@ impl Toodle {
 
     pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         let item_uuid = create_uuid();
-        let mut in_progress = self.connection.begin_transaction()?;
         {
-            let mut builder = TermBuilder::new();
-            let entid = builder.named_tempid("item".to_string());
+            let in_progress = self.connection.begin_transaction()?;
+            let mut builder = in_progress.builder().describe_tempid("item");
 
             let uuid_kw = kw!(:item/uuid);
-            let uuid_ref = in_progress.get_entid(&uuid_kw).ok_or_else(|| ErrorKind::UnknownAttribute(uuid_kw))?;
-            let _ = builder.add(entid.clone(), uuid_ref, TypedValue::Uuid(item_uuid));
+            let _ = builder.add_kw(&uuid_kw, TypedValue::Uuid(item_uuid));
 
             let name_kw = kw!(:item/name);
-            let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
-            let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&item.name));
+            let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&item.name));
 
             if let Some(due_date) = item.due_date {
                 let due_date_kw = kw!(:item/due_date);
-                let due_date_ref = in_progress.get_entid(&due_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(due_date_kw))?;
-                let _ = builder.add(entid.clone(), due_date_ref, due_date.to_typed_value());
+                let _ = builder.add_kw(&due_date_kw, due_date.to_typed_value());
             }
             if let Some(completion_date) = item.completion_date {
                 let completion_date_kw = kw!(:item/completion_date);
-                let completion_date_ref = in_progress.get_entid(&completion_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(completion_date_kw))?;
-                let _ = builder.add(entid.clone(), completion_date_ref, completion_date.to_typed_value());
+                let _ = builder.add_kw(&completion_date_kw, completion_date.to_typed_value());
             }
 
             let item_labels_kw = kw!(:item/label);
-            let item_labels_ref = in_progress.get_entid(&item_labels_kw).ok_or_else(|| ErrorKind::UnknownAttribute(item_labels_kw))?;
             for label in item.labels.iter() {
                 let label_id = label.id.clone().ok_or_else(|| ErrorKind::LabelNotFound(label.name.clone()))?;
-                let _ = builder.add(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label_id.id));
+                let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label_id.id));
             }
-
-            let (terms, tempids) = builder.build()?;
-            let _ = in_progress.transact_terms(terms, tempids);
+            builder.commit()?;
         }
-        in_progress.commit()?;
         Ok(item_uuid)
     }
 
@@ -452,59 +435,50 @@ impl Toodle {
                        labels: Option<&Vec<Label>>) -> Result<()> {
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
         let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
-        let mut in_progress = self.connection.begin_transaction()?;
-        {
-            let mut builder = TermBuilder::new();
+        let in_progress = self.connection.begin_transaction()?;
+        let mut builder = in_progress.builder().describe(entid);
 
-            if let Some(name) = name {
-                if item.name != name {
-                    let name_kw = kw!(:item/name);
-                    let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
-                    let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&name));
-                }
+        if let Some(name) = name {
+            if item.name != name {
+                let name_kw = kw!(:item/name);
+                let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&name));
             }
-
-            if item.due_date != due_date {
-                let due_date_kw = kw!(:item/due_date);
-                let due_date_ref = in_progress.get_entid(&due_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(due_date_kw))?;
-                if let Some(date) = due_date {
-                    let _ = builder.add(entid.clone(), due_date_ref, date.to_typed_value());
-                } else if let Some(date) = item.due_date {
-                    let _ = builder.retract(entid.clone(), due_date_ref, date.to_typed_value());
-                }
-            }
-
-            if item.completion_date != completion_date {
-                let completion_date_kw = kw!(:item/completion_date);
-                let completion_date_ref = in_progress.get_entid(&completion_date_kw).ok_or_else(|| ErrorKind::UnknownAttribute(completion_date_kw))?;
-                if let Some(date) = completion_date {
-                    let _ = builder.add(entid.clone(), completion_date_ref, date.to_typed_value());
-                } else if let Some(date) = item.completion_date {
-                    let _ = builder.retract(entid.clone(), completion_date_ref, date.to_typed_value());
-                }
-            }
-
-            if let Some(new_labels) = labels {
-                let item_labels_kw = kw!(:item/label);
-                let item_labels_ref = in_progress.get_entid(&item_labels_kw).ok_or_else(|| ErrorKind::UnknownAttribute(item_labels_kw))?;
-                for label in new_labels {
-                    if !existing_labels.contains(&label) && label.id.is_some() {
-                        let _ = builder.add(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label.id.clone().unwrap().id));
-                    }
-                }
-                for label in existing_labels {
-                    if !new_labels.contains(&label) && label.id.is_some() {
-                        let _ = builder.retract(entid.clone(), item_labels_ref.clone(), TypedValue::Ref(label.id.clone().unwrap().id));
-                    }
-                }
-            }
-
-            let (terms, tempids) = builder.build()?;
-            let _ = in_progress.transact_terms(terms, tempids);
         }
-        in_progress.commit()
-                   .map_err(|e| e.into())
-                   .and(Ok(()))
+
+        if item.due_date != due_date {
+            let due_date_kw = kw!(:item/due_date);
+            if let Some(date) = due_date {
+                let _ = builder.add_kw(&due_date_kw, date.to_typed_value());
+            } else if let Some(date) = item.due_date {
+                let _ = builder.retract_kw(&due_date_kw, date.to_typed_value());
+            }
+        }
+
+        if item.completion_date != completion_date {
+            let completion_date_kw = kw!(:item/completion_date);
+            if let Some(date) = completion_date {
+                let _ = builder.add_kw(&completion_date_kw, date.to_typed_value());
+            } else if let Some(date) = item.completion_date {
+                let _ = builder.retract_kw(&completion_date_kw, date.to_typed_value());
+            }
+        }
+
+        if let Some(new_labels) = labels {
+            let item_labels_kw = kw!(:item/label);
+            for label in new_labels {
+                if !existing_labels.contains(&label) && label.id.is_some() {
+                    let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
+                }
+            }
+            for label in existing_labels {
+                if !new_labels.contains(&label) && label.id.is_some() {
+                    let _ = builder.retract_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
+                }
+            }
+        }
+        builder.commit()
+                .map_err(|e| e.into())
+                .and(Ok(()))
     }
 }
 
