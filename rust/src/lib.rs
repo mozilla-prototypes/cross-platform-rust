@@ -220,11 +220,9 @@ impl Toodle {
             let in_progress = self.connection.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("label");
 
-            let name_kw = kw!(:label/name);
-            let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&name));
+            builder.add_kw(&kw!(:label/name), TypedValue::typed_string(&name))?;
+            builder.add_kw(&kw!(:label/color), TypedValue::typed_string(&color))?;
 
-            let color_kw = kw!(:label/color);
-            let _ = builder.add_kw(&color_kw, TypedValue::typed_string(&color));
             builder.commit()?;
         }
         self.fetch_label(&name)
@@ -375,25 +373,20 @@ impl Toodle {
             let in_progress = self.connection.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("item");
 
-            let uuid_kw = kw!(:item/uuid);
-            let _ = builder.add_kw(&uuid_kw, TypedValue::Uuid(item_uuid));
-
-            let name_kw = kw!(:item/name);
-            let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&item.name));
+            builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
+            builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
 
             if let Some(due_date) = item.due_date {
-                let due_date_kw = kw!(:item/due_date);
-                let _ = builder.add_kw(&due_date_kw, due_date.to_typed_value());
+                builder.add_kw(&kw!(:item/due_date), due_date.to_typed_value())?;
             }
             if let Some(completion_date) = item.completion_date {
-                let completion_date_kw = kw!(:item/completion_date);
-                let _ = builder.add_kw(&completion_date_kw, completion_date.to_typed_value());
+                builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
             }
 
             let item_labels_kw = kw!(:item/label);
             for label in item.labels.iter() {
                 let label_id = label.id.clone().ok_or_else(|| ErrorKind::LabelNotFound(label.name.clone()))?;
-                let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label_id.id));
+                builder.add_kw(&item_labels_kw, TypedValue::Ref(label_id.id))?;
             }
             builder.commit()?;
         }
@@ -440,43 +433,42 @@ impl Toodle {
 
         if let Some(name) = name {
             if item.name != name {
-                let name_kw = kw!(:item/name);
-                let _ = builder.add_kw(&name_kw, TypedValue::typed_string(&name));
+                builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&name))?;
             }
         }
 
         if item.due_date != due_date {
             let due_date_kw = kw!(:item/due_date);
             if let Some(date) = due_date {
-                let _ = builder.add_kw(&due_date_kw, date.to_typed_value());
+                builder.add_kw(&due_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.due_date {
-                let _ = builder.retract_kw(&due_date_kw, date.to_typed_value());
+                builder.retract_kw(&due_date_kw, date.to_typed_value())?;
             }
         }
 
         if item.completion_date != completion_date {
             let completion_date_kw = kw!(:item/completion_date);
             if let Some(date) = completion_date {
-                let _ = builder.add_kw(&completion_date_kw, date.to_typed_value());
+                builder.add_kw(&completion_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.completion_date {
-                let _ = builder.retract_kw(&completion_date_kw, date.to_typed_value());
+                builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
             }
         }
 
         if let Some(new_labels) = labels {
             let item_labels_kw = kw!(:item/label);
             for label in new_labels {
-                let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
+                builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id))?;
             }
             for label in existing_labels {
                 if !new_labels.contains(&label) && label.id.is_some() {
-                    let _ = builder.retract_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
+                    builder.retract_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id))?;
                 }
             }
         }
         builder.commit()
-                .map_err(|e| e.into())
-                .and(Ok(()))
+               .map_err(|e| e.into())
+               .and(Ok(()))
     }
 }
 
