@@ -11,7 +11,7 @@
 #[macro_use]
 extern crate error_chain;
 
-#[macro_use(kw)]
+#[macro_use(kw, var)]
 extern crate mentat;
 
 extern crate ffi_utils;
@@ -46,7 +46,6 @@ use mentat::{
     QueryInputs,
     TypedValue,
     ValueType,
-    Variable,
 };
 
 use mentat_core::{
@@ -107,7 +106,7 @@ static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
     in_progress.ensure_vocabulary(&Definition {
-            name: kw!(:example/links),
+            name: kw!(:toodle/items),
             version: 1,
             attributes: vec![
                 (kw!(:item/uuid),
@@ -146,7 +145,7 @@ fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
 
 fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
     in_progress.ensure_vocabulary(&Definition {
-            name: kw!(:example/links),
+            name: kw!(:toodle/labels),
             version: 1,
             attributes: vec![
                 (kw!(:label/name),
@@ -248,7 +247,7 @@ impl Toodle {
                         [?eid :label/color ?color]
         ]"#;
         let in_progress_read = self.connection.begin_read()?;
-        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?name"), name.to_typed_value())]);
+        let args = QueryInputs::with_value_sequence(vec![(var!(?name), name.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
             .into_tuple_result()
@@ -280,7 +279,7 @@ impl Toodle {
                         [?l :label/color ?color]
         ]"#;
         let in_progress_read = self.connection.begin_read()?;
-        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?item_uuid"), item_uuid.to_typed_value())]);
+        let args = QueryInputs::with_value_sequence(vec![(var!(?item_uuid), item_uuid.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
             .into_rel_result()
@@ -301,7 +300,7 @@ impl Toodle {
         let rows;
         {
             let in_progress_read = self.connection.begin_read()?;
-            let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?label"), label.name.to_typed_value())]);
+            let args = QueryInputs::with_value_sequence(vec![(var!(?label), label.name.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
                 .into_rel_result()
@@ -328,7 +327,7 @@ impl Toodle {
         rows.map(|rows| Items::new(rows.into_iter().map(|r| self.item_row_to_item(r)).collect()))
     }
 
-    pub fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>>{
+    pub fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>> {
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
@@ -338,7 +337,7 @@ impl Toodle {
         let rows;
         {
             let in_progress_read = self.connection.begin_read()?;
-            let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), uuid.to_typed_value())]);
+            let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), uuid.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
                 .into_tuple_result()
@@ -358,7 +357,7 @@ impl Toodle {
         ]"#;
 
         let in_progress_read = self.connection.begin_read()?;
-        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]);
+        let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         return_date_field(
             in_progress_read
             .q_once(query, args))
@@ -372,7 +371,7 @@ impl Toodle {
             [?eid :item/due_date ?date]
         ]"#;
         let in_progress_read = self.connection.begin_read()?;
-        let args = QueryInputs::with_value_sequence(vec![(Variable::from_valid_name("?uuid"), item_id.to_typed_value())]);
+        let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         let date = return_date_field(
             in_progress_read
             .q_once(query, args));
