@@ -466,9 +466,7 @@ impl Toodle {
         if let Some(new_labels) = labels {
             let item_labels_kw = kw!(:item/label);
             for label in new_labels {
-                if !existing_labels.contains(&label) && label.id.is_some() {
-                    let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
-                }
+                let _ = builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id));
             }
             for label in existing_labels {
                 if !new_labels.contains(&label) && label.id.is_some() {
