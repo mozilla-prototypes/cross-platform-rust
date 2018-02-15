@@ -161,7 +161,12 @@ class ItemViewController: UIViewController {
             return
         }
 
-        ToodleLib.sharedInstance.update(item: currentItem, name: description, completionDate: nil)
+        var completion_date: Date? = nil
+        if self.statusValueLabel.text == "Complete" {
+            completion_date = Date();
+        }
+
+        ToodleLib.sharedInstance.update(item: currentItem, name: description, completionDate: completion_date)
         if let new_item = ToodleLib.sharedInstance.item(withUuid: currentItem.uuid!) {
             self.delegate?.itemUpdated(item: new_item)
         }

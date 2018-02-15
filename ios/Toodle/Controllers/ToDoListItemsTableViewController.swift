@@ -41,7 +41,9 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.completionDateAsString()
+        if item.completionDate != nil {
+            cell.detailTextLabel?.text = "Completed on: \(item.completionDateAsString()!)"
+        }
 
         return cell
     }
@@ -72,7 +74,7 @@ extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate 
         guard let index = self.items.index(where: { i in item.uuid == i.uuid }) else {
             return itemCreated(item: item)
         }
-        self.items[index] = self.items[index]
+        self.items[index] = item
         self.tableView.reloadData()
     }
 }

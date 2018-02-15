@@ -56,7 +56,8 @@ class Item {
             return nil
         }
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
         return dateFormatter.string(from: completionDate)
     }
 }
