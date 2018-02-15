@@ -35,22 +35,6 @@ class Item {
         }
     }
 
-    var dueDate: Date? {
-        get {
-            guard let date = raw.pointee.dueDate else {
-                return nil
-            }
-            return Date(timeIntervalSince1970: Double(date.pointee))
-        }
-        set {
-            if let d = newValue {
-                let timestamp = d.timeIntervalSince1970
-                var date = Int64(timestamp)
-                item_set_due_date(UnsafeMutablePointer<CItem>(mutating: raw), AutoreleasingUnsafeMutablePointer<Int64>(&date))
-            }
-        }
-    }
-
     var completionDate: Date? {
         get {
             guard let date = raw.pointee.completionDate else {
@@ -67,34 +51,12 @@ class Item {
         }
     }
 
-    fileprivate var _labels: [Label]?
-
-    var labels: [Label] {
-        get {
-            if _labels == nil {
-                _labels = []
-                // TODO: When we get labels in, put this back!
-//                let ls = item_get_labels(self.raw)
-//                _labels = []
-//                for index in 0..<item_labels_count(ls) {
-//                    let label = Label(raw: item_label_at(ls, index)!)
-//                    _labels?.append(label)
-//                }
-            }
-
-            return _labels!
-        }
-        set {
-            _labels = nil
-        }
-    }
-
-    func dueDateAsString() -> String? {
-        guard let dueDate = self.dueDate else {
+    func completionDateAsString() -> String? {
+        guard let completionDate = self.completionDate else {
             return nil
         }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        return dateFormatter.string(from: dueDate)
+        return dateFormatter.string(from: completionDate)
     }
 }

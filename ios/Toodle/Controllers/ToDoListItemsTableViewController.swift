@@ -41,7 +41,7 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.dueDateAsString()
+        cell.detailTextLabel?.text = item.completionDateAsString()
 
         return cell
     }

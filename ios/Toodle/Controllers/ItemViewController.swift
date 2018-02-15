@@ -22,29 +22,6 @@ class ItemViewController: UIViewController {
         return textField
     }()
 
-
-    lazy var dueDateLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Due date:"
-        label.textAlignment = .right
-        return label
-    }()
-
-    var dueDateButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitleColor(.blue, for: .normal)
-        button.addTarget(self, action: #selector(togglePicker), for: .touchUpInside)
-        return button
-    }()
-
-    var dueDatePicker: UIDatePicker = {
-        let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .dateAndTime
-        datePicker.minimumDate = Date()
-        datePicker.addTarget(self, action: #selector(datePickerValueDidChange), for: UIControlEvents.valueChanged)
-        return datePicker
-    }()
-
     lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.text = "Item status:"
@@ -74,19 +51,13 @@ class ItemViewController: UIViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
         self.markComplete(isComplete: false)
-        self.dueDateButton.setTitle("Set", for: .normal)
     }
 
     init(item: Item) {
         self.item = item
         super.init(nibName: nil, bundle: nil)
-        self.dueDateButton.setTitle("Set", for: .normal)
 
         self.descriptionField.text = item.name
-        if let dueDate = item.dueDate {
-            self.dueDateButton.setTitle(self.dateAsString(date: dueDate), for: .normal)
-            self.dueDatePicker.date = dueDate
-        }
         self.markComplete(isComplete: false)
     }
 
@@ -127,26 +98,8 @@ class ItemViewController: UIViewController {
                         descriptionField.leftAnchor.constraint(equalTo: itemDescriptionLabel.rightAnchor, constant: 20),
                         descriptionField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20)]
 
-        view.addSubview(dueDateLabel)
-        constraints += [dueDateLabel.topAnchor.constraint(equalTo: itemDescriptionLabel.bottomAnchor, constant: 20),
-                        dueDateLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-                        dueDateLabel.widthAnchor.constraint(equalToConstant: 98)]
-
-        view.addSubview(dueDateButton)
-        constraints += [dueDateButton.centerYAnchor.constraint(equalTo: dueDateLabel.centerYAnchor),
-                        dueDateButton.leftAnchor.constraint(equalTo: dueDateLabel.rightAnchor, constant: 10),
-                        dueDateButton.widthAnchor.constraint(equalToConstant: 250)]
-
-        view.addSubview(dueDatePicker)
-        dueDatePickerHeightConstraint = dueDatePicker.heightAnchor.constraint(equalToConstant: 0)
-        dueDatePickerTopAnchorConstraint = dueDatePicker.topAnchor.constraint(equalTo: dueDateButton.bottomAnchor, constant: 0)
-        constraints += [dueDatePickerTopAnchorConstraint!,
-                        dueDatePicker.leftAnchor.constraint(equalTo: dueDateLabel.rightAnchor),
-                        dueDatePicker.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -40),
-                        dueDatePickerHeightConstraint!]
-
         view.addSubview(statusLabel)
-        constraints += [statusLabel.topAnchor.constraint(equalTo: dueDatePicker.bottomAnchor, constant: 20),
+        constraints += [statusLabel.topAnchor.constraint(equalTo: itemDescriptionLabel.bottomAnchor, constant: 20),
                         statusLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
                         statusLabel.widthAnchor.constraint(equalToConstant: 98)]
 
@@ -182,21 +135,6 @@ class ItemViewController: UIViewController {
         }
     }
 
-    @objc func datePickerValueDidChange() {
-        self.dueDateButton.setTitle(self.dateAsString(date: self.dueDatePicker.date), for: .normal)
-    }
-
-    @objc func togglePicker() {
-        if (dueDatePickerHeightConstraint?.constant ?? 0) == 0 {
-            self.dueDatePickerHeightConstraint?.constant = 150
-            self.dueDatePickerTopAnchorConstraint?.constant = 20
-        } else {
-            self.dueDatePickerHeightConstraint?.constant = 0
-            self.dueDatePickerTopAnchorConstraint?.constant = 0
-        }
-        self.view.updateConstraintsIfNeeded()
-    }
-
     @objc func done() {
         self.save()
         if let _ = self.item {
@@ -216,20 +154,14 @@ class ItemViewController: UIViewController {
             return self.descriptionField.layer.borderColor = UIColor.red.cgColor
         }
 
-        var dueDate: Date? = nil
-        if self.dueDateButton.titleLabel?.text != "Set" {
-            dueDate = self.dueDatePicker.date
-        }
-        let labels: [Label] = []
-
         guard let currentItem = self.item else {
-            if let item = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels) {
+            if let item = ToodleLib.sharedInstance.createItem(withName: description) {
                 self.delegate?.itemCreated(item: item)
             }
             return
         }
 
-        ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
+        ToodleLib.sharedInstance.update(item: currentItem, name: description, completionDate: nil)
         if let new_item = ToodleLib.sharedInstance.item(withUuid: currentItem.uuid!) {
             self.delegate?.itemUpdated(item: new_item)
         }

@@ -31,9 +31,9 @@ class ToodleLib: RustObject {
         self.init(raw: new_toodle(storeURI))
     }
 
-        deinit {
-            toodle_destroy(raw)
-        }
+    deinit {
+        toodle_destroy(raw)
+    }
 
     fileprivate func toPointerArray(list: [RustObject]) -> OpaquePointer {
         var pointerArray = list.map({ $0.intoRaw() })
@@ -50,31 +50,9 @@ class ToodleLib: RustObject {
         return allItems
     }
 
-    //    func allLabels() -> [Label] {
-    //        let labels = list_manager_get_all_labels(self.raw)
-    //        var allLabels: [Label] = []
-    //        for index in 0..<label_list_count(labels) {
-    //            let label = Label(raw: label_list_entry_at(labels, index))
-    //            allLabels.append(label)
-    //        }
-    //        return allLabels
-    //    }
-
-    func createLabel(withName name: String, color: UIColor) -> Label {
-        return Label(raw: toodle_create_label(self.raw, name, color.toHex()!))
-    }
-
-    func createItem(withName name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) -> Item? {
-        var dd: UnsafeMutablePointer<Int64>? = nil
-        if let due = dueDate {
-            var d = due.asInt64Timestamp()
-            dd = UnsafeMutablePointer<Int64>(&d)
-        }
-        var pointerArray = self.toPointerArray(list: labels as [RustObject])
+    func createItem(withName name: String) -> Item? {
         return Item(raw: toodle_create_item(self.raw,
-                                                  name,
-                                                  dd,
-                                                  UnsafeMutablePointer<OpaquePointer>(&pointerArray))!)
+                                            name)!)
     }
 
     func item(withUuid uuid: String) -> Item? {
@@ -84,27 +62,19 @@ class ToodleLib: RustObject {
         return Item(raw: new_item)
     }
 
-    func update(item: Item, name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) {
-        var dd: AutoreleasingUnsafeMutablePointer<Int64>? = nil
-        if let due = dueDate{
-            var d = due.asInt64Timestamp()
-            dd = AutoreleasingUnsafeMutablePointer<Int64>(&d)
-        }
+    func update(item: Item, name: String, completionDate: Date?) {
         var cd: AutoreleasingUnsafeMutablePointer<Int64>? = nil
         if let completion = completionDate {
             var c = completion.asInt64Timestamp()
             cd = AutoreleasingUnsafeMutablePointer<Int64>(&c)
         }
-        var pointerArray = self.toPointerArray(list: labels as [RustObject])
         if let uuid = item.uuid {
-            toodle_update_item_by_uuid(self.raw, uuid, name, dd, cd)
+            toodle_update_item_by_uuid(self.raw, uuid, name, cd)
         } else {
             toodle_update_item(self.raw,
                                item.raw,
                                name,
-                               dd,
-                               cd,
-                               UnsafeMutablePointer<OpaquePointer>(&pointerArray))
+                               cd)
         }
     }
 }
