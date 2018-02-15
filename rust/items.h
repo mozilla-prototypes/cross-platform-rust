@@ -15,8 +15,6 @@ struct CItemList {
     uint64_t* _Nonnull len;
 };
 
-struct Label;
-
 const struct CItem* _Nullable toodle_create_item(const struct Toodle* _Nonnull manager, const char* _Nonnull name);
 const void toodle_update_item(const struct Toodle* _Nonnull manager, const struct CItem* _Nonnull item, const char* _Nonnull name, const int64_t* _Nullable completion_date);
 const void toodle_update_item_by_uuid (const struct Toodle* _Nonnull manager, const char* _Nonnull uuid, const char* _Nonnull name, const int64_t* _Nullable completion_date);
