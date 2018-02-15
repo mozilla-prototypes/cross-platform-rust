@@ -36,7 +36,6 @@ use libc::{
 };
 
 use mentat::{
-    HasSchema,
     InProgress,
     IntoResult,
     Queryable,
@@ -53,7 +52,6 @@ use mentat_core::{
 
 use mentat::entity_builder::{
     BuildTerms,
-    TermBuilder,
 };
 
 use mentat::vocabulary::{
