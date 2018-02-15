@@ -114,7 +114,6 @@ impl From<ItemC> for Item {
             name: c_char_to_string(item_c.name),
             due_date: due,
             completion_date: completion,
-            labels: vec![]
         }
     }
 }

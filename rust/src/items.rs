@@ -10,7 +10,6 @@
 
 use std::os::raw::{
     c_char,
-    c_int,
 };
 
 use ffi_utils::strings::{
@@ -25,10 +24,6 @@ use mentat::{
     Uuid,
 };
 
-use labels::{
-    Label,
-};
-
 use utils::{
     Entity,
 };
@@ -40,7 +35,6 @@ pub struct Item {
     pub name: String,
     pub due_date: Option<Timespec>,
     pub completion_date: Option<Timespec>,
-    pub labels: Vec<Label>,
 }
 
 #[derive(Debug)]
@@ -80,25 +74,4 @@ pub unsafe extern "C" fn item_set_completion_date(item: *mut Item, completion_da
     } else {
         item.completion_date = None;
     }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_labels(item: *const Item) -> *mut Vec<Label> {
-    let item = &*item;
-    let boxed_labels = Box::new(item.labels.clone());
-    Box::into_raw(boxed_labels)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_labels_count(item: *const Item) -> c_int {
-    let item = &*item;
-    item.labels.len() as c_int
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_label_at(label_list: *const Vec<Label>, index: size_t) -> *const Label {
-    let label_list = &*label_list;
-    let index = index as usize;
-    let label = Box::new(label_list[index].clone());
-    Box::into_raw(label)
 }
