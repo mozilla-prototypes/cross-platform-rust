@@ -34,20 +34,11 @@ use items::{
 pub struct ItemC {
     pub uuid: *mut c_char,
     pub name: *mut c_char,
-    pub due_date: *mut i64,
     pub completion_date: *mut i64,
 }
 
 impl From<Item> for ItemC {
     fn from(item: Item) -> Self {
-        let due = match item.due_date {
-            Some(date) => {
-                Box::into_raw(Box::new(date.sec))
-            },
-            None => {
-                ptr::null_mut()
-            }
-        };
         let completion = match item.completion_date {
             Some(date) => {
                 Box::into_raw(Box::new(date.sec))
@@ -59,7 +50,6 @@ impl From<Item> for ItemC {
         ItemC {
             uuid: string_to_c_char(item.uuid.hyphenated().to_string()),
             name: string_to_c_char(item.name.clone()),
-            due_date: due,
             completion_date: completion,
         }
     }
@@ -96,12 +86,6 @@ impl From<Vec<Item>> for ItemsC {
 impl From<ItemC> for Item {
     fn from(item_c: ItemC) -> Self {
         let uuid = Uuid::parse_str(&c_char_to_string(item_c.uuid)).unwrap_or(Uuid::default());
-        let due: Option<Timespec>;
-        if !item_c.due_date.is_null() {
-            due = Some(Timespec::new(item_c.due_date as i64, 0));
-        } else {
-            due = None;
-        }
         let completion: Option<Timespec>;
         if !item_c.completion_date.is_null() {
             completion = Some(Timespec::new(item_c.completion_date as i64, 0));
@@ -112,7 +96,6 @@ impl From<ItemC> for Item {
             id: None,
             uuid: uuid,
             name: c_char_to_string(item_c.name),
-            due_date: due,
             completion_date: completion,
         }
     }

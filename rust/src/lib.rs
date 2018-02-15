@@ -117,20 +117,10 @@ fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
                     .multival(false)
                     .fulltext(true)
                     .build()),
-                (kw!(:item/due_date),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Instant)
-                    .multival(false)
-                    .build()),
                 (kw!(:item/completion_date),
                  AttributeBuilder::new()
                     .value_type(ValueType::Instant)
                     .multival(false)
-                    .build()),
-                (kw!(:item/label),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Ref)
-                    .multival(true)
                     .build()),
             ],
         })
@@ -182,7 +172,6 @@ impl Toodle {
                 id: row[0].clone().to_inner(),
                 uuid: uuid,
                 name: row[2].clone().to_inner(),
-                due_date: self.fetch_due_date_for_item(&uuid).unwrap_or(None),
                 completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
             }
         }
@@ -243,21 +232,6 @@ impl Toodle {
             .q_once(query, args))
     }
 
-    fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
-        let query = r#"[:find ?date .
-            :in ?uuid
-            :where
-            [?eid :item/uuid ?uuid]
-            [?eid :item/due_date ?date]
-        ]"#;
-        let in_progress_read = self.connection.begin_read()?;
-        let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
-        let date = return_date_field(
-            in_progress_read
-            .q_once(query, args));
-        date
-    }
-
     pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         let item_uuid = create_uuid();
         {
@@ -267,9 +241,6 @@ impl Toodle {
             builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
             builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
 
-            if let Some(due_date) = item.due_date {
-                builder.add_kw(&kw!(:item/due_date), due_date.to_typed_value())?;
-            }
             if let Some(completion_date) = item.completion_date {
                 builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
             }
@@ -288,7 +259,6 @@ impl Toodle {
     pub fn update_item_by_uuid(&mut self,
                                uuid_string: &str,
                                name: Option<String>,
-                               due_date: Option<Timespec>,
                                completion_date: Option<Timespec>)
                                -> Result<Item> {
         let uuid = Uuid::parse_str(&uuid_string)?;
@@ -299,7 +269,7 @@ impl Toodle {
                 .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
 
         let new_item =
-            self.update_item(&item, name, due_date, completion_date)
+            self.update_item(&item, name, completion_date)
                 .and_then(|_| self.fetch_item(&uuid))
                 .unwrap_or_default()
                 .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
@@ -309,7 +279,6 @@ impl Toodle {
 
     pub fn update_item(&mut self,
                        item: &Item, name: Option<String>,
-                       due_date: Option<Timespec>,
                        completion_date: Option<Timespec>) -> Result<()> {
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
         let in_progress = self.connection.begin_transaction()?;
@@ -321,15 +290,6 @@ impl Toodle {
             }
         }
 
-        if item.due_date != due_date {
-            let due_date_kw = kw!(:item/due_date);
-            if let Some(date) = due_date {
-                builder.add_kw(&due_date_kw, date.to_typed_value())?;
-            } else if let Some(date) = item.due_date {
-                builder.retract_kw(&due_date_kw, date.to_typed_value())?;
-            }
-        }
-
         if item.completion_date != completion_date {
             let completion_date_kw = kw!(:item/completion_date);
             if let Some(date) = completion_date {
@@ -338,6 +298,7 @@ impl Toodle {
                 builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
             }
         }
+
         builder.commit()
                .map_err(|e| e.into())
                .and(Ok(()))
@@ -357,22 +318,14 @@ pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_create_item(manager: *mut Toodle, name: *const c_char, due_date: *const time_t) -> *mut ItemC {
+pub unsafe extern "C" fn toodle_create_item(manager: *mut Toodle, name: *const c_char) -> *mut ItemC {
     let name = c_char_to_string(name);
-    log::d(&format!("Creating item: {:?}, {:?}, {:?}", name, due_date, manager)[..]);
+    log::d(&format!("Creating item: {:?}, {:?}", name, manager)[..]);
 
     let manager = &mut*manager;
     let mut item = Item::default();
-
     item.name = name;
-    let due: Option<Timespec>;
-    if !due_date.is_null() {
-        let due_date = *due_date as i64;
-        due = Some(Timespec::new(due_date, 0));
-    } else {
-        due = None;
-    }
-    item.due_date = due;
+
     let item = manager.create_and_fetch_item(&item).expect("expected an item");
     if let Some(callback) = CHANGED_CALLBACK {
         callback();
@@ -470,26 +423,24 @@ pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
+pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const Item, name: *const c_char, completion_date: *const time_t) {
     let name = c_char_to_string(name);
     let manager = &mut*manager;
     let item = &*item;
     let _ = manager.update_item(
         &item,
         Some(name),
-        optional_timespec(due_date),
         optional_timespec(completion_date)
     );
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
+pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, completion_date: *const time_t) {
     let name = c_char_to_string(name);
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
     let _ = manager.update_item_by_uuid(c_char_to_string(uuid).as_str(),
                                         Some(name),
-                                        optional_timespec(due_date),
                                         optional_timespec(completion_date));
 
     if let Some(callback) = CHANGED_CALLBACK {
@@ -567,36 +518,12 @@ mod test {
             id: None,
             uuid: Uuid::nil(),
             name: "test item".to_string(),
-            due_date: Some(date.clone()),
             completion_date: Some(date.clone())
         };
 
         let item = manager.create_and_fetch_item(&i).expect("expected an item option").expect("expected an item");
         assert!(!item.uuid.is_nil());
         assert_eq!(item.name, i.name);
-        let due_date = item.due_date.expect("expecting a due date");
-        assert_eq!(due_date.sec, date.sec);
-        let completion_date = item.completion_date.expect("expecting a completion date");
-        assert_eq!(completion_date.sec, date.sec);
-    }
-
-    #[test]
-    fn test_create_item_no_due_date() {
-        let mut manager = toodle();
-
-        let date = now_utc().to_timespec();
-        let i = Item {
-            id: None,
-            uuid: Uuid::nil(),
-            name: "test item".to_string(),
-            due_date: None,
-            completion_date: Some(date.clone()),
-        };
-
-        let item = manager.create_and_fetch_item(&i).expect("expected an item option").expect("expected an item");
-        assert!(!item.uuid.is_nil());
-        assert_eq!(item.name, i.name);
-        assert_eq!(item.due_date, i.due_date);
         let completion_date = item.completion_date.expect("expecting a completion date");
         assert_eq!(completion_date.sec, date.sec);
     }
@@ -605,20 +532,16 @@ mod test {
     fn test_create_item_no_completion_date() {
         let mut manager = toodle();
 
-        let date = now_utc().to_timespec();
         let i = Item {
             id: None,
             uuid: Uuid::nil(),
             name: "test item".to_string(),
-            due_date: Some(date.clone()),
             completion_date: None
         };
 
         let item = manager.create_and_fetch_item(&i).expect("expected an item option").expect("expected an item");
         assert!(!item.uuid.is_nil());
         assert_eq!(item.name, i.name);
-        let due_date = item.due_date.expect("expecting a due date");
-        assert_eq!(due_date.sec, date.sec);
         assert_eq!(item.completion_date, i.completion_date);
     }
 
@@ -629,7 +552,6 @@ mod test {
             id: None,
             uuid: Uuid::nil(),
             name: "test item".to_string(),
-            due_date: None,
             completion_date: None
         };
 
@@ -637,7 +559,6 @@ mod test {
         let fetched_item = manager.fetch_item(&created_item.uuid).expect("expected an item option").expect("expected an item");
         assert_eq!(fetched_item.uuid, created_item.uuid);
         assert_eq!(fetched_item.name, created_item.name);
-        assert_eq!(fetched_item.due_date, created_item.due_date);
         assert_eq!(fetched_item.completion_date, created_item.completion_date);
 
         let tmp_uuid = create_uuid().hyphenated().to_string();
@@ -647,48 +568,18 @@ mod test {
     }
 
     #[test]
-    fn test_update_item_add_due_date() {
-        let mut manager = toodle();
-
-        let date = now_utc().to_timespec();
-        let item1 = Item {
-            id: None,
-            uuid: Uuid::nil(),
-            name: "test item 1".to_string(),
-            due_date: None,
-            completion_date: None,
-        };
-
-        let created_item = manager.create_and_fetch_item(&item1).expect("expected an item option").expect("expected an item");
-
-        match manager.update_item(&created_item, None, Some(date), None) {
-            Ok(()) => (),
-            Err(e) => {
-                eprintln!("e {:?}", e);
-                assert!(false)
-            }
-        }
-
-        let fetched_item = manager.fetch_item(&created_item.uuid).expect("expected an item option").expect("expected an item");
-        let due_date = fetched_item.due_date.expect("expected a due date");
-        assert_eq!(due_date.sec, date.sec);
-    }
-
-    #[test]
     fn test_update_item_change_name() {
         let mut manager = toodle();
 
-        let date = now_utc().to_timespec();
         let item1 = Item {
             id: None,
             uuid: Uuid::nil(),
             name: "test item 1".to_string(),
-            due_date: Some(date),
             completion_date: None,
         };
 
         let mut created_item = manager.create_and_fetch_item(&item1).expect("expected an item option").expect("expected an item");
-        match manager.update_item(&created_item, Some("new name".to_string()), None, None) {
+        match manager.update_item(&created_item, Some("new name".to_string()), None) {
             Ok(()) => (),
             Err(e) => {
                 eprintln!("e {:?}", e);
@@ -711,12 +602,11 @@ mod test {
             id: None,
             uuid: Uuid::nil(),
             name: "test item 1".to_string(),
-            due_date: None,
             completion_date: None,
         };
 
         let created_item = manager.create_and_fetch_item(&item1).expect("expected an item option").expect("expected an item");
-        match manager.update_item(&created_item, None, None, Some(date)) {
+        match manager.update_item(&created_item, None, Some(date)) {
             Ok(()) => (),
             Err(e) => {
                 eprintln!("e {:?}", e);

@@ -33,7 +33,6 @@ pub struct Item {
     pub id: Option<Entity>,
     pub uuid: Uuid,
     pub name: String,
-    pub due_date: Option<Timespec>,
     pub completion_date: Option<Timespec>,
 }
 
@@ -54,16 +53,6 @@ impl Items {
 pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
     let item = &mut*item;
     item.name = c_char_to_string(name);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_set_due_date(item: *mut Item, due_date: *const size_t) {
-    let item = &mut*item;
-    if !due_date.is_null() {
-        item.due_date = Some(Timespec::new(due_date as i64, 0));
-    } else {
-        item.due_date = None;
-    }
 }
 
 #[no_mangle]
