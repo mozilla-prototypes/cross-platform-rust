@@ -29,7 +29,7 @@ use labels::{
     Label,
 };
 
-use utils::{
+use store::{
     Entity,
 };
 
@@ -53,6 +53,12 @@ impl Items {
         Items {
             vec: vec
         }
+    }
+}
+
+impl Drop for Item {
+    fn drop(&mut self) {
+        eprintln!("{:?} is being deallocated", self);
     }
 }
 

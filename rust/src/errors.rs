@@ -12,7 +12,6 @@ use rusqlite;
 
 use mentat::errors as mentat;
 use mentat::edn::UuidParseError;
-use mentat::NamespacedKeyword;
 
 error_chain! {
     types {
@@ -29,17 +28,9 @@ error_chain! {
     }
 
     errors {
-        UnknownAttribute(keyword: NamespacedKeyword) {
-            description("Keyword not found")
-            display("Keyword {} not found", keyword)
-        }
         ItemNotFound(uuid: String) {
             description("Item not found")
             display("Item {} not found", uuid)
-        }
-        LabelNotFound(name: String) {
-            description("Label not found")
-            display("Label {} not found", name)
         }
         UnexpectedResultType(message: String) {
             description("An unexpected Result type was encountered")
