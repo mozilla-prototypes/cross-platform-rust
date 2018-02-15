@@ -866,19 +866,6 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "store"
-version = "0.1.0"
-dependencies = [
- "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "ffi-utils 0.1.0",
- "jni 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)",
- "rusqlite 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
- "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "syn"
 version = "0.11.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -989,7 +976,6 @@ dependencies = [
  "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
  "rusqlite 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "store 0.1.0",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

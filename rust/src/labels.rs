@@ -19,7 +19,7 @@ use mentat::{
     TypedValue,
 };
 
-use store::{
+use utils::{
     Entity,
     ToInner,
 };

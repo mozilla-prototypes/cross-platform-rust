@@ -21,8 +21,6 @@ extern crate rusqlite;
 extern crate time;
 extern crate uuid;
 
-extern crate store;
-
 use std::ffi::CString;
 use std::os::raw::c_char;
 
@@ -44,6 +42,7 @@ use mentat::{
     Queryable,
     QueryExecutionResult,
     QueryInputs,
+    Store,
     TypedValue,
     ValueType,
 };
@@ -74,6 +73,7 @@ pub mod labels;
 pub mod items;
 pub mod errors;
 pub mod ctypes;
+mod utils;
 
 use errors::{
     ErrorKind,
@@ -93,9 +93,7 @@ use ctypes::{
     ItemCList
 };
 
-use store::{
-    new_store,
-    Store,
+use utils::{
     ToInner,
     ToTypedValue,
 };
@@ -172,8 +170,9 @@ pub struct Toodle {
 }
 
 impl Toodle {
-    pub fn new(uri: String) -> Result<Toodle> {
-        let mut store_result = new_store(uri)?;
+    pub fn new<T>(uri: T) -> Result<Toodle>  where T: Into<Option<String>> {
+        let uri_string = uri.into().unwrap_or(String::new());
+        let mut store_result = Store::open(&uri_string)?;
         {
             // TODO proper error handling at the FFI boundary
             let mut in_progress = store_result.begin_transaction()?;

@@ -29,7 +29,7 @@ use labels::{
     Label,
 };
 
-use store::{
+use utils::{
     Entity,
 };
 
