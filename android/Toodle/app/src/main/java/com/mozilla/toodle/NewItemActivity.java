@@ -20,22 +20,17 @@ public class NewItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_item);
 
         final TextView itemName = findViewById(R.id.itemName);
-        final DatePicker itemDueDate = findViewById(R.id.itemDueDate);
         final Button addBtn = findViewById(R.id.itemAdd);
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String name = itemName.getText().toString();
-                final int yearDue = itemDueDate.getYear();
-                final int monthDue = itemDueDate.getMonth();
-                final int dayDue = itemDueDate.getDayOfMonth();
 
                 final Item item = new Item();
 
                 item
                         .name(name)
-                        .dueDate(yearDue, monthDue, dayDue)
                         .create(getApplicationContext());
 
                 finish();

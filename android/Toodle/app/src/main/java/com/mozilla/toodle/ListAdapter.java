@@ -111,15 +111,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Item item = dataset.get(position);
         ((TextView) holder.itemView.findViewById(R.id.itemTitle)).setText(item.name());
-        final Long dueDate = item.dueDate();
-        if (dueDate != null) {
-            ((TextView) holder.itemView.findViewById(R.id.itemDueDate)).setText(
-                    context.getResources().getString(
-                            R.string.due_date,
-                            SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(dueDate * 1000)
-                    )
-            );
-        }
         final Long completionDate = item.completionDate();
         final CheckBox itemDoneCheckbox = holder.itemView.findViewById(R.id.itemDone);
         itemDoneCheckbox.setChecked(completionDate != null);

@@ -24,12 +24,11 @@ public class NativeItem extends Structure implements Closeable {
 
     public String uuid;
     public String itemName;
-    @Nullable public NativeLongByReference dueDate;
     @Nullable public NativeLongByReference completionDate;
 
     @Override
     protected List<String> getFieldOrder() {
-        return Arrays.asList("uuid", "itemName", "dueDate", "completionDate");
+        return Arrays.asList("uuid", "itemName", "completionDate");
     }
 
     @Override

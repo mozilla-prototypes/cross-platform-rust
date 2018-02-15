@@ -17,7 +17,6 @@ import java.util.List;
 public class Item {
     private String uuid;
     private String name;
-    private Long dueDate;
     private Long completionDate;
 
     public String name() {
@@ -33,10 +32,6 @@ public class Item {
         return uuid;
     }
 
-    public Long dueDate() {
-        return dueDate;
-    }
-
     public Long completionDate() {
         return completionDate;
     }
@@ -50,23 +45,10 @@ public class Item {
         return this;
     }
 
-    Item dueDate(final int year, final int month, final int date) {
-        final Calendar cal = Calendar.getInstance();
-        cal.set(year, month, date);
-        dueDate = cal.getTimeInMillis() / 1000;
-        return this;
-    }
-
     private static Item fromNativeItem(NativeItem nativeItem) {
         final Item item = new Item();
         item.uuid = nativeItem.uuid;
         item.name = nativeItem.itemName;
-        if (nativeItem.dueDate != null) {
-            item.dueDate = nativeItem.dueDate.getValue().longValue();
-            if (item.dueDate == 0) {
-                item.dueDate = null;
-            }
-        }
         if (nativeItem.completionDate != null) {
             item.completionDate = nativeItem.completionDate.getValue().longValue();
             if (item.completionDate == 0) {

@@ -28,8 +28,7 @@ public class Toodle extends RustObject {
     public void createItem(Item item) {
         JNA.INSTANCE.toodle_create_item(
                 rawPointer,
-                item.name(),
-                new NativeLongByReference(new NativeLong(item.dueDate()))
+                item.name()
         );
     }
 
@@ -45,7 +44,6 @@ public class Toodle extends RustObject {
                 rawPointer,
                 item.uuid(),
                 item.name(),
-                new NativeLongByReference(new NativeLong(item.dueDate())),
                 completionDateRef
         );
     }
