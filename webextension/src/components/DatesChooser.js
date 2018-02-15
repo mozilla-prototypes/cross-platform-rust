@@ -21,22 +21,13 @@ function convertToDate(dateStr) {
 class DatesChooser extends Component {
 
   static propTypes = {
-    dueDate: PropTypes.number,
     completionDate: PropTypes.number,
-    onTodoChangeDueDate: PropTypes.func.isRequired,
     onTodoChangeCompletionDate: PropTypes.func.isRequired,
   }
 
   constructor(props) {
     super(props);
-    this.state = { newDueDate: convertToYYYYMMDD(this.props.dueDate),
-      newCompletionDate: convertToYYYYMMDD(this.props.completionDate) };
-  }
-
-  handleDueDateChange = (e) => {
-    const newDueDate = e.target.value;
-    this.setState({ newDueDate });
-    this.props.onTodoChangeDueDate(convertToDate(newDueDate));
+    this.state = { newCompletionDate: convertToYYYYMMDD(this.props.completionDate) };
   }
 
   handleCompletionDateChange = (e) => {
@@ -55,9 +46,6 @@ class DatesChooser extends Component {
   render() {
     return (
       <div className="todo-dates-chooser">
-        <span>Due Date</span>
-        <input type="date" value={this.state.newDueDate}
-          onChange={this.handleDueDateChange} />
         <span>Completion Date</span>
         <input type="date" value={this.state.newCompletionDate}
           onChange={this.handleCompletionDateChange} />

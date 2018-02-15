@@ -21,27 +21,6 @@ input {
   display: flex;
 }
 
-.labels {
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.label {
-  color: #fff;
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  margin-bottom: 10px;
-  height: 30px;
-  border-radius: var(--border-radius);
-  font-size: 16px;
-}
-
-.label-name {
-  flex: 1;
-}
-
 button {
   border: 1px solid grey;
   border-radius: var(--border-radius);
@@ -54,10 +33,4 @@ button:hover {
 
 button:hover:active {
   background-color: #cccccc;
-}
-
-.edit-labels-button {
-  margin: 15px;
-  width: 100px;
-  height: 35px;
 }

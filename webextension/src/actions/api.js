@@ -51,54 +51,12 @@ const Api = {
       name: newTodoName,
     });
   },
-  async todoChangeDueDate(uuid, dueDate) {
-    return this.execute({
-      type: 'TodoChangeDueDate',
-      uuid,
-      dueDate,
-    });
-  },
   async todoChangeCompletionDate(uuid, completionDate) {
     return this.execute({
       type: 'TodoChangeCompletionDate',
       uuid,
       completionDate,
     });
-  },
-  async todoAddLabel(uuid, labelName) {
-    return this.execute({
-      type: 'TodoAddLabel',
-      uuid,
-      label: {
-        name: labelName,
-      },
-    });
-  },
-  async todoRemoveLabel(uuid, labelName) {
-    return this.execute({
-      type: 'TodoRemoveLabel',
-      uuid,
-      name: labelName,
-    });
-  },
-  async getLabels() {
-    return this.execute({
-      type: 'GetLabels',
-    });
-  },
-  async addLabel(name, color) {
-    return this.execute({
-      type: 'AddLabel',
-      name,
-      color,
-    });
-  },
-  async removeLabel(labelName) {
-    let { name: removedLabelName } = await this.execute({
-      type: 'RemoveLabel',
-      name: labelName,
-    });
-    return removedLabelName;
   }
 };
 

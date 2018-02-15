@@ -10,20 +10,14 @@ import './TodoList.css';
 class TodoList extends Component {
   static propTypes = {
     todos: PropTypes.array.isRequired,
-    allLabels: PropTypes.array.isRequired,
-    populateLabels: PropTypes.func.isRequired,
     populateTodos: PropTypes.func.isRequired,
     todoChangeName: PropTypes.func.isRequired,
-    todoAddLabel: PropTypes.func.isRequired,
-    todoRemoveLabel: PropTypes.func.isRequired,
     todoChangeCompletionDate: PropTypes.func.isRequired,
-    todoChangeDueDate: PropTypes.func.isRequired,
     removeTodo: PropTypes.func.isRequired
   }
 
   componentDidMount() {
-    const { populateLabels, populateTodos } = this.props;
-    populateLabels();
+    const { populateTodos } = this.props;
     populateTodos();
   }
 
@@ -32,8 +26,8 @@ class TodoList extends Component {
   }
 
   render() {
-    const { todos, allLabels, todoAddLabel, todoRemoveLabel, todoChangeName,
-      removeTodo, todoChangeDueDate, todoChangeCompletionDate } = this.props;
+    const { todos, todoChangeName,
+      removeTodo, todoChangeCompletionDate } = this.props;
     return (
       <div className="todo-list">
         <h1>Todo List</h1>
@@ -41,13 +35,9 @@ class TodoList extends Component {
           <Todo
             key={todo.uuid}
             {...todo}
-            allLabels={allLabels}
             onRemoveTodo={() => removeTodo(todo.uuid)}
-            onTodoLabelAdded={todoAddLabel}
-            onTodoLabelRemoved={todoRemoveLabel}
             onTodoNameChanged={todoChangeName}
             onTodoChangeCompletionDate={todoChangeCompletionDate}
-            onTodoChangeDueDate={todoChangeDueDate}
             onTodoCompleted={this.onTodoCompleted}
           />
         )}
@@ -59,17 +49,16 @@ class TodoList extends Component {
 
 const mapStateToProps = (state) => ({
   todos: state.todos,
-  allLabels: state.labels
 });
 
 const mapDispatchToProps = (dispatch) => {
-  const { populateLabels, populateTodos, todoChangeName, todoAddLabel,
-    todoRemoveLabel, todoChangeCompletionDate, todoChangeDueDate,
+  const { populateTodos, todoChangeName,
+    todoChangeCompletionDate,
     removeTodo } = Actions;
   return {
-    ...bindActionCreators({ populateLabels, populateTodos,
-      todoChangeCompletionDate, todoChangeDueDate,
-      todoAddLabel, todoRemoveLabel, todoChangeName,
+    ...bindActionCreators({ populateTodos,
+      todoChangeCompletionDate,
+      todoChangeName,
       removeTodo
     }, dispatch)
   };
