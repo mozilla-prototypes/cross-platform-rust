@@ -227,7 +227,6 @@ impl Toodle {
 
     pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
         {
-<<<<<<< HEAD
             let in_progress = self.connection.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("label");
 
@@ -235,23 +234,6 @@ impl Toodle {
             builder.add_kw(&kw!(:label/color), TypedValue::typed_string(&color))?;
 
             builder.commit()?;
-=======
-            let mut in_progress = self.connection.begin_transaction()?;
-            let mut builder = TermBuilder::new();
-            let entid = builder.named_tempid("label".to_string());
-
-            let name_kw = kw!(:label/name);
-            let name_ref = in_progress.get_entid(&name_kw).ok_or_else(|| ErrorKind::UnknownAttribute(name_kw))?;
-            let _ = builder.add(entid.clone(), name_ref, TypedValue::typed_string(&name));
-
-            let color_kw = kw!(:label/color);
-            let color_ref = in_progress.get_entid(&color_kw).ok_or_else(|| ErrorKind::UnknownAttribute(color_kw))?;
-            let _ = builder.add(entid.clone(), color_ref, TypedValue::typed_string(&color));
-
-            let (terms, tempids) = builder.build()?;
-            let _ = in_progress.transact_terms(terms, tempids);
-            in_progress.commit()?;
->>>>>>> Use entity builder in toodle
         }
         self.fetch_label(&name)
     }
