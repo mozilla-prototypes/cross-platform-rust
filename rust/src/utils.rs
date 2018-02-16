@@ -13,10 +13,10 @@ extern crate time;
 
 extern crate mentat;
 
+use std::fmt;
 use std::fmt::{
     Display,
-    Formatter,
-    Result
+    Formatter
 };
 
 use time::Timespec;
@@ -24,8 +24,14 @@ use time::Timespec;
 use mentat::{
     NamespacedKeyword,
     Entid,
+    IntoResult,
+    QueryExecutionResult,
     TypedValue,
     Uuid,
+};
+
+use errors::{
+    Result,
 };
 
 pub trait ToTypedValue {
@@ -56,7 +62,7 @@ impl Entity {
 }
 
 impl Display for Entity {
-    fn fmt(&self, f: &mut Formatter) -> Result {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{}", self.id)
     }
 }
@@ -182,6 +188,17 @@ impl<'a> ToInner<Uuid> for &'a TypedValue {
             _ => Uuid::nil(),
         }
     }
+}
+
+
+pub fn create_uuid() -> Uuid {
+    Uuid::new_v4()
+}
+
+pub fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> {
+    results.into_scalar_result()
+           .map(|o| o.and_then(|ts| ts.to_inner()))
+           .map_err(|e| e.into())
 }
 
 #[cfg(test)]

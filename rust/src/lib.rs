@@ -39,7 +39,6 @@ use mentat::{
     InProgress,
     IntoResult,
     Queryable,
-    QueryExecutionResult,
     QueryInputs,
     Store,
     TypedValue,
@@ -91,12 +90,30 @@ use ctypes::{
 use utils::{
     ToInner,
     ToTypedValue,
+    create_uuid,
+    return_date_field,
 };
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
 // inside a Toodle struct and be able to mutate it...
 static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
+// Creates items as:
+// [
+//  {   :db/ident       :item/uuid
+//      :db/valueType   :db.type/uuid
+//      :db/cardinality :db.cardinality/one
+//      :db/unique      :db.unique/value
+//      :db/index true                        },
+//  {   :db/ident       :item/name
+//      :db/valueType   :db.type/string
+//      :db/cardinality :db.cardinality/one
+//      :db/index       true
+//      :db/fulltext    true                  },
+//  {   :db/ident       :item/completion_date
+//      :db/valueType   :db.type/instant
+//      :db/cardinality :db.cardinality/one   }
+// ]
 fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
     in_progress.ensure_vocabulary(&Definition {
             name: kw!(:toodle/items),
@@ -151,29 +168,72 @@ impl Toodle {
     }
 }
 
-fn create_uuid() -> Uuid {
-    uuid::Uuid::new_v4()
-}
-
-fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> {
-    results.into_scalar_result()
-           .map(|o| o.and_then(|ts| ts.to_inner()))
-           .map_err(|e| e.into())
-}
-
 impl Toodle {
-    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
-        let uuid = row[1].clone().to_inner();
-        let item;
+
+    pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
+        let item_uuid = create_uuid();
         {
-            item = Item {
-                id: row[0].clone().to_inner(),
-                uuid: uuid,
-                name: row[2].clone().to_inner(),
-                completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
+            let in_progress = self.connection.begin_transaction()?;
+            let mut builder = in_progress.builder().describe_tempid("item");
+
+            builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
+            builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
+
+            if let Some(completion_date) = item.completion_date {
+                builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
+            }
+
+            builder.commit()?;
+        }
+        Ok(item_uuid)
+    }
+
+    pub fn update_item_by_uuid(&mut self,
+                               uuid_string: &str,
+                               name: Option<String>,
+                               completion_date: Option<Timespec>)
+                               -> Result<Item> {
+        let uuid = Uuid::parse_str(&uuid_string)?;
+        let item =
+            self.fetch_item(&uuid)
+                .ok()
+                .unwrap_or_default()
+                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+
+        let new_item =
+            self.update_item(&item, name, completion_date)
+                .and_then(|_| self.fetch_item(&uuid))
+                .unwrap_or_default()
+                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
+
+        Ok(new_item)
+    }
+
+    pub fn update_item(&mut self,
+                       item: &Item, name: Option<String>,
+                       completion_date: Option<Timespec>) -> Result<()> {
+        let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
+        let in_progress = self.connection.begin_transaction()?;
+        let mut builder = in_progress.builder().describe(entid);
+
+        if let Some(name) = name {
+            if item.name != name {
+                builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&name))?;
             }
         }
-        item
+
+        if item.completion_date != completion_date {
+            let completion_date_kw = kw!(:item/completion_date);
+            if let Some(date) = completion_date {
+                builder.add_kw(&completion_date_kw, date.to_typed_value())?;
+            } else if let Some(date) = item.completion_date {
+                builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
+            }
+        }
+
+        builder.commit()
+               .map_err(|e| e.into())
+               .and(Ok(()))
     }
 
     pub fn fetch_items(&mut self) -> Result<Items> {
@@ -230,76 +290,24 @@ impl Toodle {
             .q_once(query, args))
     }
 
-    pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
-        let item_uuid = create_uuid();
+    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
+        let uuid = row[1].clone().to_inner();
+        let item;
         {
-            let in_progress = self.connection.begin_transaction()?;
-            let mut builder = in_progress.builder().describe_tempid("item");
-
-            builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
-            builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
-
-            if let Some(completion_date) = item.completion_date {
-                builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
+            item = Item {
+                id: row[0].clone().to_inner(),
+                uuid: uuid,
+                name: row[2].clone().to_inner(),
+                completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
             }
-
-            builder.commit()?;
         }
-        Ok(item_uuid)
+        item
     }
 
     pub fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
         let item_uuid = self.create_item(&item)?;
         let item = self.fetch_item(&item_uuid);
         item
-    }
-
-    pub fn update_item_by_uuid(&mut self,
-                               uuid_string: &str,
-                               name: Option<String>,
-                               completion_date: Option<Timespec>)
-                               -> Result<Item> {
-        let uuid = Uuid::parse_str(&uuid_string)?;
-        let item =
-            self.fetch_item(&uuid)
-                .ok()
-                .unwrap_or_default()
-                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
-
-        let new_item =
-            self.update_item(&item, name, completion_date)
-                .and_then(|_| self.fetch_item(&uuid))
-                .unwrap_or_default()
-                .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
-
-        Ok(new_item)
-    }
-
-    pub fn update_item(&mut self,
-                       item: &Item, name: Option<String>,
-                       completion_date: Option<Timespec>) -> Result<()> {
-        let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
-        let in_progress = self.connection.begin_transaction()?;
-        let mut builder = in_progress.builder().describe(entid);
-
-        if let Some(name) = name {
-            if item.name != name {
-                builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&name))?;
-            }
-        }
-
-        if item.completion_date != completion_date {
-            let completion_date_kw = kw!(:item/completion_date);
-            if let Some(date) = completion_date {
-                builder.add_kw(&completion_date_kw, date.to_typed_value())?;
-            } else if let Some(date) = item.completion_date {
-                builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
-            }
-        }
-
-        builder.commit()
-               .map_err(|e| e.into())
-               .and(Ok(()))
     }
 }
 
