@@ -22,8 +22,6 @@ use std::ffi::CString;
 use std::os::raw::{
     c_char,
 };
-use std::ptr;
-use std::str::FromStr;
 use time::Timespec;
 
 use toodle::{
@@ -48,9 +46,6 @@ use ffi_utils::log;
 // inside a Toodle struct and be able to mutate it...
 static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
-
-
-
 #[no_mangle]
 pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Toodle {
     let uri = c_char_to_string(uri);
@@ -64,8 +59,8 @@ pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_get_all_labels(manager: *const Toodle) -> *mut Vec<Label> {
-    let manager = &*manager;
+pub unsafe extern "C" fn toodle_get_all_labels(manager: *mut Toodle) -> *mut Vec<Label> {
+    let manager = &mut*manager;
     let label_list = Box::new(manager.fetch_labels().unwrap_or(vec![]));
     Box::into_raw(label_list)
 }
@@ -133,7 +128,7 @@ pub unsafe extern "C" fn item_list_count(item_list: *mut ItemCList) -> c_int {
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_all_items(manager: *mut Toodle, callback: extern "C" fn(Option<&ItemCList>)) {
-    let manager = &*manager;
+    let manager = &mut*manager;
     let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
 
     // TODO there's bound to be a better way. Ideally this should just return an empty set,
@@ -171,13 +166,27 @@ pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const c_char) -> *mut ItemC {
+    let uuid_string = c_char_to_string(uuid);
+    let uuid = Uuid::parse_str(&uuid_string).unwrap();
+    let manager = &mut*manager;
+
+    if let Ok(Some(i)) = manager.fetch_item(&uuid) {
+        let c_item: ItemC = i.into();
+        return Box::into_raw(Box::new(c_item));
+    }
+    return std::ptr::null_mut();
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t, labels: *const Vec<Label>) {
+    let name = c_char_to_string(name);
     let manager = &mut*manager;
     let item = &*item;
     let labels = &*labels;
     let _ = manager.update_item(
         &item,
-        Some(c_char_to_string(name)),
+        Some(name),
         optional_timespec(due_date),
         optional_timespec(completion_date),
         Some(&labels)
@@ -186,18 +195,13 @@ pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const I
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
+    let name = c_char_to_string(name);
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
-    let item = manager.fetch_item(
-        &Uuid::from_str(c_char_to_string(uuid).as_str()).expect("parsed uuid")
-    ).expect("item from uuid").unwrap();
-    let _ = manager.update_item(
-        &item,
-        Some(c_char_to_string(name)),
-        optional_timespec(due_date),
-        optional_timespec(completion_date),
-        Some(&item.labels)
-    );
+    let _ = manager.update_item_by_uuid(c_char_to_string(uuid).as_str(),
+                                        Some(name),
+                                        optional_timespec(due_date),
+                                        optional_timespec(completion_date));
 
     if let Some(callback) = CHANGED_CALLBACK {
         callback();
@@ -236,43 +240,10 @@ pub unsafe extern "C" fn label_set_color(label: *mut Label, color: *const c_char
     label.color = c_char_to_string(color);
 }
 
-
-#[no_mangle]
-pub extern "C" fn item_new() -> *mut Item {
-    let item = Item::default();
-    let boxed_item = Box::new(item);
-    Box::into_raw(boxed_item)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_destroy(item: *mut Item) {
-    let _ = Box::from_raw(item);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_name(item: *const Item) -> *mut c_char {
-    let item = &*item;
-    string_to_c_char(item.name.clone())
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
     let item = &mut*item;
     item.name = c_char_to_string(name);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_due_date(item: *const Item) -> *mut i64 {
-    let item = &*item;
-    match item.due_date {
-        Some(date) => {
-            Box::into_raw(Box::new(date.sec))
-        },
-        None => {
-            ptr::null_mut()
-        }
-    }
-
 }
 
 #[no_mangle]
@@ -283,20 +254,6 @@ pub unsafe extern "C" fn item_set_due_date(item: *mut Item, due_date: *const siz
     } else {
         item.due_date = None;
     }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_completion_date(item: *const Item) -> *mut i64 {
-    let item = &*item;
-    match item.completion_date {
-        Some(date) => {
-            Box::into_raw(Box::new(date.sec))
-        },
-        None => {
-            ptr::null_mut()
-        }
-    }
-
 }
 
 #[no_mangle]

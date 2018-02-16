@@ -64,12 +64,12 @@ use errors::{
     Result,
 };
 
-use items::{
+pub use items::{
     Item,
     Items,
 };
 
-use labels::{
+pub use labels::{
     Label,
 };
 

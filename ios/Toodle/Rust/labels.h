@@ -1,5 +1,5 @@
-#ifndef categories_h
-#define categories_h
+#ifndef labels_h
+#define labels_h
 
 #import "items.h"
 
@@ -19,4 +19,4 @@ const char* _Nonnull label_get_color(const struct Label* _Nonnull label);
 const void label_set_color(struct Label* _Nonnull label, const char* _Nonnull color);
 
 
-#endif /* categories_h */
+#endif /* labels_h */
