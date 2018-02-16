@@ -1,0 +1,16 @@
+[package]
+name = "toodlext"
+version = "0.1.0"
+authors = ["Kit Cambridge <kit@mozilla.com>"]
+description = "Web Extension native messaging bridge for Toodle"
+
+[[bin]]
+path = "src/main.rs"
+name = "toodlext"
+
+[dependencies]
+byteorder = "1.1.0"
+serde = "1.0.21"
+serde_derive = "1.0.21"
+serde_json = "1.0.6"
+toodle = { path = "../rust", version = "0.1.0" }

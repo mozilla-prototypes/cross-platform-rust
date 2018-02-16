@@ -1,0 +1,25 @@
+.todo-dates-chooser {
+  min-width: 130px;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-dates-chooser span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.todo-dates-chooser input[type="date"] {
+  font-size: inherit;
+  padding-left: 5px;
+  height: 25px;
+  margin-bottom: 10px;
+}
+
+.todo-dates-chooser button {
+  margin-top: 4px;
+  width: 60px;
+  height: 30px;
+  align-self: flex-end;
+}

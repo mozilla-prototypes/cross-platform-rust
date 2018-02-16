@@ -1,0 +1,36 @@
+:root {
+  --border-radius: 3px;
+}
+
+body {
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+h1 {
+  user-select: none;
+  margin: 10px 0;
+}
+
+input {
+  border: 1px solid grey;
+  border-radius: var(--border-radius);
+}
+
+.app {
+  display: flex;
+}
+
+button {
+  border: 1px solid grey;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #e0dede;
+}
+
+button:hover:active {
+  background-color: #cccccc;
+}

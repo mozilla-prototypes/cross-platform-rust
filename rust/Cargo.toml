@@ -1,0 +1,36 @@
+[package]
+name = "toodle"
+version = "0.1.0"
+authors = ["Emily Toop <etoop@mozilla.com>"]
+description = "Cross Platform Library for providing To Do List data"
+
+[workspace]
+members = ["toodle_ffi"]
+
+# In order to be usable from the WebExtension app, which expects an ordinary
+# Cargo dependency, and the Android and iOS apps, which expect specific kinds of
+# library formats, we must explicitly define multiple crate-type options. They'll
+# all be built, and our consuming apps will use the right one. See #20 for
+# discussion.
+[lib]
+name = "toodle"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[dependencies]
+error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
+libc = "0.2"
+time = "0.1"
+uuid = { version = "0.5", features = ["v4"] }
+
+[dependencies.mentat]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
+
+[dependencies.mentat_core]
+git = "https://github.com/mozilla/mentat.git"
+branch = "master"
+
+[dependencies.rusqlite]
+version = "0.12"
+# System sqlite might be very old.
+features = ["bundled", "limits"]

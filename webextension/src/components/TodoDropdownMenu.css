@@ -1,0 +1,10 @@
+.todo-dropdown-menu {
+  position: absolute;
+  z-index: 3;
+  top: 21px;
+  right: 0;
+  border: 1px rgb(226, 228, 230) solid;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: var(--border-radius);
+}
