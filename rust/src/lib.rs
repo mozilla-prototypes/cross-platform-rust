@@ -14,7 +14,6 @@ extern crate error_chain;
 #[macro_use(kw, var)]
 extern crate mentat;
 
-extern crate ffi_utils;
 extern crate libc;
 extern crate mentat_core;
 extern crate rusqlite;

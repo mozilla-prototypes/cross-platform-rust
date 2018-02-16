@@ -21,6 +21,3 @@ branch = "master"
 
 [dependencies.toodle]
 path = "../"
-
-[dependencies.ffi-utils]
-path = "../ffi-utils"

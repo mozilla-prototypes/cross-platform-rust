@@ -33,9 +33,6 @@ branch = "master"
 git = "https://github.com/mozilla/mentat.git"
 branch = "master"
 
-[dependencies.ffi-utils]
-path = "ffi-utils"
-
 [dependencies.rusqlite]
 version = "0.12"
 # System sqlite might be very old.

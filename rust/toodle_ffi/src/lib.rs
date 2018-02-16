@@ -8,13 +8,15 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-extern crate ffi_utils;
 extern crate libc;
 extern crate mentat;
 extern crate time;
 extern crate toodle;
 
+#[doc(hidden)]
+pub mod android_ffi;
 mod ctypes;
+mod utils;
 
 use libc::{ c_int, size_t, time_t };
 use mentat::Uuid;
@@ -34,12 +36,12 @@ use ctypes::{
     ItemsC,
     ItemCList
 };
-use ffi_utils::strings::{
+use utils::strings::{
     c_char_to_string,
     optional_timespec,
     string_to_c_char,
 };
-use ffi_utils::log;
+use utils::log;
 
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live

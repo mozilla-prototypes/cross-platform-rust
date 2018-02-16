@@ -11,11 +11,6 @@
 use std::os::raw::c_char;
 use std::ptr;
 
-use ffi_utils::strings::{
-    string_to_c_char,
-    c_char_to_string,
-};
-
 use time::{
     Timespec,
 };
@@ -27,6 +22,11 @@ use mentat::{
 use toodle::items::{
     Item,
     Items,
+};
+
+use utils::strings::{
+    string_to_c_char,
+    c_char_to_string,
 };
 
 #[repr(C)]
