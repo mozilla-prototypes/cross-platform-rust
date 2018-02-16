@@ -5,6 +5,7 @@ authors = ["Emily Toop <etoop@mozilla.com>"]
 description = "Cross Platform Library for providing To Do List data"
 
 [workspace]
+members = ["toodle_ffi"]
 
 # In order to be usable from the WebExtension app, which expects an ordinary
 # Cargo dependency, and the Android and iOS apps, which expect specific kinds of
@@ -14,9 +15,6 @@ description = "Cross Platform Library for providing To Do List data"
 [lib]
 name = "toodle"
 crate-type = ["lib", "staticlib", "cdylib"]
-
-[target.'cfg(target_os="android")'.dependencies]
-jni = { version = "0.5", default-features = false }
 
 [dependencies]
 error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
@@ -31,9 +29,6 @@ branch = "master"
 [dependencies.mentat_core]
 git = "https://github.com/mozilla/mentat.git"
 branch = "master"
-
-[dependencies.ffi-utils]
-path = "ffi-utils"
 
 [dependencies.rusqlite]
 version = "0.12"

@@ -8,16 +8,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use std::os::raw::{
-    c_char,
-};
-
-use ffi_utils::strings::{
-    c_char_to_string,
-};
-
-use libc::size_t;
-
 use time::Timespec;
 
 use mentat::{
@@ -46,21 +36,5 @@ impl Items {
         Items {
             vec: vec
         }
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
-    let item = &mut*item;
-    item.name = c_char_to_string(name);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_set_completion_date(item: *mut Item, completion_date: *const size_t) {
-    let item = &mut*item;
-    if !completion_date.is_null() {
-        item.completion_date = Some(Timespec::new(completion_date as i64, 0));
-    } else {
-        item.completion_date = None;
     }
 }

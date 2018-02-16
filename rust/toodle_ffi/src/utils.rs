@@ -7,8 +7,6 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-extern crate time;
-extern crate libc;
 
 pub mod strings {
     use std::os::raw::c_char;
@@ -39,9 +37,6 @@ pub mod strings {
         }
     }
 }
-
-#[doc(hidden)]
-pub mod android_ffi;
 
 pub mod log {
     #[cfg(all(target_os="android", not(test)))]
