@@ -8,16 +8,10 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use std::os::raw::{
-    c_char,
-    c_int,
+pub use mentat::edn::{
+    DateTime,
+    Utc,
 };
-
-use ffi_utils::strings::{
-    c_char_to_string,
-};
-
-use libc::size_t;
 
 use time::Timespec;
 
@@ -56,49 +50,8 @@ impl Items {
     }
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
-    let item = &mut*item;
-    item.name = c_char_to_string(name);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_set_due_date(item: *mut Item, due_date: *const size_t) {
-    let item = &mut*item;
-    if !due_date.is_null() {
-        item.due_date = Some(Timespec::new(due_date as i64, 0));
-    } else {
-        item.due_date = None;
+impl Drop for Item {
+    fn drop(&mut self) {
+        println!("{:?} is being deallocated", self);
     }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_set_completion_date(item: *mut Item, completion_date: *const size_t) {
-    let item = &mut*item;
-    if !completion_date.is_null() {
-        item.completion_date = Some(Timespec::new(completion_date as i64, 0));
-    } else {
-        item.completion_date = None;
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_get_labels(item: *const Item) -> *mut Vec<Label> {
-    let item = &*item;
-    let boxed_labels = Box::new(item.labels.clone());
-    Box::into_raw(boxed_labels)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_labels_count(item: *const Item) -> c_int {
-    let item = &*item;
-    item.labels.len() as c_int
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn item_label_at(label_list: *const Vec<Label>, index: size_t) -> *const Label {
-    let label_list = &*label_list;
-    let index = index as usize;
-    let label = Box::new(label_list[index].clone());
-    Box::into_raw(label)
 }

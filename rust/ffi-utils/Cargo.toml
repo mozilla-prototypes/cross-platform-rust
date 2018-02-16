@@ -1,8 +1,0 @@
-[package]
-name = "ffi-utils"
-version = "0.1.0"
-authors = ["Emily Toop <etoop@mozilla.com>"]
-
-[dependencies]
-time = "0.1.38"
-libc = "0.2.32"
