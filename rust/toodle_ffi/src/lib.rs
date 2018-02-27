@@ -10,6 +10,7 @@
 
 extern crate libc;
 extern crate mentat;
+extern crate mentat_ffi;
 extern crate time;
 extern crate toodle;
 
@@ -19,12 +20,25 @@ mod ctypes;
 mod utils;
 
 use libc::{ c_int, size_t, time_t };
-use mentat::Uuid;
 use std::ffi::CString;
 use std::os::raw::{
     c_char,
 };
+use std::sync::{
+    Arc,
+};
+
 use time::Timespec;
+
+pub use mentat::{
+    Store,
+    Uuid,
+};
+
+pub use mentat_ffi::{
+    store_register_observer,
+    store_unregister_observer,
+};
 
 use toodle::{
     Item,
@@ -58,6 +72,12 @@ pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Toodle {
 #[no_mangle]
 pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
     let _ = Box::from_raw(toodle);
+}
+
+#[no_mangle]
+pub extern "C" fn toodle_connection(toodle: *mut Toodle) -> *mut Arc<Store> {
+    let toodle = unsafe { &mut*toodle };
+    Box::into_raw(Box::new(toodle.connection()))
 }
 
 #[no_mangle]

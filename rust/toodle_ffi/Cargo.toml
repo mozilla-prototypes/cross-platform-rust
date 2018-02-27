@@ -17,7 +17,11 @@ uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "fluffyemily/expose-txobserver-over-ffi"
+
+[dependencies.mentat_ffi]
+git = "https://github.com/mozilla/mentat.git"
+branch = "fluffyemily/expose-txobserver-over-ffi"
 
 [dependencies.toodle]
 path = "../"

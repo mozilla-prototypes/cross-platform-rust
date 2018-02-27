@@ -20,6 +20,10 @@ extern crate rusqlite;
 extern crate time;
 extern crate uuid;
 
+use std::sync::{
+    Arc,
+};
+
 use mentat::{
     InProgress,
     IntoResult,
@@ -141,7 +145,7 @@ fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
 
 #[repr(C)]
 pub struct Toodle {
-    connection: Store,
+    connection: Arc<Store>,
 }
 
 impl Toodle {
@@ -158,10 +162,18 @@ impl Toodle {
         }
 
         let toodle = Toodle {
-            connection: store_result,
+            connection: Arc::new(store_result),
         };
 
         Ok(toodle)
+    }
+
+    pub fn connection(&self) -> Arc<Store> {
+        Arc::clone(&self.connection)
+    }
+
+    pub fn connection_mut(&mut self) -> &mut Store {
+        Arc::get_mut(&mut self.connection).unwrap()
     }
 }
 
@@ -194,7 +206,7 @@ impl Toodle {
 
     pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
         {
-            let in_progress = self.connection.begin_transaction()?;
+            let in_progress = self.connection_mut().begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("label");
 
             builder.add_kw(&kw!(:label/name), TypedValue::typed_string(&name))?;
@@ -212,7 +224,7 @@ impl Toodle {
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.connection_mut().begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?name), name.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
@@ -227,7 +239,7 @@ impl Toodle {
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.connection_mut().begin_read()?;
         in_progress_read
             .q_once(query, None)
             .into_rel_result()
@@ -244,7 +256,7 @@ impl Toodle {
                         [?l :label/name ?name]
                         [?l :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.connection_mut().begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?item_uuid), item_uuid.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
@@ -265,7 +277,7 @@ impl Toodle {
         ]"#;
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.connection_mut().begin_read()?;
             let args = QueryInputs::with_value_sequence(vec![(var!(?label), label.name.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
@@ -284,7 +296,7 @@ impl Toodle {
 
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.connection_mut().begin_read()?;
             rows = in_progress_read
                 .q_once(query, None)
                 .into_rel_result()
@@ -302,7 +314,7 @@ impl Toodle {
         ]"#;
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.connection_mut().begin_read()?;
             let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), uuid.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
@@ -322,7 +334,7 @@ impl Toodle {
             [?eid :item/completion_date ?date]
         ]"#;
 
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.connection_mut().begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         return_date_field(
             in_progress_read
@@ -336,7 +348,7 @@ impl Toodle {
             [?eid :item/uuid ?uuid]
             [?eid :item/due_date ?date]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.connection_mut().begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         let date = return_date_field(
             in_progress_read
@@ -347,7 +359,7 @@ impl Toodle {
     pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         let item_uuid = create_uuid();
         {
-            let in_progress = self.connection.begin_transaction()?;
+            let in_progress = self.connection_mut().begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("item");
 
             builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
@@ -405,7 +417,7 @@ impl Toodle {
                        labels: Option<&Vec<Label>>) -> Result<()> {
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
         let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
-        let in_progress = self.connection.begin_transaction()?;
+        let in_progress = self.connection_mut().begin_transaction()?;
         let mut builder = in_progress.builder().describe(entid);
 
         if let Some(name) = name {

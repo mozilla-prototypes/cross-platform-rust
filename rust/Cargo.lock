@@ -102,7 +102,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "edn"
 version = "0.1.0"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -328,25 +328,25 @@ dependencies = [
 [[package]]
 name = "mentat"
 version = "0.6.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_parser 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_parser 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -356,10 +356,10 @@ dependencies = [
 [[package]]
 name = "mentat_core"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "enum-set 0.0.6 (git+https://github.com/rnewman/enum-set)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "num 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -372,15 +372,15 @@ dependencies = [
 [[package]]
 name = "mentat_db"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "itertools 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "ordered-float 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tabwriter 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -388,97 +388,105 @@ dependencies = [
 ]
 
 [[package]]
+name = "mentat_ffi"
+version = "0.1.0"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
+dependencies = [
+ "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+]
+
+[[package]]
 name = "mentat_parser_utils"
 version = "0.1.0"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "itertools 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
 name = "mentat_query_algebrizer"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
 name = "mentat_query_parser"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "maplit 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "matches 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
 name = "mentat_query_projector"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query_sql"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "regex 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query_translator"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
 name = "mentat_sql"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "ordered-float 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -486,14 +494,14 @@ dependencies = [
 [[package]]
 name = "mentat_tolstoy"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "futures 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_cbor 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -506,21 +514,21 @@ dependencies = [
 [[package]]
 name = "mentat_tx"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
 name = "mentat_tx_parser"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git#36d455150dd5d8a84594d81124312718019fb45e"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#1413c91189ba8fb8d38bd861aba57d21de2d3076"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/mozilla/mentat.git)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git)",
- "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
 
 [[package]]
@@ -953,8 +961,8 @@ dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "jni 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.37 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)",
- "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -966,7 +974,8 @@ version = "0.1.0"
 dependencies = [
  "jni 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.37 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)",
+ "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
+ "mentat_ffi 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
  "toodle 0.1.0",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1093,7 +1102,7 @@ dependencies = [
 "checksum chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7c20ebe0b2b08b0aeddba49c609fe7957ba2e33449882cb186a180bc60682fa9"
 "checksum combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1645a65a99c7c8d345761f4b75a6ffe5be3b3b27a93ee731fccc5050ba6be97c"
 "checksum dtoa 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "09c3753c3db574d215cba4ea76018483895d7bff25a31b49ba45db21c48e50ab"
-"checksum edn 0.1.0 (git+https://github.com/mozilla/mentat.git)" = "<none>"
+"checksum edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
 "checksum either 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "740178ddf48b1a9e878e6d6509a1442a2d42fd2928aae8e7a6f8a36fb01981b3"
 "checksum enum-set 0.0.6 (git+https://github.com/rnewman/enum-set)" = "<none>"
 "checksum error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d9435d864e017c3c6afeac1654189b06cdb491cf2ff73dbf0d73b0f292f42ff8"
@@ -1123,20 +1132,21 @@ dependencies = [
 "checksum maplit 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "22593015b8df7747861c69c28acd32589fb96c1686369f3b661d12e409d4cf65"
 "checksum matches 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "100aabe6b8ff4e4a7e32c1c13523379802df0772b82466207ac25b013f193376"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
-"checksum mentat 0.6.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query_parser 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
-"checksum mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git)" = "<none>"
+"checksum mentat 0.6.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_ffi 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query_parser 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_tx 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
+"checksum mentat_tx_parser 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)" = "<none>"
 "checksum mime 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "e2e00e17be181010a91dbfefb01660b17311059dc8c7f48b9017677721e732bd"
 "checksum mio 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)" = "7da01a5e23070d92d99b1ecd1cd0af36447c6fd44b0fe283c2db199fa136724f"
 "checksum miow 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f2f3b1cf331de6896aabf6e9d55dca90356cc9960cca7eaaf408a355ae919"

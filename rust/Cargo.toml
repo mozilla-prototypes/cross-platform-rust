@@ -27,11 +27,11 @@ uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "fluffyemily/expose-txobserver-over-ffi"
 
 [dependencies.mentat_core]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "fluffyemily/expose-txobserver-over-ffi"
 
 [dependencies.rusqlite]
 version = "0.13"
