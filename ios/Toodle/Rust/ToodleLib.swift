@@ -120,44 +120,27 @@ class ToodleLib {
 
 extension ToodleLib: Observable {
     func register(key: String, observer: Observing, attributes: [String]) {
-//        let ownedPointer = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
-//        let wrapper = TmpCallback(
-//            obj: ownedPointer,
-//            destroy: destroy,
-//            callback_fn: callbackDidCallBack)
-//        callback(wrapper)
-        print("Register \(key)")
-
         let attrEntIds = attributes.map({ Int64(self.entidForAttribute(attribute: $0)) })
 
         let ptr = UnsafeMutablePointer<Int64>.allocate(capacity: attrEntIds.count)
         let entidPointer = UnsafeMutableBufferPointer(start: ptr, count: attrEntIds.count)
         var _ = entidPointer.initialize(from: attrEntIds)
+
         guard let firstElement = entidPointer.baseAddress else {
             return
         }
-
-        print("registering attributes \(attrEntIds)")
-//        var attributeLen = UInt64(attributes.count)
-//        var attributeList = AttributeList(
-//            attributes: ,
-//            len: &attributeLen)
-
         self.observers[key] = observer
         let ownedPointer = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
         let wrapper = RustCallback(
             obj: ownedPointer,
             destroy: destroy,
             callback_fn: transactionObserverCallback)
-//        let attrPointer = UnsafeMutablePointer<Int64>(&firstElement)
         store_register_observer(self.raw, key, firstElement, Int64(attributes.count), wrapper)
 
     }
 
     func unregister(key: String) {
-        print("Unregister \(key)")
         store_unregister_observer(self.raw, key)
-        print("\(key) unregistered")
     }
 
     func transactionObserverCalled(key: String, reports: [TxReport]) {
@@ -185,6 +168,5 @@ private func transactionObserverCallback(obj: UnsafeMutableRawPointer, key: Unsa
 }
 
 private func destroy(obj: UnsafeMutableRawPointer) {
-    print("Destroy was called")
     let _ = Unmanaged<AnyObject>.fromOpaque(UnsafeRawPointer(obj)).takeRetainedValue()
 }

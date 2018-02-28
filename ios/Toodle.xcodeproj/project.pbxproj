@@ -15,7 +15,6 @@
 		7B8992321FE176C6007B0BE2 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */; };
 		7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */; };
 		7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8992311FE176C5007B0BE2 /* Date+Int64.swift */; };
-		7B99184F20457A8B00C9A842 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B99184E20457A8B00C9A842 /* Store.swift */; };
 		7B99185420459D6700C9A842 /* TxReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B99185320459D6700C9A842 /* TxReport.swift */; };
 		7B9F01101F794DB2000407E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F010F1F794DB2000407E5 /* AppDelegate.swift */; };
 		7B9F01151F794DB2000407E5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B9F01131F794DB2000407E5 /* Main.storyboard */; };
@@ -39,7 +38,6 @@
 		7B89922F1FE176C5007B0BE2 /* UIColor+Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		7B8992301FE176C5007B0BE2 /* NSLayoutConstraint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Utils.swift"; sourceTree = "<group>"; };
 		7B8992311FE176C5007B0BE2 /* Date+Int64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Int64.swift"; sourceTree = "<group>"; };
-		7B99184E20457A8B00C9A842 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		7B99185220457CEC00C9A842 /* store.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = store.h; sourceTree = "<group>"; };
 		7B99185320459D6700C9A842 /* TxReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxReport.swift; sourceTree = "<group>"; };
 		7B9D81B01FB0CFC30027C605 /* libtoodle.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoodle.a; path = ../cargo/target/universal/release/libtoodle.a; sourceTree = "<group>"; };
@@ -88,7 +86,6 @@
 				7BB220531F8FA72500ACD7AF /* RustObject.swift */,
 				7B1F2D6C1FB0D318000246C9 /* List */,
 				7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */,
-				7B99184E20457A8B00C9A842 /* Store.swift */,
 				7B99185220457CEC00C9A842 /* store.h */,
 				7B99185320459D6700C9A842 /* TxReport.swift */,
 			);
@@ -251,7 +248,6 @@
 				7B99185420459D6700C9A842 /* TxReport.swift in Sources */,
 				7BB2204D1F8F976C00ACD7AF /* Item.swift in Sources */,
 				7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */,
-				7B99184F20457A8B00C9A842 /* Store.swift in Sources */,
 				7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */,
 				7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */,
 				7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */,
