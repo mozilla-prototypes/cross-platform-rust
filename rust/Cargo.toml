@@ -16,9 +16,6 @@ members = ["toodle_ffi"]
 name = "toodle"
 crate-type = ["lib", "staticlib", "cdylib"]
 
-[target.'cfg(target_os="android")'.dependencies]
-jni = { version = "0.5", default-features = false }
-
 [dependencies]
 error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
 libc = "0.2"

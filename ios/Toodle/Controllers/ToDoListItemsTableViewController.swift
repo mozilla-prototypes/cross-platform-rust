@@ -17,9 +17,15 @@ class ToDoListItemsTableViewController: UITableViewController {
         super.viewDidLoad()
 
         self.items = ToodleLib.sharedInstance.allItems()
+        let attrs = ["item/uuid", "item/name", "item/completion_date"]
+        ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(newItem))
+    }
+
+    deinit {
+        ToodleLib.sharedInstance.unregister(key: "ToDoListItemsTableViewController")
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,5 +80,11 @@ extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate 
         }
         self.items[index] = self.items[index]
         self.tableView.reloadData()
+    }
+}
+
+extension ToDoListItemsTableViewController: Observing {
+    func transactionDidOccur(key: String, reports: [TxReport]) {
+        print("transaction did occur \(key)")
     }
 }

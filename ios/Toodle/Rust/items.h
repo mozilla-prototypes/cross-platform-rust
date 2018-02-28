@@ -18,7 +18,7 @@ struct CItemList {
 
 struct Label;
 
-const struct CItem* _Nullable toodle_create_item(const struct Toodle* _Nonnull manager, const char* _Nonnull name, const int64_t* _Nullable due_date, struct Label*_Nonnull* _Nonnull list);
+const struct CItem* _Nullable toodle_create_item(const struct Toodle* _Nonnull manager, const char* _Nonnull name, const int64_t* _Nullable due_date);
 const void toodle_update_item(const struct Toodle* _Nonnull manager, const struct CItem* _Nonnull item, const char* _Nonnull name, const int64_t* _Nullable due_date, const int64_t* _Nullable completion_date, struct label*_Nonnull* _Nullable list);
 const void toodle_update_item_by_uuid (const struct Toodle* _Nonnull manager, const char* _Nonnull uuid, const char* _Nonnull name, const int64_t* _Nullable due_date, const int64_t* _Nullable completion_date);
 const struct CItemList*_Nonnull toodle_get_all_items(const struct Toodle* _Nonnull manager);

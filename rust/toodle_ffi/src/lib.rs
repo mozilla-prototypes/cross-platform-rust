@@ -36,6 +36,8 @@ pub use mentat::{
 };
 
 pub use mentat_ffi::{
+    store_destroy,
+    store_entid_for_attribute,
     store_register_observer,
     store_unregister_observer,
 };
@@ -63,21 +65,15 @@ use utils::log;
 static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 #[no_mangle]
-pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Toodle {
-    let uri = c_char_to_string(uri);
-    let toodle = Toodle::new(uri).expect("expected a toodle");
+pub extern "C" fn new_toodle(store: *mut Store) -> *mut Toodle {
+    let local_store = unsafe { Box::from_raw(store) };
+    let toodle = Toodle::new(local_store).expect("expected a toodle");
     Box::into_raw(Box::new(toodle))
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
     let _ = Box::from_raw(toodle);
-}
-
-#[no_mangle]
-pub extern "C" fn toodle_connection(toodle: *mut Toodle) -> *mut Arc<Store> {
-    let toodle = unsafe { &mut*toodle };
-    Box::into_raw(Box::new(toodle.connection()))
 }
 
 #[no_mangle]
@@ -308,3 +304,4 @@ pub unsafe extern "C" fn item_label_at(label_list: *const Vec<Label>, index: siz
     let label = Box::new(label_list[index].clone());
     Box::into_raw(label)
 }
+
