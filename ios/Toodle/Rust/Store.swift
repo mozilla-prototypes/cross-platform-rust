@@ -17,14 +17,8 @@ class Store: RustObject {
         return self.raw
     }
 
-    func entidForAttribute(attribute: String) -> Int64 {
-        return Int64(store_entid_for_attribute(self.raw, attribute))
-    }
-
     deinit {
-        print("Destroying store")
         store_destroy(self.raw)
-        print("Store destroyed")
     }
 }
 

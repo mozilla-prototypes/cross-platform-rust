@@ -139,32 +139,6 @@ fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
         .and(Ok(()))
 }
 
-#[repr(C)]
-pub struct Toodle {
-    connection: Box<Store>,
-}
-
-impl Toodle {
-    pub fn new(mut connection: Box<Store>) -> Result<Toodle> {
-        // let uri_string = uri.into().unwrap_or(String::new());
-        // let mut store_result = Store::open(&uri_string)?;
-        {
-            // TODO proper error handling at the FFI boundary
-            let mut in_progress = connection.begin_transaction()?;
-            in_progress.verify_core_schema()?;
-            transact_labels_vocabulary(&mut in_progress)?;
-            transact_items_vocabulary(&mut in_progress)?;
-            in_progress.commit()?;
-        }
-
-        let toodle = Toodle {
-            connection: connection,
-        };
-
-        Ok(toodle)
-    }
-}
-
 fn create_uuid() -> Uuid {
     uuid::Uuid::new_v4()
 }
@@ -175,7 +149,47 @@ fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> 
            .map_err(|e| e.into())
 }
 
-impl Toodle {
+pub trait Toodle {
+    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item;
+    fn fetch_completion_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
+    fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
+
+    fn initialize(&mut self) -> Result<()>;
+    fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>>;
+    fn fetch_label(&mut self, name: &String) -> Result<Option<Label>>;
+    fn fetch_labels(&mut self) -> Result<Vec<Label>>;
+    fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>>;
+    fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>>;
+    fn fetch_items(&mut self) -> Result<Items>;
+    fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>>;
+    fn create_item(&mut self, item: &Item) -> Result<Uuid>;
+    fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>>;
+    fn update_item_by_uuid(&mut self,
+                               uuid_string: &str,
+                               name: Option<String>,
+                               due_date: Option<Timespec>,
+                               completion_date: Option<Timespec>)
+                               -> Result<Item>;
+    fn update_item(&mut self,
+                       item: &Item, name: Option<String>,
+                       due_date: Option<Timespec>,
+                       completion_date: Option<Timespec>,
+                       labels: Option<&Vec<Label>>) -> Result<()>;
+}
+
+impl Toodle for Store {
+
+    fn initialize(&mut self) -> Result<()> {
+        let mut in_progress = self.begin_transaction()?;
+        {
+            transact_items_vocabulary(&mut in_progress)?;
+        }
+        {
+            transact_labels_vocabulary(&mut in_progress)?;
+        }
+        Ok(())
+    }
+
     fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
         let uuid = row[1].clone().to_inner();
         let item;
@@ -192,9 +206,9 @@ impl Toodle {
         item
     }
 
-    pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
+    fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
         {
-            let in_progress = self.connection.begin_transaction()?;
+            let in_progress = self.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("label");
 
             builder.add_kw(&kw!(:label/name), TypedValue::typed_string(&name))?;
@@ -205,14 +219,14 @@ impl Toodle {
         self.fetch_label(&name)
     }
 
-    pub fn fetch_label(&mut self, name: &String) -> Result<Option<Label>> {
+    fn fetch_label(&mut self, name: &String) -> Result<Option<Label>> {
         let query = r#"[:find [?eid ?name ?color]
                         :in ?name
                         :where
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?name), name.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
@@ -221,13 +235,13 @@ impl Toodle {
             .map_err(|e| e.into())
     }
 
-    pub fn fetch_labels(&mut self) -> Result<Vec<Label>> {
+    fn fetch_labels(&mut self) -> Result<Vec<Label>> {
         let query = r#"[:find ?eid ?name ?color
                         :where
                         [?eid :label/name ?name]
                         [?eid :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.begin_read()?;
         in_progress_read
             .q_once(query, None)
             .into_rel_result()
@@ -235,7 +249,7 @@ impl Toodle {
             .map_err(|e| e.into())
     }
 
-    pub fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
+    fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
         let query = r#"[:find ?l ?name ?color
                         :in ?item_uuid
                         :where
@@ -244,7 +258,7 @@ impl Toodle {
                         [?l :label/name ?name]
                         [?l :label/color ?color]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?item_uuid), item_uuid.to_typed_value())]);
         in_progress_read
             .q_once(query, args)
@@ -254,7 +268,7 @@ impl Toodle {
     }
 
 
-    pub fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>> {
+    fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>> {
         let query = r#"[:find ?eid ?uuid ?name
                         :in ?label
                         :where
@@ -265,7 +279,7 @@ impl Toodle {
         ]"#;
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.begin_read()?;
             let args = QueryInputs::with_value_sequence(vec![(var!(?label), label.name.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
@@ -275,7 +289,7 @@ impl Toodle {
         rows.map(|rows| rows.into_iter().map(|r| self.item_row_to_item(r)).collect())
     }
 
-    pub fn fetch_items(&mut self) -> Result<Items> {
+    fn fetch_items(&mut self) -> Result<Items> {
         let query = r#"[:find ?eid ?uuid ?name
                         :where
                         [?eid :item/uuid ?uuid]
@@ -284,7 +298,7 @@ impl Toodle {
 
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.begin_read()?;
             rows = in_progress_read
                 .q_once(query, None)
                 .into_rel_result()
@@ -293,7 +307,7 @@ impl Toodle {
         rows.map(|rows| Items::new(rows.into_iter().map(|r| self.item_row_to_item(r)).collect()))
     }
 
-    pub fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>> {
+    fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>> {
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
@@ -302,7 +316,7 @@ impl Toodle {
         ]"#;
         let rows;
         {
-            let in_progress_read = self.connection.begin_read()?;
+            let in_progress_read = self.begin_read()?;
             let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), uuid.to_typed_value())]);
             rows = in_progress_read
                 .q_once(query, args)
@@ -322,7 +336,7 @@ impl Toodle {
             [?eid :item/completion_date ?date]
         ]"#;
 
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         return_date_field(
             in_progress_read
@@ -336,7 +350,7 @@ impl Toodle {
             [?eid :item/uuid ?uuid]
             [?eid :item/due_date ?date]
         ]"#;
-        let in_progress_read = self.connection.begin_read()?;
+        let in_progress_read = self.begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
         let date = return_date_field(
             in_progress_read
@@ -344,10 +358,10 @@ impl Toodle {
         date
     }
 
-    pub fn create_item(&mut self, item: &Item) -> Result<Uuid> {
+    fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         let item_uuid = create_uuid();
         {
-            let in_progress = self.connection.begin_transaction()?;
+            let in_progress = self.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("item");
 
             builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
@@ -360,23 +374,18 @@ impl Toodle {
                 builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
             }
 
-            // let item_labels_kw = kw!(:item/label);
-            // for label in item.labels.iter() {
-            //     let label_id = label.id.clone().ok_or_else(|| ErrorKind::LabelNotFound(label.name.clone()))?;
-            //     builder.add_kw(&item_labels_kw, TypedValue::Ref(label_id.id))?;
-            // }
             builder.commit()?;
         }
         Ok(item_uuid)
     }
 
-    pub fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
+    fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
         let item_uuid = self.create_item(&item)?;
         let item = self.fetch_item(&item_uuid);
         item
     }
 
-    pub fn update_item_by_uuid(&mut self,
+    fn update_item_by_uuid(&mut self,
                                uuid_string: &str,
                                name: Option<String>,
                                due_date: Option<Timespec>,
@@ -398,14 +407,14 @@ impl Toodle {
         Ok(new_item)
     }
 
-    pub fn update_item(&mut self,
+    fn update_item(&mut self,
                        item: &Item, name: Option<String>,
                        due_date: Option<Timespec>,
                        completion_date: Option<Timespec>,
                        labels: Option<&Vec<Label>>) -> Result<()> {
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
         let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
-        let in_progress = self.connection.begin_transaction()?;
+        let in_progress = self.begin_transaction()?;
         let mut builder = in_progress.builder().describe(entid);
 
         if let Some(name) = name {
@@ -467,8 +476,8 @@ mod test {
     };
     use mentat::edn;
 
-    fn toodle() -> Toodle {
-        Toodle::new(String::new()).expect("Expected a Toodle")
+    fn toodle() -> Store {
+        Store::open(String::new()).expect("Expected a Toodle")
     }
 
     fn assert_ident_present(edn: edn::Value, namespace: &str, name: &str) -> bool {

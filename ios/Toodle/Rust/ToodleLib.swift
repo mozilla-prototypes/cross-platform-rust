@@ -26,17 +26,15 @@ class ToodleLib {
         return Static.instance
     }
 
-    var toodle_raw: OpaquePointer
-    var store: Store
+    var raw: OpaquePointer
 
-    required init(store_raw: OpaquePointer, toodle_raw: OpaquePointer) {
-        self.toodle_raw = toodle_raw
-        self.store = Store(raw: store_raw)
+    required init(raw: OpaquePointer) {
+        self.raw = raw
         self.observers = [:]
     }
 
     func intoRaw() -> OpaquePointer {
-        return self.toodle_raw
+        return self.raw
     }
 
     convenience init() {
@@ -44,13 +42,11 @@ class ToodleLib {
         let documentsURL = paths[0]
         let storeURI = documentsURL.appendingPathComponent("todolist.db", isDirectory: false).absoluteString
 
-        let store_raw = new_store(storeURI)
-        self.init(store_raw: store_raw, toodle_raw: new_toodle(store_raw))
+        self.init(raw: new_toodle(storeURI))
     }
 
     deinit {
-        toodle_destroy(toodle_raw)
-        store_destroy(self.store.intoRaw())
+        toodle_destroy(raw)
     }
 
     fileprivate func toPointerArray(list: [RustObject]) -> OpaquePointer {
@@ -59,7 +55,7 @@ class ToodleLib {
     }
 
     func allItems() -> [Item] {
-        let items = toodle_get_all_items(self.toodle_raw)
+        let items = toodle_get_all_items(self.raw)
         var allItems: [Item] = []
         for index in 0..<item_list_count(items) {
             let item = Item(raw: item_list_entry_at(items, Int(index))!)
@@ -69,7 +65,7 @@ class ToodleLib {
     }
 
     func createLabel(withName name: String, color: UIColor) -> Label {
-        return Label(raw: toodle_create_label(self.toodle_raw, name, color.toHex()!))
+        return Label(raw: toodle_create_label(self.raw, name, color.toHex()!))
     }
 
     func createItem(withName name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) -> Item? {
@@ -79,7 +75,7 @@ class ToodleLib {
             dd = UnsafeMutablePointer<Int64>(&d)
         }
 
-        if let item_raw = toodle_create_item(self.toodle_raw, name, dd) {
+        if let item_raw = toodle_create_item(self.raw, name, dd) {
             return Item(raw: item_raw)
         }
 
@@ -87,7 +83,7 @@ class ToodleLib {
     }
 
     func item(withUuid uuid: String) -> Item? {
-        guard let new_item = toodle_item_for_uuid(self.toodle_raw, uuid) else {
+        guard let new_item = toodle_item_for_uuid(self.raw, uuid) else {
             return nil
         }
         return Item(raw: new_item)
@@ -106,15 +102,19 @@ class ToodleLib {
         }
         var pointerArray = self.toPointerArray(list: labels as [RustObject])
         if let uuid = item.uuid {
-            toodle_update_item_by_uuid(self.toodle_raw, uuid, name, dd, cd)
+            toodle_update_item_by_uuid(self.raw, uuid, name, dd, cd)
         } else {
-            toodle_update_item(self.toodle_raw,
+            toodle_update_item(self.raw,
                                item.raw,
                                name,
                                dd,
                                cd,
                                UnsafeMutablePointer<OpaquePointer>(&pointerArray))
         }
+    }
+
+    func entidForAttribute(attribute: String) -> Int64 {
+        return Int64(store_entid_for_attribute(self.raw, attribute))
     }
 }
 
@@ -128,7 +128,7 @@ extension ToodleLib: Observable {
 //        callback(wrapper)
         print("Register \(key)")
 
-        let attrEntIds = attributes.map({ Int64(store.entidForAttribute(attribute: $0)) })
+        let attrEntIds = attributes.map({ Int64(self.entidForAttribute(attribute: $0)) })
 
         let ptr = UnsafeMutablePointer<Int64>.allocate(capacity: attrEntIds.count)
         let entidPointer = UnsafeMutableBufferPointer(start: ptr, count: attrEntIds.count)
@@ -150,13 +150,13 @@ extension ToodleLib: Observable {
             destroy: destroy,
             callback_fn: transactionObserverCallback)
 //        let attrPointer = UnsafeMutablePointer<Int64>(&firstElement)
-        store_register_observer(store.intoRaw(), key, firstElement, Int64(attributes.count), wrapper)
+        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), wrapper)
 
     }
 
     func unregister(key: String) {
         print("Unregister \(key)")
-        store_unregister_observer(store.intoRaw(), key)
+        store_unregister_observer(self.raw, key)
         print("\(key) unregistered")
     }
 
