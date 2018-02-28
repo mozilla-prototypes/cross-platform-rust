@@ -161,7 +161,6 @@ extension ToodleLib: Observable {
     }
 
     func transactionObserverCalled(key: String, reports: [TxReport]) {
-        print("transactionObserverCalled \(key), \(reports)")
         let observer = self.observers[key]
         observer?.transactionDidOccur(key: key, reports: reports)
     }
@@ -170,25 +169,19 @@ extension ToodleLib: Observable {
 class Singleton {
 }
 
-private func callbackDidCallBack() {
-    print("Callback was called")
-}
-
 private func transactionObserverCallback(obj: UnsafeMutableRawPointer, key: UnsafePointer<CChar>, reports: UnsafePointer<TxReportList>) {
-    let store: ToodleLib = Unmanaged.fromOpaque(UnsafeRawPointer(obj)).takeUnretainedValue()
-    let len = Int(reports.pointee.len)
-    var txReports = [TxReport]()
-    for i in 0..<len {
-        let raw = tx_report_list_entry_at(reports, i)
-        let report = TxReport(raw: raw!)
-        txReports.append(report)
-    }
+    DispatchQueue.global(qos: .background).async {
+        let store: ToodleLib = Unmanaged.fromOpaque(UnsafeRawPointer(obj)).takeUnretainedValue()
+        let len = Int(reports.pointee.len)
+        var txReports = [TxReport]()
+        for i in 0..<len {
+            let raw = tx_report_list_entry_at(reports, i)
+            let report = TxReport(raw: raw!)
+            txReports.append(report)
+        }
 
-//    let bufferPointer = UnsafeMutableBufferPointer(start: , count: len)
-//    for (_idx, report) in bufferPointer.enumerated() {
-//        txReports.append(TxReport(fromExternReport: report))
-//    }
-    store.transactionObserverCalled(key: String(cString: key), reports: txReports)
+        store.transactionObserverCalled(key: String(cString: key), reports: txReports)
+    }
 }
 
 private func destroy(obj: UnsafeMutableRawPointer) {

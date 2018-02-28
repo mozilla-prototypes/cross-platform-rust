@@ -4,11 +4,6 @@
 
 import UIKit
 
-protocol ToDoListItemsViewControllerDelegate {
-    func itemCreated(item: Item)
-    func itemUpdated(item: Item)
-}
-
 class ToDoListItemsTableViewController: UITableViewController {
 
     var items: [Item]!
@@ -55,36 +50,23 @@ class ToDoListItemsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = self.items[indexPath.row]
         let itemVC = ItemViewController(item: item)
-        itemVC.delegate = self
         self.navigationController?.pushViewController(itemVC, animated: true)
     }
 
     @objc fileprivate func newItem() {
         let itemVC = ItemViewController()
-        itemVC.delegate = self
         let navController = UINavigationController(rootViewController: itemVC)
         self.present(navController, animated: true, completion: nil)
     }
 
 }
 
-extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate {
-    func itemCreated(item: Item) {
-        self.items.append(item)
-        self.tableView.reloadData()
-    }
-
-    func itemUpdated(item: Item) {
-        guard let index = self.items.index(where: { i in item.uuid == i.uuid }) else {
-            return itemCreated(item: item)
-        }
-        self.items[index] = self.items[index]
-        self.tableView.reloadData()
-    }
-}
-
 extension ToDoListItemsTableViewController: Observing {
     func transactionDidOccur(key: String, reports: [TxReport]) {
         print("transaction did occur \(key)")
+        self.items = ToodleLib.sharedInstance.allItems()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
 }

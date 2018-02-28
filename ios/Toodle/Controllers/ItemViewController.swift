@@ -6,8 +6,6 @@ import UIKit
 
 class ItemViewController: UIViewController {
 
-    var delegate: ToDoListItemsViewControllerDelegate?
-
     lazy var itemDescriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Description:"
@@ -223,16 +221,11 @@ class ItemViewController: UIViewController {
         let labels: [Label] = []
 
         guard let currentItem = self.item else {
-            if let item = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels) {
-                self.delegate?.itemCreated(item: item)
-            }
+            let _ = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels)
             return
         }
 
         ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
-        if let new_item = ToodleLib.sharedInstance.item(withUuid: currentItem.uuid!) {
-            self.delegate?.itemUpdated(item: new_item)
-        }
     }
 
 }
