@@ -130,12 +130,7 @@ extension ToodleLib: Observable {
             return
         }
         self.observers[key] = observer
-        let ownedPointer = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
-        let wrapper = RustCallback(
-            obj: ownedPointer,
-            destroy: destroy,
-            callback_fn: transactionObserverCallback)
-        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), wrapper)
+        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), transactionObserverCallback)
 
     }
 
@@ -152,9 +147,8 @@ extension ToodleLib: Observable {
 class Singleton {
 }
 
-private func transactionObserverCallback(obj: UnsafeMutableRawPointer, key: UnsafePointer<CChar>, reports: UnsafePointer<TxReportList>) {
+private func transactionObserverCallback(key: UnsafePointer<CChar>, reports: UnsafePointer<TxReportList>) {
     DispatchQueue.global(qos: .background).async {
-        let store: ToodleLib = Unmanaged.fromOpaque(UnsafeRawPointer(obj)).takeUnretainedValue()
         let len = Int(reports.pointee.len)
         var txReports = [TxReport]()
         for i in 0..<len {
@@ -163,7 +157,7 @@ private func transactionObserverCallback(obj: UnsafeMutableRawPointer, key: Unsa
             txReports.append(report)
         }
 
-        store.transactionObserverCalled(key: String(cString: key), reports: txReports)
+        ToodleLib.sharedInstance.transactionObserverCalled(key: String(cString: key), reports: txReports)
     }
 }
 

@@ -97,7 +97,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "edn"
 version = "0.1.0"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -301,7 +301,7 @@ dependencies = [
 [[package]]
 name = "mentat"
 version = "0.6.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -329,7 +329,7 @@ dependencies = [
 [[package]]
 name = "mentat_core"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -345,7 +345,7 @@ dependencies = [
 [[package]]
 name = "mentat_db"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
@@ -363,7 +363,7 @@ dependencies = [
 [[package]]
 name = "mentat_ffi"
 version = "0.1.0"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "mentat 0.6.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
@@ -371,7 +371,7 @@ dependencies = [
 [[package]]
 name = "mentat_parser_utils"
 version = "0.1.0"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -381,7 +381,7 @@ dependencies = [
 [[package]]
 name = "mentat_query"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -390,7 +390,7 @@ dependencies = [
 [[package]]
 name = "mentat_query_algebrizer"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -400,7 +400,7 @@ dependencies = [
 [[package]]
 name = "mentat_query_parser"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -415,7 +415,7 @@ dependencies = [
 [[package]]
 name = "mentat_query_projector"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -430,7 +430,7 @@ dependencies = [
 [[package]]
 name = "mentat_query_sql"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
  "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -442,7 +442,7 @@ dependencies = [
 [[package]]
 name = "mentat_query_translator"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -456,7 +456,7 @@ dependencies = [
 [[package]]
 name = "mentat_sql"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
@@ -467,7 +467,7 @@ dependencies = [
 [[package]]
 name = "mentat_tolstoy"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "futures 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -487,7 +487,7 @@ dependencies = [
 [[package]]
 name = "mentat_tx"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
 ]
@@ -495,7 +495,7 @@ dependencies = [
 [[package]]
 name = "mentat_tx_parser"
 version = "0.0.1"
-source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#52e92e44fc2f1cfa2e15a0646f98d8505e7640ea"
+source = "git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi#bc830721ee38518c247cc04b75037b3093912b75"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=fluffyemily/expose-txobserver-over-ffi)",
