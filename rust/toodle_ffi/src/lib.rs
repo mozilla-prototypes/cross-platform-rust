@@ -14,8 +14,6 @@ extern crate mentat_ffi;
 extern crate time;
 extern crate toodle;
 
-#[doc(hidden)]
-pub mod android_ffi;
 mod ctypes;
 mod utils;
 
@@ -39,6 +37,12 @@ pub use mentat_ffi::{
     store_unregister_observer,
 };
 
+use mentat_ffi::utils::log;
+use mentat_ffi::utils::strings::{
+    c_char_to_string,
+    string_to_c_char,
+};
+
 use toodle::{
     Item,
     Label,
@@ -49,12 +53,9 @@ use ctypes::{
     ItemsC,
     ItemCList
 };
-use utils::strings::{
-    c_char_to_string,
+use utils::time::{
     optional_timespec,
-    string_to_c_char,
 };
-use utils::log;
 
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
