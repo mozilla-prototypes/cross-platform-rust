@@ -12,6 +12,8 @@ import com.mozilla.toodle.Item;
 import com.sun.jna.NativeLong;
 import com.sun.jna.ptr.NativeLongByReference;
 
+import java.util.ArrayList;
+
 public class Toodle extends RustObject {
     static {
         System.loadLibrary("toodle");
@@ -56,6 +58,19 @@ public class Toodle extends RustObject {
 
     public void getAllItems(NativeItemsCallback callback) {
         JNA.INSTANCE.toodle_all_items(rawPointer, callback);
+    }
+
+    public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {
+        // turn string array into int array
+        int[] attrEntids = new int[attributes.length];
+        for(int i = 0; i < attributes.length; i++) {
+            attrEntids[i] = JNA.INSTANCE.store_entid_for_attribute(rawPointer, attributes[i]);
+        }
+        JNA.INSTANCE.store_register_observer(rawPointer, key, attrEntids, attrEntids.length, callback);
+    }
+
+    public void unregisterObserver(String key) {
+        JNA.INSTANCE.store_unregister_observer(rawPointer, key);
     }
 
     @Override

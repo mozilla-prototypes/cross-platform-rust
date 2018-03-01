@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.mozilla.toodle.rust.NativeItemSet;
 import com.mozilla.toodle.rust.NativeItemsCallback;
 import com.mozilla.toodle.rust.NativeItemsChangedCallback;
+import com.mozilla.toodle.rust.NativeTxObserverCallback;
+import com.mozilla.toodle.rust.NativeTxReportList;
 import com.mozilla.toodle.rust.Toodle;
 
 import java.lang.ref.WeakReference;
@@ -34,15 +36,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private List<Item> dataset = new ArrayList<>(0);
     private final Context context;
 
-    static class NativeItemsCallbackInner implements NativeItemsChangedCallback {
+    static class NativeTXObserverCallbackInner implements NativeTxObserverCallback {
         private final WeakReference<ListAdapter> listAdapterWeakReference;
 
-        NativeItemsCallbackInner(WeakReference<ListAdapter> listAdapterWeakReference) {
+        NativeTXObserverCallbackInner(WeakReference<ListAdapter> listAdapterWeakReference) {
             this.listAdapterWeakReference = listAdapterWeakReference;
         }
 
-        @Override
-        public void items() {
+        public void transactionObserverCalled(String key, NativeTxReportList.ByReference reports) {
             final ListAdapter listAdapter = listAdapterWeakReference.get();
             if (listAdapter == null) {
                 return;
@@ -77,7 +78,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     // We must keep reference to the callback around, otherwise it'll get GC'd and the native code
     // will call an empty stub instead of our callback.
-    private final NativeItemsChangedCallback nativeItemsChangedCallback = new NativeItemsCallbackInner(
+    private final NativeTxObserverCallback nativeTxObserverCallback = new NativeTXObserverCallbackInner(
             new WeakReference<>(this)
     );
 
@@ -85,7 +86,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         this.context = context;
 
         try (final Toodle toodle = new Toodle(context)) {
-            toodle.registerChangedItemsCallback(nativeItemsChangedCallback);
+            String[] attributes = {"item/uuid", "item/name", "item/completion_date", "item/due_date"};
+            toodle.registerObserver("ListAdapter", attributes, nativeTxObserverCallback);
         }
     }
 
@@ -146,5 +148,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public long getItemId(int position) {
         return dataset.get(position).uuid().hashCode();
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+        try (final Toodle toodle = new Toodle(context)) {
+            toodle.unregisterObserver("ListAdapter");
+        }
     }
 }
