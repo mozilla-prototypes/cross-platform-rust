@@ -7,11 +7,6 @@
 
 struct Store;
 
-struct AttributeList {
-    int64_t*_Nonnull* _Nonnull attributes;
-    uint64_t len;
-};
-
 struct TxReportList {
     struct ExternTxReport*_Nonnull* _Nonnull reports;
     uint64_t len;
@@ -19,7 +14,8 @@ struct TxReportList {
 
 struct ExternTxReport {
     int64_t txid;
-    struct AttributeList*_Nonnull* _Nonnull changes;
+    int64_t*_Nonnull* _Nonnull changes;
+    uint64_t changes_len;
 };
 
 struct Store*_Nonnull  new_store(const char*_Nonnull uri);
@@ -30,6 +26,6 @@ void store_unregister_observer(struct Store*_Nonnull  store, const char* _Nonnul
 int64_t store_entid_for_attribute(struct Store*_Nonnull store, const char*_Nonnull attr);
 
 const struct ExternTxReport* _Nullable tx_report_list_entry_at(const struct TxReportList* _Nonnull list, size_t index);
-const struct int64_t changelist_entry_at(const struct AttributeList* _Nonnull list, size_t index);
+const struct int64_t changelist_entry_at(const struct ExternTxReport* _Nonnull report, size_t index);
 
 #endif /* store_h */
