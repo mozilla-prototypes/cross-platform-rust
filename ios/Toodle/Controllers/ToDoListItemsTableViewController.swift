@@ -12,7 +12,7 @@ class ToDoListItemsTableViewController: UITableViewController {
         super.viewDidLoad()
 
         self.items = ToodleLib.sharedInstance.allItems()
-        let attrs = ["item/uuid", "item/name", "item/completion_date"]
+        let attrs = [":item/uuid", ":item/name", ":item/completion_date"]
         ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"

@@ -35,6 +35,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private List<Item> dataset = new ArrayList<>(0);
     private final Context context;
+    private final Toodle toodle;
 
     static class NativeTXObserverCallbackInner implements NativeTxObserverCallback {
         private final WeakReference<ListAdapter> listAdapterWeakReference;
@@ -50,29 +51,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             }
 
             Log.i(LOG_TAG, "Items changed!");
-            try (final Toodle toodle = new Toodle(listAdapter.context)) {
-                toodle.getAllItems(new NativeItemsCallback() {
-                    @Override
-                    public void items(@Nullable NativeItemSet.ByReference itemSet) {
-                        if (itemSet == null) {
-                            Log.i(LOG_TAG, "Got no items!");
-                            listAdapter.dataset = new ArrayList<>(0);
-                            return;
-                        }
-                        Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
-                        listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
-
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                listAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-                        itemSet.close();
-                    }
-                });
-            }
+            listAdapter.fetchItems();
         }
     }
 
@@ -84,11 +63,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     ListAdapter(Context context) {
         this.context = context;
-
-        try (final Toodle toodle = new Toodle(context)) {
-            String[] attributes = {"item/uuid", "item/name", "item/completion_date", "item/due_date"};
-            toodle.registerObserver("ListAdapter", attributes, nativeTxObserverCallback);
-        }
+        this.toodle = Toodle.getSharedInstance(context);
+        String[] attributes = {":item/uuid", ":item/name", ":item/completion_date", ":item/due_date"};
+        toodle.registerObserver("ListAdapter", attributes, nativeTxObserverCallback);
+        this.fetchItems();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -97,6 +75,39 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         ViewHolder(LinearLayout v) {
             super(v);
             itemView = v;
+        }
+    }
+
+    private void fetchItems() {
+        final WeakReference<ListAdapter> listAdapterWeakReference = new WeakReference<>(this);
+        try (final Toodle toodle = this.toodle) {
+            toodle.getAllItems(new NativeItemsCallback() {
+
+                @Override
+                public void items(@Nullable NativeItemSet.ByReference itemSet) {
+                    final ListAdapter listAdapter = listAdapterWeakReference.get();
+                    if (listAdapter == null) {
+                        return;
+                    }
+
+                    if (itemSet == null) {
+                        Log.i(LOG_TAG, "Got no items!");
+                        listAdapter.dataset = new ArrayList<>(0);
+                        return;
+                    }
+                    Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
+                    listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
+
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listAdapter.notifyDataSetChanged();
+                        }
+                    });
+
+                    itemSet.close();
+                }
+            });
         }
     }
 
@@ -153,7 +164,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public void onViewRecycled(ViewHolder holder) {
         super.onViewRecycled(holder);
-        try (final Toodle toodle = new Toodle(context)) {
+        try (final Toodle toodle = this.toodle) {
             toodle.unregisterObserver("ListAdapter");
         }
     }

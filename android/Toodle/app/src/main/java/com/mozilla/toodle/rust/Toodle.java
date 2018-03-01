@@ -20,11 +20,19 @@ public class Toodle extends RustObject {
     }
 
     private static final String DB_NAME = "toodle.db";
+    private static Toodle sharedInstance;
 
     public Toodle(Context context) {
         this.rawPointer = JNA.INSTANCE.new_toodle(
                 context.getDatabasePath(DB_NAME).getAbsolutePath()
         );
+    }
+
+    public static Toodle getSharedInstance(Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new Toodle(context);
+        }
+        return sharedInstance;
     }
 
     public void createItem(Item item) {

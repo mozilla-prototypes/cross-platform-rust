@@ -60,7 +60,7 @@ use utils::time::{
 
 // TODO this is pretty horrible and rather crafty, but I couldn't get this to live
 // inside a Toodle struct and be able to mutate it...
-static mut CHANGED_CALLBACK: Option<extern fn()> = None;
+// static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 #[no_mangle]
 pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
@@ -100,20 +100,20 @@ pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_
     }
     item.due_date = due;
     let item = manager.create_and_fetch_item(&item).expect("expected an item");
-    if let Some(callback) = CHANGED_CALLBACK {
-        callback();
-    }
+    // if let Some(callback) = CHANGED_CALLBACK {
+    //     callback();
+    // }
     if let Some(i) = item {
         return Box::into_raw(Box::new(i.into()));
     }
     return std::ptr::null_mut();
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn toodle_on_items_changed(callback: extern fn()) {
-    CHANGED_CALLBACK = Some(callback);
-    callback();
-}
+// #[no_mangle]
+// pub unsafe extern "C" fn toodle_on_items_changed(callback: extern fn()) {
+//     CHANGED_CALLBACK = Some(callback);
+//     callback();
+// }
 
 // TODO: figure out callbacks in swift such that we can use `toodle_all_items` instead.
 #[no_mangle]
@@ -220,9 +220,9 @@ pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Store, uuid: *
                                         optional_timespec(due_date),
                                         optional_timespec(completion_date));
 
-    if let Some(callback) = CHANGED_CALLBACK {
-        callback();
-    }
+    // if let Some(callback) = CHANGED_CALLBACK {
+    //     callback();
+    // }
 }
 
 #[no_mangle]
