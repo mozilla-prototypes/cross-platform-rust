@@ -6,13 +6,22 @@ import UIKit
 
 class ToDoListItemsTableViewController: UITableViewController {
 
+    lazy var syncToRefresh: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(sync), for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.red
+        return refreshControl
+    }()
+
     var items: [Item]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.tableView.addSubview(self.syncToRefresh)
+
         self.items = ToodleLib.sharedInstance.allItems()
-        let attrs = [":item/uuid", ":item/name", ":item/completion_date"]
+        let attrs = [":todo/uuid", ":todo/name", ":todo/completion_date"]
         ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"
@@ -42,7 +51,11 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.dueDateAsString()
+        if let dueDateString = item.dueDateAsString() {
+            cell.detailTextLabel?.text = "Due: \(dueDateString)"
+        } else {
+            cell.detailTextLabel?.text = ""
+        }
 
         return cell
     }
@@ -57,6 +70,17 @@ class ToDoListItemsTableViewController: UITableViewController {
         let itemVC = ItemViewController()
         let navController = UINavigationController(rootViewController: itemVC)
         self.present(navController, animated: true, completion: nil)
+    }
+
+    @objc func sync() {
+        let success = ToodleLib.sharedInstance.sync_now()
+        if success {
+            print("Sync succeeded")
+            self.syncToRefresh.endRefreshing()
+        } else {
+            print("Sync failed")
+            self.syncToRefresh.endRefreshing()
+        }
     }
 
 }

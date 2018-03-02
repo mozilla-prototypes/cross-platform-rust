@@ -116,6 +116,17 @@ class ToodleLib {
     func entidForAttribute(attribute: String) -> Int64 {
         return Int64(store_entid_for_attribute(self.raw, attribute))
     }
+
+    func sync_now() -> Bool {
+        let err = toodle_sync(self.raw)
+        if let error = err.pointee.error {
+            let str = String(cString: error)
+            print("Sync error \(str)")
+            return false
+        }
+
+        return true
+    }
 }
 
 extension ToodleLib: Observable {
