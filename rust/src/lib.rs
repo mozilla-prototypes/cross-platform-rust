@@ -16,6 +16,7 @@ extern crate mentat;
 
 extern crate libc;
 extern crate mentat_core;
+extern crate mentat_ffi;
 extern crate rusqlite;
 extern crate time;
 extern crate uuid;
@@ -30,6 +31,8 @@ use mentat::{
     TypedValue,
     ValueType,
 };
+
+use mentat_ffi::utils::log;
 
 use mentat_core::{
     KnownEntid,
@@ -177,6 +180,8 @@ pub trait Toodle {
                        labels: Option<&Vec<Label>>) -> Result<()>;
 }
 
+use std::panic;
+
 impl Toodle for Store {
 
     fn initialize(&mut self) -> Result<()> {
@@ -187,6 +192,7 @@ impl Toodle for Store {
         {
             transact_labels_vocabulary(&mut in_progress)?;
         }
+        in_progress.commit()?;
         Ok(())
     }
 
@@ -360,29 +366,47 @@ impl Toodle for Store {
 
     fn create_item(&mut self, item: &Item) -> Result<Uuid> {
         let item_uuid = create_uuid();
+        log::d(&format!("create_item item_uuid: {:?}", item_uuid));
         {
             let in_progress = self.begin_transaction()?;
+            log::d(&format!("create_item in_progress"));
             let mut builder = in_progress.builder().describe_tempid("item");
-
+            log::d(&format!("create_item builder"));
             builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
+            log::d(&format!("create_item builder uuid"));
             builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
-
+            log::d(&format!("create_item builder name"));
             if let Some(due_date) = item.due_date {
                 builder.add_kw(&kw!(:item/due_date), due_date.to_typed_value())?;
+                log::d(&format!("create_item builder due_date"));
             }
             if let Some(completion_date) = item.completion_date {
                 builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
+                log::d(&format!("create_item builder completion_date"));
             }
-
+            
+            log::d(&format!("create_item builder pre commit"));
             builder.commit()?;
+            log::d(&format!("create_item builder post commit"));
         }
         Ok(item_uuid)
     }
 
     fn create_and_fetch_item(&mut self, item: &Item) -> Result<Option<Item>> {
-        let item_uuid = self.create_item(&item)?;
-        let item = self.fetch_item(&item_uuid);
-        item
+        log::d(&format!("create_and_fetch_item item: {:?}", item));
+        let item_uuid_res = self.create_item(&item);
+        match item_uuid_res {
+            Ok(item_uuid) => {
+                log::d(&format!("create_and_fetch_item item_uuid: {:?}", item_uuid));
+                let item = self.fetch_item(&item_uuid);
+                log::d(&format!("create_and_fetch_item fetch_item: {:?}", item));
+                item
+            },
+            Err(e) => {
+                log::d(&format!("create_and_fetch_item error: {:?}", e));
+                Err(e)
+            }
+        }
     }
 
     fn update_item_by_uuid(&mut self,

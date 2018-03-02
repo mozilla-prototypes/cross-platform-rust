@@ -44,14 +44,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             this.listAdapterWeakReference = listAdapterWeakReference;
         }
 
-        public void transactionObserverCalled(String key, NativeTxReportList.ByReference reports) {
+        public void transactionObserverCalled(String key) {
+            Log.i(LOG_TAG, "Observer called! " + key);
+//            Log.i(LOG_TAG, "Reports: " + reports);
             final ListAdapter listAdapter = listAdapterWeakReference.get();
             if (listAdapter == null) {
+                Log.i(LOG_TAG, "No list adapter");
                 return;
             }
 
             Log.i(LOG_TAG, "Items changed!");
-            listAdapter.fetchItems();
+            // TODO This is a hack around observer firing at a wrong moment.
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    listAdapter.fetchItems();
+                }
+            });
         }
     }
 
@@ -80,35 +89,34 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private void fetchItems() {
         final WeakReference<ListAdapter> listAdapterWeakReference = new WeakReference<>(this);
-        try (final Toodle toodle = this.toodle) {
-            toodle.getAllItems(new NativeItemsCallback() {
-
-                @Override
-                public void items(@Nullable NativeItemSet.ByReference itemSet) {
-                    final ListAdapter listAdapter = listAdapterWeakReference.get();
-                    if (listAdapter == null) {
-                        return;
-                    }
-
-                    if (itemSet == null) {
-                        Log.i(LOG_TAG, "Got no items!");
-                        listAdapter.dataset = new ArrayList<>(0);
-                        return;
-                    }
-                    Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
-                    listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
-
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listAdapter.notifyDataSetChanged();
-                        }
-                    });
-
-                    itemSet.close();
+        toodle.getAllItems(new NativeItemsCallback() {
+            @Override
+            public void items(@Nullable NativeItemSet.ByReference itemSet) {
+                Log.i(LOG_TAG, "fetchItems: items");
+                final ListAdapter listAdapter = listAdapterWeakReference.get();
+                if (listAdapter == null) {
+                    Log.i(LOG_TAG, "fetchItems: no listadapter");
+                    return;
                 }
-            });
-        }
+
+                if (itemSet == null) {
+                    Log.i(LOG_TAG, "Got no items!");
+                    listAdapter.dataset = new ArrayList<>(0);
+                    return;
+                }
+                Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
+                listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                itemSet.close();
+            }
+        });
     }
 
     @Override

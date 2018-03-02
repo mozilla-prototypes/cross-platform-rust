@@ -7,7 +7,7 @@ import UIKit
 
 protocol Observing {
     // define functions for store observation
-    func transactionDidOccur(key: String, reports: [TxReport])
+    func transactionDidOccur(key: String);//, reports: [TxReport])
 }
 
 protocol Observable {
@@ -138,26 +138,26 @@ extension ToodleLib: Observable {
         store_unregister_observer(self.raw, key)
     }
 
-    func transactionObserverCalled(key: String, reports: [TxReport]) {
+    func transactionObserverCalled(key: String) {//, reports: [TxReport]) {
         let observer = self.observers[key]
-        observer?.transactionDidOccur(key: key, reports: reports)
+        observer?.transactionDidOccur(key: key)//, reports: reports)
     }
 }
 
 class Singleton {
 }
 
-private func transactionObserverCallback(key: UnsafePointer<CChar>, reports: UnsafePointer<TxReportList>) {
+private func transactionObserverCallback(key: UnsafePointer<CChar>) {//, reports: UnsafePointer<TxReportList>) {
     DispatchQueue.global(qos: .background).async {
-        let len = Int(reports.pointee.len)
-        var txReports = [TxReport]()
-        for i in 0..<len {
-            let raw = tx_report_list_entry_at(reports, i)
-            let report = TxReport(raw: raw!)
-            txReports.append(report)
-        }
+        // let len = Int(reports.pointee.len)
+        // var txReports = [TxReport]()
+        // for i in 0..<len {
+        //     let raw = tx_report_list_entry_at(reports, i)
+        //     let report = TxReport(raw: raw!)
+        //     txReports.append(report)
+        // }
 
-        ToodleLib.sharedInstance.transactionObserverCalled(key: String(cString: key), reports: txReports)
+        ToodleLib.sharedInstance.transactionObserverCalled(key: String(cString: key))//, reports: txReports)
     }
 }
 

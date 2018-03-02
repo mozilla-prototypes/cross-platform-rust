@@ -8,7 +8,6 @@ package com.mozilla.toodle.rust;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
-import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
@@ -27,7 +26,7 @@ public interface JNA extends Library {
     void toodle_all_items(Pointer listManager, NativeItemsCallback callback);
     void item_c_destroy(Pointer item);
 
-    void store_register_observer(Pointer Store, String key, int[] attributes, int len, NativeTxObserverCallback callback );
+    void store_register_observer(Pointer Store, String key, Pointer attributes, int len, NativeTxObserverCallback callback );
     void store_unregister_observer(Pointer Store, String key);
     int store_entid_for_attribute(Pointer Store, String attr);
 }

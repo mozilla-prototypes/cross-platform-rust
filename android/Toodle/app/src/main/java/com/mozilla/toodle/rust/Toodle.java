@@ -9,20 +9,24 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mozilla.toodle.Item;
+import com.sun.jna.Memory;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Toodle extends RustObject {
     static {
         System.loadLibrary("toodle");
     }
+    private static final String LOG_TAG = "Toodle";
 
     private static final String DB_NAME = "toodle.db";
     private static Toodle sharedInstance;
 
-    public Toodle(Context context) {
+    private Toodle(Context context) {
         this.rawPointer = JNA.INSTANCE.new_toodle(
                 context.getDatabasePath(DB_NAME).getAbsolutePath()
         );
@@ -74,7 +78,13 @@ public class Toodle extends RustObject {
         for(int i = 0; i < attributes.length; i++) {
             attrEntids[i] = JNA.INSTANCE.store_entid_for_attribute(rawPointer, attributes[i]);
         }
-        JNA.INSTANCE.store_register_observer(rawPointer, key, attrEntids, attrEntids.length, callback);
+        Log.i(LOG_TAG, "Registering observer {" + key + "} for attributes:");
+        for (int i = 0; i < attrEntids.length; i++) {
+            Log.i(LOG_TAG, "entid: " + attrEntids[i]);
+        }
+        final Pointer entidsNativeArray = new Memory(4 * attrEntids.length);
+        entidsNativeArray.write(0, attrEntids, 0, attrEntids.length);
+        JNA.INSTANCE.store_register_observer(rawPointer, key, entidsNativeArray, attrEntids.length, callback);
     }
 
     public void unregisterObserver(String key) {

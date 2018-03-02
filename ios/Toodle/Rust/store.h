@@ -21,7 +21,7 @@ struct ExternTxReport {
 struct Store*_Nonnull  new_store(const char*_Nonnull uri);
 void store_destroy(struct Store*_Nonnull  store);
 
-void store_register_observer(struct Store*_Nonnull  store, const char* _Nonnull key, const int64_t* _Nonnull attributes, const int64_t len, void (*_Nonnull callback_fn)(const char* _Nonnull key, const struct TxReportList* _Nonnull reports));
+void store_register_observer(struct Store*_Nonnull  store, const char* _Nonnull key, const int64_t* _Nonnull attributes, const int64_t len, void (*_Nonnull callback_fn)(const char* _Nonnull key));//, const struct TxReportList* _Nonnull reports));
 void store_unregister_observer(struct Store*_Nonnull  store, const char* _Nonnull key);
 int64_t store_entid_for_attribute(struct Store*_Nonnull store, const char*_Nonnull attr);
 

@@ -62,7 +62,7 @@ class ToDoListItemsTableViewController: UITableViewController {
 }
 
 extension ToDoListItemsTableViewController: Observing {
-    func transactionDidOccur(key: String, reports: [TxReport]) {
+    func transactionDidOccur(key: String) {//, reports: [TxReport]) {
         print("transaction did occur \(key)")
         self.items = ToodleLib.sharedInstance.allItems()
         DispatchQueue.main.async {

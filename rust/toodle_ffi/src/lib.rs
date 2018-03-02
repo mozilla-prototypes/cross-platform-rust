@@ -67,6 +67,7 @@ pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
     let uri = c_char_to_string(uri);
     let mut store = Store::open(&uri).expect("expected a store");
     store.initialize().expect("Expected store to initialize");
+    log::d(&format!("init the store, schema: {:?}", store.conn().current_schema()));
     Box::into_raw(Box::new(store))
 }
 
@@ -90,6 +91,8 @@ pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_
     let manager = &mut*manager;
     let mut item = Item::default();
 
+    log::d(&format!("toodle_create_item default item: {:?}", item));
+
     item.name = name;
     let due: Option<Timespec>;
     if !due_date.is_null() {
@@ -99,10 +102,12 @@ pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_
         due = None;
     }
     item.due_date = due;
+    log::d(&format!("toodle_create_item due item: {:?}", item));
     let item = manager.create_and_fetch_item(&item).expect("expected an item");
     // if let Some(callback) = CHANGED_CALLBACK {
     //     callback();
     // }
+    log::d(&format!("toodle_create_item create_and_fetch_item: {:?}", item));
     if let Some(i) = item {
         return Box::into_raw(Box::new(i.into()));
     }
