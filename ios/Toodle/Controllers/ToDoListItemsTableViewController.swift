@@ -6,10 +6,19 @@ import UIKit
 
 class ToDoListItemsTableViewController: UITableViewController {
 
+    lazy var syncToRefresh: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(sync), for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.red
+        return refreshControl
+    }()
+
     var items: [Item]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.tableView.addSubview(self.syncToRefresh)
 
         self.items = ToodleLib.sharedInstance.allItems()
         let attrs = [":item/uuid", ":item/name", ":item/completion_date"]
@@ -57,6 +66,10 @@ class ToDoListItemsTableViewController: UITableViewController {
         let itemVC = ItemViewController()
         let navController = UINavigationController(rootViewController: itemVC)
         self.present(navController, animated: true, completion: nil)
+    }
+
+    @objc func sync() {
+        print("syncing")
     }
 
 }

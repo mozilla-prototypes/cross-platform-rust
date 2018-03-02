@@ -23,17 +23,17 @@ time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-path = "/home/grisha/Code/mentat"
+path = "/Users/emilytoop/Development/mentat"
 #git = "https://github.com/mozilla/mentat.git"
 #branch = "fluffyemily/expose-txobserver-over-ffi"
 
 [dependencies.mentat_core]
-path = "/home/grisha/Code/mentat/core"
+path = "/Users/emilytoop/Development/mentat/core"
 #git = "https://github.com/mozilla/mentat.git"
 #branch = "fluffyemily/expose-txobserver-over-ffi"
 
 [dependencies.mentat_ffi]
-path = "/home/grisha/Code/mentat/ffi"
+path = "/Users/emilytoop/Development/mentat/ffi"
 #git = "https://github.com/mozilla/mentat.git"
 #branch = "fluffyemily/expose-txobserver-over-ffi"
 

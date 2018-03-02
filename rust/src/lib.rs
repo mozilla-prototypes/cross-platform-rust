@@ -191,27 +191,6 @@ pub trait Toodle {
     fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()>;
 }
 
-pub struct ResultC {
-    pub error: *const c_char
-}
-
-impl From<std::result::Result<(), errors::Error>> for ResultC {
-    fn from(result: std::result::Result<(), errors::Error>) -> Self {
-        match result {
-            Ok(_) => {
-                ResultC {
-                    error: std::ptr::null(),
-                }
-            },
-            Err(e) => {
-                ResultC {
-                    error: string_to_c_char(e.description().into())
-                }
-            }
-        }
-    }
-}
-
 impl Toodle for Store {
 
     fn initialize(&mut self) -> Result<()> {
@@ -414,7 +393,7 @@ impl Toodle for Store {
                 builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
                 log::d(&format!("create_item builder completion_date"));
             }
-            
+
             log::d(&format!("create_item builder pre commit"));
             builder.commit()?;
             log::d(&format!("create_item builder post commit"));
@@ -512,8 +491,7 @@ impl Toodle for Store {
     }
 
     fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()> {
-        self.sync(server_uri, user_uuid);
-        Ok(())
+        self.sync(server_uri, user_uuid).map_err(|e| e.into())
     }
 }
 

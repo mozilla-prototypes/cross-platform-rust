@@ -53,7 +53,8 @@ use toodle::{
 use ctypes::{
     ItemC,
     ItemsC,
-    ItemCList
+    ItemCList,
+    ResultC,
 };
 use utils::time::{
     optional_timespec,
@@ -242,9 +243,9 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_sync(manager: *mut Store) -> *mut toodle::ResultC {
+pub unsafe extern "C" fn toodle_sync(manager: *mut Store) -> *mut ResultC {
     let manager = &mut*manager;
-    let user_uuid = String::from_str("00000000-0000-0000-0000-000000000031").unwrap();
+    let user_uuid = String::from_str("00000000-0000-0000-0000-000000000050").unwrap();
     let server_uri = String::from_str("http://mentat.dev.lcip.org/mentatsync/0.1").unwrap();
     let res = manager.do_sync(&server_uri, &user_uuid);
     Box::into_raw(Box::new(res.into()))
