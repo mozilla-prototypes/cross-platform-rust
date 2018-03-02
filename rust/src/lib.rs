@@ -22,7 +22,6 @@ extern crate time;
 extern crate uuid;
 
 use mentat::{
-    InProgress,
     IntoResult,
     Queryable,
     QueryExecutionResult,
@@ -91,66 +90,6 @@ use utils::{
     ToTypedValue,
 };
 
-fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
-    in_progress.ensure_vocabulary(&Definition {
-            name: kw!(:toodle/items),
-            version: 1,
-            attributes: vec![
-                (kw!(:item/uuid),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Uuid)
-                    .multival(false)
-                    .unique(Unique::Value)
-                    .index(true)
-                    .build()),
-                (kw!(:item/name),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::String)
-                    .multival(false)
-                    .build()),
-                (kw!(:item/due_date),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Instant)
-                    .multival(false)
-                    .build()),
-                (kw!(:item/completion_date),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Instant)
-                    .multival(false)
-                    .build()),
-                (kw!(:item/label),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::Ref)
-                    .multival(true)
-                    .build()),
-            ],
-        })
-        .map_err(|e| e.into())
-        .and(Ok(()))
-}
-
-fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
-    in_progress.ensure_vocabulary(&Definition {
-            name: kw!(:toodle/labels),
-            version: 1,
-            attributes: vec![
-                (kw!(:label/name),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::String)
-                    .multival(false)
-                    .unique(Unique::Identity)
-                    .build()),
-                (kw!(:label/color),
-                 AttributeBuilder::new()
-                    .value_type(ValueType::String)
-                    .multival(false)
-                    .build()),
-            ],
-        })
-        .map_err(|e| e.into())
-        .and(Ok(()))
-}
-
 fn create_uuid() -> Uuid {
     uuid::Uuid::new_v4()
 }
@@ -194,15 +133,57 @@ pub trait Toodle {
 impl Toodle for Store {
 
     fn initialize(&mut self) -> Result<()> {
+        println!("initializing Toodle");
         let mut in_progress = self.begin_transaction()?;
-        {
-            transact_items_vocabulary(&mut in_progress)?;
-        }
-        {
-            transact_labels_vocabulary(&mut in_progress)?;
-        }
-        in_progress.commit()?;
-        Ok(())
+        in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:toodle/list),
+            version: 1,
+            attributes: vec![
+                (kw!(:todo/uuid),
+                AttributeBuilder::new()
+                    .value_type(ValueType::Uuid)
+                    .multival(false)
+                    .unique(Unique::Value)
+                    .index(true)
+                    .build()),
+                (kw!(:todo/name),
+                AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .build()),
+                (kw!(:todo/due_date),
+                AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:todo/completion_date),
+                AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:todo/label),
+                AttributeBuilder::new()
+                    .value_type(ValueType::Ref)
+                    .multival(true)
+                    .build()),
+                (kw!(:label/name),
+                AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .unique(Unique::Identity)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:label/color),
+                AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .build()),
+            ],
+        })?;
+        println!("committing Toodle schema");
+        in_progress.commit()
+        .map_err(|e| e.into())
+        .and(Ok(()))
     }
 
     fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
@@ -268,8 +249,8 @@ impl Toodle for Store {
         let query = r#"[:find ?l ?name ?color
                         :in ?item_uuid
                         :where
-                        [?i :item/uuid ?item_uuid]
-                        [?i :item/label ?l]
+                        [?i :todo/uuid ?item_uuid]
+                        [?i :todo/label ?l]
                         [?l :label/name ?name]
                         [?l :label/color ?color]
         ]"#;
@@ -288,9 +269,9 @@ impl Toodle for Store {
                         :in ?label
                         :where
                         [?l :label/name ?label]
-                        [?eid :item/label ?l]
-                        [?eid :item/uuid ?uuid]
-                        [?eid :item/name ?name]
+                        [?eid :todo/label ?l]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
         ]"#;
         let rows;
         {
@@ -307,8 +288,8 @@ impl Toodle for Store {
     fn fetch_items(&mut self) -> Result<Items> {
         let query = r#"[:find ?eid ?uuid ?name
                         :where
-                        [?eid :item/uuid ?uuid]
-                        [?eid :item/name ?name]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
         ]"#;
 
         let rows;
@@ -326,8 +307,8 @@ impl Toodle for Store {
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
-                        [?eid :item/uuid ?uuid]
-                        [?eid :item/name ?name]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
         ]"#;
         let rows;
         {
@@ -347,8 +328,8 @@ impl Toodle for Store {
         let query = r#"[:find ?date .
             :in ?uuid
             :where
-            [?eid :item/uuid ?uuid]
-            [?eid :item/completion_date ?date]
+            [?eid :todo/uuid ?uuid]
+            [?eid :todo/completion_date ?date]
         ]"#;
 
         let in_progress_read = self.begin_read()?;
@@ -362,8 +343,8 @@ impl Toodle for Store {
         let query = r#"[:find ?date .
             :in ?uuid
             :where
-            [?eid :item/uuid ?uuid]
-            [?eid :item/due_date ?date]
+            [?eid :todo/uuid ?uuid]
+            [?eid :todo/due_date ?date]
         ]"#;
         let in_progress_read = self.begin_read()?;
         let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
@@ -381,16 +362,16 @@ impl Toodle for Store {
             log::d(&format!("create_item in_progress"));
             let mut builder = in_progress.builder().describe_tempid("item");
             log::d(&format!("create_item builder"));
-            builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
+            builder.add_kw(&kw!(:todo/uuid), TypedValue::Uuid(item_uuid))?;
             log::d(&format!("create_item builder uuid"));
-            builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
+            builder.add_kw(&kw!(:todo/name), TypedValue::typed_string(&item.name))?;
             log::d(&format!("create_item builder name"));
             if let Some(due_date) = item.due_date {
-                builder.add_kw(&kw!(:item/due_date), due_date.to_typed_value())?;
+                builder.add_kw(&kw!(:todo/due_date), due_date.to_typed_value())?;
                 log::d(&format!("create_item builder due_date"));
             }
             if let Some(completion_date) = item.completion_date {
-                builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
+                builder.add_kw(&kw!(:todo/completion_date), completion_date.to_typed_value())?;
                 log::d(&format!("create_item builder completion_date"));
             }
 
@@ -452,12 +433,12 @@ impl Toodle for Store {
 
         if let Some(name) = name {
             if item.name != name {
-                builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&name))?;
+                builder.add_kw(&kw!(:todo/name), TypedValue::typed_string(&name))?;
             }
         }
 
         if item.due_date != due_date {
-            let due_date_kw = kw!(:item/due_date);
+            let due_date_kw = kw!(:todo/due_date);
             if let Some(date) = due_date {
                 builder.add_kw(&due_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.due_date {
@@ -466,7 +447,7 @@ impl Toodle for Store {
         }
 
         if item.completion_date != completion_date {
-            let completion_date_kw = kw!(:item/completion_date);
+            let completion_date_kw = kw!(:todo/completion_date);
             if let Some(date) = completion_date {
                 builder.add_kw(&completion_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.completion_date {
@@ -475,7 +456,7 @@ impl Toodle for Store {
         }
 
         if let Some(new_labels) = labels {
-            let item_labels_kw = kw!(:item/label);
+            let item_labels_kw = kw!(:todo/label);
             for label in new_labels {
                 builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id))?;
             }

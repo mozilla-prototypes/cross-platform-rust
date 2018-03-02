@@ -73,7 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     ListAdapter(Context context) {
         this.context = context;
         this.toodle = Toodle.getSharedInstance(context);
-        String[] attributes = {":item/uuid", ":item/name", ":item/completion_date", ":item/due_date"};
+        String[] attributes = {":todo/uuid", ":todo/name", ":todo/completion_date", ":todo/due_date"};
         toodle.registerObserver("ListAdapter", attributes, nativeTxObserverCallback);
         this.fetchItems();
     }

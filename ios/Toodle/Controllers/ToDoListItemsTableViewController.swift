@@ -21,7 +21,7 @@ class ToDoListItemsTableViewController: UITableViewController {
         self.tableView.addSubview(self.syncToRefresh)
 
         self.items = ToodleLib.sharedInstance.allItems()
-        let attrs = [":item/uuid", ":item/name", ":item/completion_date"]
+        let attrs = [":todo/uuid", ":todo/name", ":todo/completion_date"]
         ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"
@@ -51,7 +51,11 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.dueDateAsString()
+        if let dueDateString = item.dueDateAsString() {
+            cell.detailTextLabel?.text = "Due: \(dueDateString)"
+        } else {
+            cell.detailTextLabel?.text = ""
+        }
 
         return cell
     }
@@ -69,7 +73,14 @@ class ToDoListItemsTableViewController: UITableViewController {
     }
 
     @objc func sync() {
-        print("syncing")
+        let success = ToodleLib.sharedInstance.sync_now()
+        if success {
+            print("Sync succeeded")
+            self.syncToRefresh.endRefreshing()
+        } else {
+            print("Sync failed")
+            self.syncToRefresh.endRefreshing()
+        }
     }
 
 }
