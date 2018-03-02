@@ -512,8 +512,7 @@ impl Toodle for Store {
     }
 
     fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()> {
-        self.sync(server_uri, user_uuid);
-        Ok(())
+        self.sync(server_uri, user_uuid).map_err(|e| e.into())
     }
 }
 

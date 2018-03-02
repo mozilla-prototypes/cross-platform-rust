@@ -40,6 +40,7 @@ public class Toodle extends RustObject {
     }
 
     public void createItem(Item item) {
+        Log.i(LOG_TAG, "sync pointer: " + rawPointer);
         JNA.INSTANCE.toodle_create_item(
                 rawPointer,
                 item.name(),
@@ -73,6 +74,7 @@ public class Toodle extends RustObject {
     }
 
     public NativeResult sync() {
+        Log.i(LOG_TAG, "sync pointer: " + rawPointer);
         return JNA.INSTANCE.toodle_sync(rawPointer);
     }
 
