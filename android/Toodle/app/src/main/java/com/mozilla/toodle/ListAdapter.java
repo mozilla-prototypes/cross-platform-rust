@@ -55,7 +55,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
             Log.i(LOG_TAG, "Items changed!");
             // TODO This is a hack around observer firing at a wrong moment
-            new Handler().post(new Runnable() {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
                     listAdapter.fetchItems();
