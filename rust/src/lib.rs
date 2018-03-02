@@ -52,6 +52,8 @@ use mentat::vocabulary::attribute::{
     Unique
 };
 
+use mentat::sync::Syncable;
+
 pub use time::Timespec;
 pub use mentat::Uuid;
 
@@ -64,6 +66,15 @@ mod utils;
 use errors::{
     ErrorKind,
     Result,
+};
+
+use std::os::raw::{
+    c_char,
+};
+
+use mentat_ffi::utils::strings::{
+    c_char_to_string,
+    string_to_c_char,
 };
 
 pub use items::{
@@ -178,9 +189,30 @@ pub trait Toodle {
                        due_date: Option<Timespec>,
                        completion_date: Option<Timespec>,
                        labels: Option<&Vec<Label>>) -> Result<()>;
+
+    fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()>;
 }
 
-use std::panic;
+pub struct ResultC {
+    pub error: *const c_char
+}
+
+impl From<std::result::Result<(), errors::Error>> for ResultC {
+    fn from(result: std::result::Result<(), errors::Error>) -> Self {
+        match result {
+            Ok(_) => {
+                ResultC {
+                    error: std::ptr::null(),
+                }
+            },
+            Err(e) => {
+                ResultC {
+                    error: string_to_c_char(e.description().into())
+                }
+            }
+        }
+    }
+}
 
 impl Toodle for Store {
 
@@ -479,6 +511,11 @@ impl Toodle for Store {
         builder.commit()
                .map_err(|e| e.into())
                .and(Ok(()))
+    }
+
+    fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()> {
+        self.sync(server_uri, user_uuid);
+        Ok(())
     }
 }
 

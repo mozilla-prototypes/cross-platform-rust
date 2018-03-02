@@ -72,6 +72,10 @@ public class Toodle extends RustObject {
         JNA.INSTANCE.toodle_all_items(rawPointer, callback);
     }
 
+    public NativeResult sync() {
+        return JNA.INSTANCE.toodle_sync(rawPointer);
+    }
+
     public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {
         // turn string array into int array
         int[] attrEntids = new int[attributes.length];

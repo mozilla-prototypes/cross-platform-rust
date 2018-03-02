@@ -23,6 +23,8 @@ use std::os::raw::{
     c_char,
 };
 
+use std::str::FromStr;
+
 use time::Timespec;
 
 pub use mentat::{
@@ -237,6 +239,15 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c
     let color = c_char_to_string(color);
     let label = Box::new(manager.create_label(name, color).unwrap_or(None));
     Box::into_raw(label)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn toodle_sync(manager: *mut Store) -> *mut toodle::ResultC {
+    let manager = &mut*manager;
+    let user_uuid = String::from_str("00000000-0000-0000-0000-000000000031").unwrap();
+    let server_uri = String::from_str("http://mentat.dev.lcip.org/mentatsync/0.1").unwrap();
+    let res = manager.do_sync(&server_uri, &user_uuid);
+    Box::into_raw(Box::new(res.into()))
 }
 
 #[no_mangle]
