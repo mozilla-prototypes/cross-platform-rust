@@ -107,7 +107,6 @@ fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
                  AttributeBuilder::new()
                     .value_type(ValueType::String)
                     .multival(false)
-                    .fulltext(true)
                     .build()),
                 (kw!(:item/due_date),
                  AttributeBuilder::new()
@@ -140,7 +139,6 @@ fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
                     .value_type(ValueType::String)
                     .multival(false)
                     .unique(Unique::Identity)
-                    .fulltext(true)
                     .build()),
                 (kw!(:label/color),
                  AttributeBuilder::new()

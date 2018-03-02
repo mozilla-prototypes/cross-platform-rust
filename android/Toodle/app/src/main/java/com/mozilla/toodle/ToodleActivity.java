@@ -13,12 +13,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import com.mozilla.toodle.rust.NativeResult;
 import com.mozilla.toodle.rust.Toodle;
 
 public class ToodleActivity extends Activity {
+    private static final String LOG_TAG = "ToodleActivity";
     private RecyclerView listRecyclerView;
     private RecyclerView.Adapter listAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -42,7 +44,9 @@ public class ToodleActivity extends Activity {
             @Override
             public void onRefresh() {
                 NativeResult result = Toodle.getSharedInstance(getApplicationContext()).sync();
+                Log.i(LOG_TAG, "Sync result: " + result);
                 if (!TextUtils.isEmpty(result.error)) {
+                    Log.i(LOG_TAG, "Sync error: " + result.error);
                     UiUtils.showError(getApplicationContext(), result.error);
                 }
                 refreshWrapper.setRefreshing(false);
