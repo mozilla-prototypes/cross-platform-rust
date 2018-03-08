@@ -131,7 +131,13 @@ class ToodleLib {
 
 extension ToodleLib: Observable {
     func register(key: String, observer: Observing, attributes: [String]) {
-        let attrEntIds = attributes.map({ Int64(self.entidForAttribute(attribute: $0)) })
+        let attrEntIds = attributes.map({ (kw) -> Int64 in
+            let entid = Int64(self.entidForAttribute(attribute: kw));
+            print("entid for \(kw) is \(entid)")
+            return entid
+        })
+
+        print("registering observer for entids \(attrEntIds)")
 
         let ptr = UnsafeMutablePointer<Int64>.allocate(capacity: attrEntIds.count)
         let entidPointer = UnsafeMutableBufferPointer(start: ptr, count: attrEntIds.count)
@@ -141,7 +147,9 @@ extension ToodleLib: Observable {
             return
         }
         self.observers[key] = observer
-        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), transactionObserverCallback)
+        // doubling the attribute count is a nasty hack - for some reason we get a attribute set in Rust with a 0 value in between. Not sure why.
+        // wondering if this happens from Java too...
+        store_register_observer(self.raw, key, firstElement, Int64(attributes.count * 2), transactionObserverCallback)
 
     }
 

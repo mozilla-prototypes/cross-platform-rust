@@ -21,7 +21,7 @@ class ToDoListItemsTableViewController: UITableViewController {
         self.tableView.addSubview(self.syncToRefresh)
 
         self.items = ToodleLib.sharedInstance.allItems()
-        let attrs = [":todo/uuid", ":todo/name", ":todo/completion_date"]
+        let attrs = [":todo/uuid", ":todo/name", ":todo/due_date", ":todo/completion_date"]
         ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"
@@ -51,7 +51,9 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        if let dueDateString = item.dueDateAsString() {
+        if let completionDateString = item.completionDateAsString() {
+            cell.detailTextLabel?.text = "Completed: \(completionDateString)"
+        } else if let dueDateString = item.dueDateAsString() {
             cell.detailTextLabel?.text = "Due: \(dueDateString)"
         } else {
             cell.detailTextLabel?.text = ""
@@ -88,8 +90,8 @@ class ToDoListItemsTableViewController: UITableViewController {
 extension ToDoListItemsTableViewController: Observing {
     func transactionDidOccur(key: String) {//, reports: [TxReport]) {
         print("transaction did occur \(key)")
-        self.items = ToodleLib.sharedInstance.allItems()
         DispatchQueue.main.async {
+            self.items = ToodleLib.sharedInstance.allItems()
             self.tableView.reloadData()
         }
     }

@@ -98,4 +98,14 @@ class Item {
         dateFormatter.timeStyle = .short
         return dateFormatter.string(from: dueDate)
     }
+
+    func completionDateAsString() -> String? {
+        guard let completionDate = self.completionDate else {
+            return nil
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: completionDate)
+    }
 }

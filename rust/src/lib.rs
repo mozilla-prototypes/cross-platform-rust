@@ -67,15 +67,6 @@ use errors::{
     Result,
 };
 
-use std::os::raw::{
-    c_char,
-};
-
-use mentat_ffi::utils::strings::{
-    c_char_to_string,
-    string_to_c_char,
-};
-
 pub use items::{
     Item,
     Items,
@@ -133,7 +124,7 @@ pub trait Toodle {
 impl Toodle for Store {
 
     fn initialize(&mut self) -> Result<()> {
-        println!("initializing Toodle");
+        //println!("initializing Toodle");
         let mut in_progress = self.begin_transaction()?;
         in_progress.ensure_vocabulary(&Definition {
             name: kw!(:toodle/list),
@@ -180,13 +171,14 @@ impl Toodle for Store {
                     .build()),
             ],
         })?;
-        println!("committing Toodle schema");
+        //println!("committing Toodle schema");
         in_progress.commit()
         .map_err(|e| e.into())
         .and(Ok(()))
     }
 
     fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
+        //println!("Toodle::item_row_to_item");
         let uuid = row[1].clone().to_inner();
         let item;
         {
@@ -203,6 +195,7 @@ impl Toodle for Store {
     }
 
     fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
+        //println!("Toodle::create_labels");
         {
             let in_progress = self.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("label");
@@ -216,6 +209,7 @@ impl Toodle for Store {
     }
 
     fn fetch_label(&mut self, name: &String) -> Result<Option<Label>> {
+        //println!("Toodle::fetch_label");
         let query = r#"[:find [?eid ?name ?color]
                         :in ?name
                         :where
@@ -232,6 +226,7 @@ impl Toodle for Store {
     }
 
     fn fetch_labels(&mut self) -> Result<Vec<Label>> {
+        //println!("Toodle::fetch_labels");
         let query = r#"[:find ?eid ?name ?color
                         :where
                         [?eid :label/name ?name]
@@ -246,6 +241,7 @@ impl Toodle for Store {
     }
 
     fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
+        //println!("Toodle::fetch_labels_for_item");
         let query = r#"[:find ?l ?name ?color
                         :in ?item_uuid
                         :where
@@ -265,6 +261,7 @@ impl Toodle for Store {
 
 
     fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>> {
+        //println!("Toodle::fetch_items_with_label");
         let query = r#"[:find ?eid ?uuid ?name
                         :in ?label
                         :where
@@ -286,6 +283,7 @@ impl Toodle for Store {
     }
 
     fn fetch_items(&mut self) -> Result<Items> {
+        //println!("Toodle::fetch_items");
         let query = r#"[:find ?eid ?uuid ?name
                         :where
                         [?eid :todo/uuid ?uuid]
@@ -304,6 +302,7 @@ impl Toodle for Store {
     }
 
     fn fetch_item(&mut self, uuid: &Uuid) -> Result<Option<Item>> {
+        //println!("Toodle::fetch_item");
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
@@ -325,6 +324,7 @@ impl Toodle for Store {
     }
 
     fn fetch_completion_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
+        //println!("Toodle::fetch_completion_date_for_item");
         let query = r#"[:find ?date .
             :in ?uuid
             :where
@@ -340,6 +340,7 @@ impl Toodle for Store {
     }
 
     fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
+        //println!("Toodle::fetch_due_date_for_item");
         let query = r#"[:find ?date .
             :in ?uuid
             :where
@@ -405,6 +406,7 @@ impl Toodle for Store {
                                due_date: Option<Timespec>,
                                completion_date: Option<Timespec>)
                                -> Result<Item> {
+        //println!("Toodle::update_item_by_uuid {:?}, {:?}, {:?}", name, due_date, completion_date);
         let uuid = Uuid::parse_str(&uuid_string)?;
         let item =
             self.fetch_item(&uuid)
@@ -426,6 +428,7 @@ impl Toodle for Store {
                        due_date: Option<Timespec>,
                        completion_date: Option<Timespec>,
                        labels: Option<&Vec<Label>>) -> Result<()> {
+        //println!("Toodle::update_item {:?}, {:?}, {:?}", name, due_date, completion_date);
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
         let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
         let in_progress = self.begin_transaction()?;
@@ -449,8 +452,10 @@ impl Toodle for Store {
         if item.completion_date != completion_date {
             let completion_date_kw = kw!(:todo/completion_date);
             if let Some(date) = completion_date {
+                //println!("Adding completion date");
                 builder.add_kw(&completion_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.completion_date {
+                //println!("retracting completion date");
                 builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
             }
         }
@@ -897,7 +902,7 @@ mod test {
         match manager.update_item(&created_item, Some("new name".to_string()), None, None, None) {
             Ok(()) => (),
             Err(e) => {
-                eprintln!("e {:?}", e);
+                println!("e {:?}", e);
                 assert!(false)
             }
         }
@@ -929,7 +934,7 @@ mod test {
         match manager.update_item(&created_item, None, None, Some(date), None) {
             Ok(()) => (),
             Err(e) => {
-                eprintln!("e {:?}", e);
+                println!("e {:?}", e);
                 assert!(false)
             }
         }

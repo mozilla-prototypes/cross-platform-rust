@@ -23,19 +23,19 @@ time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-path = "/Users/emilytoop/Development/mentat"
-#git = "https://github.com/mozilla/mentat.git"
-#branch = "fluffyemily/expose-txobserver-over-ffi"
+# path = "/Users/emilytoop/Development/mentat"
+git = "https://github.com/mozilla/mentat.git"
+branch = "grisha/observers-sync"
 
 [dependencies.mentat_core]
-path = "/Users/emilytoop/Development/mentat/core"
-#git = "https://github.com/mozilla/mentat.git"
-#branch = "fluffyemily/expose-txobserver-over-ffi"
+# path = "/Users/emilytoop/Development/mentat/core"
+git = "https://github.com/mozilla/mentat.git"
+branch = "grisha/observers-sync"
 
 [dependencies.mentat_ffi]
-path = "/Users/emilytoop/Development/mentat/ffi"
-#git = "https://github.com/mozilla/mentat.git"
-#branch = "fluffyemily/expose-txobserver-over-ffi"
+# path = "/Users/emilytoop/Development/mentat/ffi"
+git = "https://github.com/mozilla/mentat.git"
+branch = "grisha/observers-sync"
 
 [dependencies.rusqlite]
 version = "0.13"
