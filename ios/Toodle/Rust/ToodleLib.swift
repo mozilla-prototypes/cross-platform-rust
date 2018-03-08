@@ -147,9 +147,7 @@ extension ToodleLib: Observable {
             return
         }
         self.observers[key] = observer
-        // doubling the attribute count is a nasty hack - for some reason we get a attribute set in Rust with a 0 value in between. Not sure why.
-        // wondering if this happens from Java too...
-        store_register_observer(self.raw, key, firstElement, Int64(attributes.count * 2), transactionObserverCallback)
+        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), transactionObserverCallback)
 
     }
 

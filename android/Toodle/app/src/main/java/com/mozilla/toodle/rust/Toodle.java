@@ -80,7 +80,7 @@ public class Toodle extends RustObject {
 
     public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {
         // turn string array into int array
-        int[] attrEntids = new int[attributes.length];
+        long[] attrEntids = new long[attributes.length];
         for(int i = 0; i < attributes.length; i++) {
             attrEntids[i] = JNA.INSTANCE.store_entid_for_attribute(rawPointer, attributes[i]);
         }
@@ -88,7 +88,7 @@ public class Toodle extends RustObject {
         for (int i = 0; i < attrEntids.length; i++) {
             Log.i(LOG_TAG, "entid: " + attrEntids[i]);
         }
-        final Pointer entidsNativeArray = new Memory(4 * attrEntids.length);
+        final Pointer entidsNativeArray = new Memory(8 * attrEntids.length);
         entidsNativeArray.write(0, attrEntids, 0, attrEntids.length);
         JNA.INSTANCE.store_register_observer(rawPointer, key, entidsNativeArray, attrEntids.length, callback);
     }
