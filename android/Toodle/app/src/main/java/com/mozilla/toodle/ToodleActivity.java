@@ -47,7 +47,7 @@ public class ToodleActivity extends Activity {
                 Log.i(LOG_TAG, "Sync result: " + result);
                 if (!TextUtils.isEmpty(result.error)) {
                     Log.i(LOG_TAG, "Sync error: " + result.error);
-                    UiUtils.showError(getApplicationContext(), result.error);
+                    UiUtils.showError(ToodleActivity.this, result.error);
                 }
                 refreshWrapper.setRefreshing(false);
             }
