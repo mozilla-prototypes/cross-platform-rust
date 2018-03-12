@@ -1,11 +1,9 @@
 package com.mozilla.toodle.rust;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.NativeLongByReference;
 
 import java.io.Closeable;
 import java.util.Arrays;
@@ -23,13 +21,24 @@ public class NativeTxReport extends Structure implements Closeable {
     }
 
     public int txid;
-    public int[] changes;
-    // Used by the Swift counterpart, JNA does this for us automagically.
+    public Pointer changes;
+    public int numberOfItems;
+//    // Used by the Swift counterpart, JNA does this for us automagically.
     public int changes_len;
+
+    public List<Long> getChanges() {
+        final long[] array = (long[]) changes.getLongArray(0, numberOfItems);
+        Long[] longArray = new Long[numberOfItems];
+        int idx = 0;
+        for(long change: array) {
+            longArray[idx++] = change;
+        }
+        return Arrays.asList(longArray);
+    }
 
     @Override
     protected List<String> getFieldOrder() {
-        return Arrays.asList("txid", "changes", "changes_len");
+        return Arrays.asList("txid", "changes", "changes_len", "numberOfItems");
     }
 
     @Override

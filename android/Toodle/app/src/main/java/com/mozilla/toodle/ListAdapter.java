@@ -44,16 +44,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             this.listAdapterWeakReference = listAdapterWeakReference;
         }
 
-        public void transactionObserverCalled(String key) {
-            Log.i(LOG_TAG, "Observer called! " + key);
-//            Log.i(LOG_TAG, "Reports: " + reports);
+        public void transactionObserverCalled(String key, NativeTxReportList.ByReference reports) {
             final ListAdapter listAdapter = listAdapterWeakReference.get();
             if (listAdapter == null) {
                 Log.i(LOG_TAG, "No list adapter");
                 return;
             }
 
-            Log.i(LOG_TAG, "Items changed!");
             // TODO This is a hack around observer firing at a wrong moment
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override

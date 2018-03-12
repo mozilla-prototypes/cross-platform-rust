@@ -8,7 +8,7 @@
 struct ExternTxReport {
     int64_t txid;
     int64_t*_Nonnull* _Nonnull changes;
-    uint64_t changes_len;
+    uint64_t len;
 };
 
 struct Result {
@@ -27,7 +27,7 @@ void store_destroy(struct Store*_Nonnull  store);
 
 struct Result*_Nonnull store_sync(struct Store*_Nonnull store, const char* _Nonnull user_uuid, const char* _Nonnull server_uri);
 
-void store_register_observer(struct Store*_Nonnull  store, const char* _Nonnull key, const int64_t* _Nonnull attributes, const int64_t len, void (*_Nonnull callback_fn)(const char* _Nonnull key));//, const struct TxReportList* _Nonnull reports));
+void store_register_observer(struct Store*_Nonnull  store, const char* _Nonnull key, const int64_t* _Nonnull attributes, const int64_t len, void (*_Nonnull callback_fn)(const char* _Nonnull key, const struct TxReportList* _Nonnull reports));
 void store_unregister_observer(struct Store*_Nonnull  store, const char* _Nonnull key);
 int64_t store_entid_for_attribute(struct Store*_Nonnull store, const char*_Nonnull attr);
 

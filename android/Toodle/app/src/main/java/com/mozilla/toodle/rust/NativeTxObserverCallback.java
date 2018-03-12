@@ -8,5 +8,5 @@ import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 
 public interface NativeTxObserverCallback extends Callback {
-    void transactionObserverCalled(String key);//, NativeTxReportList.ByReference reports);
+    void transactionObserverCalled(String key, NativeTxReportList.ByReference reports);
 }
