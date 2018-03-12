@@ -51,8 +51,6 @@ use mentat::vocabulary::attribute::{
     Unique
 };
 
-use mentat::sync::Syncable;
-
 pub use time::Timespec;
 pub use mentat::Uuid;
 
@@ -92,11 +90,11 @@ fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> 
 }
 
 pub trait Toodle {
+    fn initialize(&mut self) -> Result<()>;
     fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item;
     fn fetch_completion_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
     fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
 
-    fn initialize(&mut self) -> Result<()>;
     fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>>;
     fn fetch_label(&mut self, name: &String) -> Result<Option<Label>>;
     fn fetch_labels(&mut self) -> Result<Vec<Label>>;
@@ -117,8 +115,6 @@ pub trait Toodle {
                        due_date: Option<Timespec>,
                        completion_date: Option<Timespec>,
                        labels: Option<&Vec<Label>>) -> Result<()>;
-
-    fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()>;
 }
 
 impl Toodle for Store {
@@ -474,10 +470,6 @@ impl Toodle for Store {
         builder.commit()
                .map_err(|e| e.into())
                .and(Ok(()))
-    }
-
-    fn do_sync(&mut self, server_uri: &String, user_uuid: &String) -> Result<()> {
-        self.sync(server_uri, user_uuid).map_err(|e| e.into())
     }
 }
 

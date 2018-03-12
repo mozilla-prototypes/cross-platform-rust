@@ -8,7 +8,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use std;
 use std::os::raw::c_char;
 use std::ptr;
 
@@ -24,8 +23,6 @@ use mentat_ffi::utils::strings::{
     c_char_to_string,
     string_to_c_char,
 };
-
-use toodle;
 
 use toodle::items::{
     Item,
@@ -127,26 +124,4 @@ impl From<ItemC> for Item {
 pub struct ItemCList {
     pub items: Box<[ItemC]>,
     pub len: usize
-}
-
-#[repr(C)]
-pub struct ResultC {
-    pub error: *const c_char
-}
-
-impl From<std::result::Result<(), toodle::errors::Error>> for ResultC {
-    fn from(result: std::result::Result<(), toodle::errors::Error>) -> Self {
-        match result {
-            Ok(_) => {
-                ResultC {
-                    error: std::ptr::null(),
-                }
-            },
-            Err(e) => {
-                ResultC {
-                    error: string_to_c_char(e.description().into())
-                }
-            }
-        }
-    }
 }

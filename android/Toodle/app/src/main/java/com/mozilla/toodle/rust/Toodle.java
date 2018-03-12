@@ -14,9 +14,6 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class Toodle extends RustObject {
     static {
         System.loadLibrary("toodle");
@@ -65,17 +62,13 @@ public class Toodle extends RustObject {
         );
     }
 
-    public void registerChangedItemsCallback(NativeItemsChangedCallback callback) {
-        JNA.INSTANCE.toodle_on_items_changed(callback);
-    }
-
     public void getAllItems(NativeItemsCallback callback) {
         JNA.INSTANCE.toodle_all_items(rawPointer, callback);
     }
 
     public NativeResult sync() {
         Log.i(LOG_TAG, "sync pointer: " + rawPointer);
-        return JNA.INSTANCE.toodle_sync(rawPointer);
+        return JNA.INSTANCE.store_sync(rawPointer, "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1");
     }
 
     public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {

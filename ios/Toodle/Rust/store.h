@@ -5,6 +5,16 @@
 #ifndef store_h
 #define store_h
 
+struct ExternTxReport {
+    int64_t txid;
+    int64_t*_Nonnull* _Nonnull changes;
+    uint64_t changes_len;
+};
+
+struct Result {
+    char* _Nullable error;
+};
+
 struct Store;
 
 struct TxReportList {
@@ -12,14 +22,10 @@ struct TxReportList {
     uint64_t len;
 };
 
-struct ExternTxReport {
-    int64_t txid;
-    int64_t*_Nonnull* _Nonnull changes;
-    uint64_t changes_len;
-};
-
 struct Store*_Nonnull  new_store(const char*_Nonnull uri);
 void store_destroy(struct Store*_Nonnull  store);
+
+struct Result*_Nonnull store_sync(struct Store*_Nonnull store, const char* _Nonnull user_uuid, const char* _Nonnull server_uri);
 
 void store_register_observer(struct Store*_Nonnull  store, const char* _Nonnull key, const int64_t* _Nonnull attributes, const int64_t len, void (*_Nonnull callback_fn)(const char* _Nonnull key));//, const struct TxReportList* _Nonnull reports));
 void store_unregister_observer(struct Store*_Nonnull  store, const char* _Nonnull key);

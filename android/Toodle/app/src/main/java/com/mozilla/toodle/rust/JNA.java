@@ -28,7 +28,7 @@ public interface JNA extends Library {
 
     void store_register_observer(Pointer Store, String key, Pointer attributes, int len, NativeTxObserverCallback callback );
     void store_unregister_observer(Pointer Store, String key);
-    int store_entid_for_attribute(Pointer Store, String attr);
+    long store_entid_for_attribute(Pointer Store, String attr);
 
-    NativeResult toodle_sync(Pointer toodle);
+    NativeResult store_sync(Pointer toodle, String userUuid, String serverUri);
 }

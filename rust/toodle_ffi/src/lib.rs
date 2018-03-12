@@ -23,8 +23,6 @@ use std::os::raw::{
     c_char,
 };
 
-use std::str::FromStr;
-
 use time::Timespec;
 
 pub use mentat::{
@@ -38,7 +36,6 @@ pub use mentat_ffi::{
     store_register_observer,
     store_unregister_observer,
 };
-
 use mentat_ffi::utils::log;
 use mentat_ffi::utils::strings::{
     c_char_to_string,
@@ -54,16 +51,10 @@ use ctypes::{
     ItemC,
     ItemsC,
     ItemCList,
-    ResultC,
 };
 use utils::time::{
     optional_timespec,
 };
-
-
-// TODO this is pretty horrible and rather crafty, but I couldn't get this to live
-// inside a Toodle struct and be able to mutate it...
-// static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 #[no_mangle]
 pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
@@ -108,21 +99,12 @@ pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_
     item.due_date = due;
     log::d(&format!("toodle_create_item due item: {:?}", item));
     let item = manager.create_and_fetch_item(&item).expect("expected an item");
-    // if let Some(callback) = CHANGED_CALLBACK {
-    //     callback();
-    // }
     log::d(&format!("toodle_create_item create_and_fetch_item: {:?}", item));
     if let Some(i) = item {
         return Box::into_raw(Box::new(i.into()));
     }
     return std::ptr::null_mut();
 }
-
-// #[no_mangle]
-// pub unsafe extern "C" fn toodle_on_items_changed(callback: extern fn()) {
-//     CHANGED_CALLBACK = Some(callback);
-//     callback();
-// }
 
 // TODO: figure out callbacks in swift such that we can use `toodle_all_items` instead.
 #[no_mangle]
@@ -241,15 +223,6 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c
     let color = c_char_to_string(color);
     let label = Box::new(manager.create_label(name, color).unwrap_or(None));
     Box::into_raw(label)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn toodle_sync(manager: *mut Store) -> *mut ResultC {
-    let manager = &mut*manager;
-    let user_uuid = String::from_str("00000000-0000-0000-0000-000000000117").unwrap();
-    let server_uri = String::from_str("http://mentat.dev.lcip.org/mentatsync/0.1").unwrap();
-    let res = manager.do_sync(&server_uri, &user_uuid);
-    Box::into_raw(Box::new(res.into()))
 }
 
 #[no_mangle]

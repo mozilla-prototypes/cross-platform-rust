@@ -118,7 +118,7 @@ class ToodleLib {
     }
 
     func sync_now() -> Bool {
-        let err = toodle_sync(self.raw)
+        let err = store_sync(self.raw, "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1")
         if let error = err.pointee.error {
             let str = String(cString: error)
             print("Sync error \(str)")
