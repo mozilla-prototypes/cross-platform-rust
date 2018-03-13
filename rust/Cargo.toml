@@ -23,12 +23,14 @@ time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+path = "/Users/emilytoop/Development/mentat"
+# git = "https://github.com/mozilla/mentat.git"
+# branch = "master"
 
 [dependencies.mentat_core]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+path = "/Users/emilytoop/Development/mentat/core"
+# git = "https://github.com/mozilla/mentat.git"
+# branch = "master"
 
 [dependencies.rusqlite]
 version = "0.13"

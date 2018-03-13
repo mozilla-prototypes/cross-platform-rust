@@ -54,6 +54,7 @@ impl Into<Item> for ItemInfo {
                 .unwrap_or_else(|| Uuid::nil()),
             name: self.name.clone(),
             completion_date,
+            labels: Vec::new(),
         }
     }
 }

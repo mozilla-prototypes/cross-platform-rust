@@ -8,38 +8,28 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-use time::Timespec;
-
 use mentat::{
-    DateTime,
-    Uuid,
-    Utc,
+    TypedValue,
 };
-
-use labels::Label;
 
 use utils::{
     Entity,
+    ToInner,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct Item {
-    pub id: Option<Entity>,
-    pub uuid: Uuid,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Label {
+    pub id: Option<Entity>,    // id should not be leaked outside of the library
     pub name: String,
-    pub completion_date: Option<Timespec>,
-    pub labels: Vec<Label>,
+    pub color: String
 }
 
-#[derive(Debug)]
-pub struct Items {
-    pub vec: Vec<Item>
-}
-
-impl Items {
-    pub fn new(vec: Vec<Item>) -> Items {
-        Items {
-            vec: vec
-        }
+impl Label {
+    pub fn from_row(row: &Vec<TypedValue>) -> Option<Label> {
+        Some(Label {
+            id: row[0].clone().to_inner(),
+            name: row[1].clone().to_inner(),
+            color: row[2].clone().to_inner()
+        })
     }
 }

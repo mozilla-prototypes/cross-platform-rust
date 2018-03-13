@@ -50,8 +50,9 @@ use mentat::vocabulary::attribute::{
 pub use time::Timespec;
 pub use mentat::Uuid;
 
-pub mod items;
 pub mod errors;
+pub mod items;
+pub mod labels;
 mod utils;
 
 use errors::{
@@ -272,6 +273,7 @@ impl Toodle {
                 uuid: uuid,
                 name: row[2].clone().to_inner(),
                 completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
+                labels: Vec::new(),
             }
         }
         item
