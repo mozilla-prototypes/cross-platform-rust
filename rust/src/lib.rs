@@ -26,9 +26,12 @@ use mentat::{
     Queryable,
     QueryExecutionResult,
     QueryInputs,
-    Store,
     TypedValue,
     ValueType,
+};
+
+pub use mentat::{
+    Store,
 };
 
 use mentat_ffi::utils::log;
