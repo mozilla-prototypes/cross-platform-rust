@@ -27,6 +27,7 @@ pub struct Item {
     pub id: Option<Entity>,
     pub uuid: Uuid,
     pub name: String,
+    pub due_date: Option<Timespec>,
     pub completion_date: Option<Timespec>,
     pub labels: Vec<Label>,
 }

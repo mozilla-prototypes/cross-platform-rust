@@ -65,6 +65,8 @@ pub use items::{
     Items,
 };
 
+pub use labels::Label;
+
 use utils::{
     ToInner,
     ToTypedValue,
@@ -74,41 +76,80 @@ use utils::{
 
 // Creates items as:
 // [
-//  {   :db/ident       :item/uuid
+//  {   :db/ident       :todo/uuid
 //      :db/valueType   :db.type/uuid
 //      :db/cardinality :db.cardinality/one
 //      :db/unique      :db.unique/value
 //      :db/index true                        },
-//  {   :db/ident       :item/name
+//  {   :db/ident       :todo/name
 //      :db/valueType   :db.type/string
 //      :db/cardinality :db.cardinality/one
 //      :db/index       true
 //      :db/fulltext    true                  },
-//  {   :db/ident       :item/completion_date
+//  {   :db/ident       :todo/due_date
 //      :db/valueType   :db.type/instant
-//      :db/cardinality :db.cardinality/one   }
+//      :db/cardinality :db.cardinality/one   },
+//  {   :db/ident       :todo/completion_date
+//      :db/valueType   :db.type/instant
+//      :db/cardinality :db.cardinality/one   },
+//  {   :db/ident       :todo/label
+//      :db/valueType   :db.type/ref
+//      :db/cardinality :db.cardinality/many   }
 // ]
 fn transact_items_vocabulary(in_progress: &mut InProgress) -> Result<()> {
     in_progress.ensure_vocabulary(&Definition {
             name: kw!(:toodle/items),
             version: 1,
             attributes: vec![
-                (kw!(:item/uuid),
+                (kw!(:todo/uuid),
                  AttributeBuilder::new()
                     .value_type(ValueType::Uuid)
                     .multival(false)
                     .unique(Unique::Value)
                     .index(true)
                     .build()),
-                (kw!(:item/name),
+                (kw!(:todo/name),
                  AttributeBuilder::new()
                     .value_type(ValueType::String)
                     .multival(false)
                     .fulltext(true)
                     .build()),
-                (kw!(:item/completion_date),
+                (kw!(:todo/due_date),
                  AttributeBuilder::new()
                     .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:todo/completion_date),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Instant)
+                    .multival(false)
+                    .build()),
+                (kw!(:todo/label),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::Ref)
+                    .multival(true)
+                    .build()),
+            ],
+        })
+        .map_err(|e| e.into())
+        .and(Ok(()))
+}
+
+fn transact_labels_vocabulary(in_progress: &mut InProgress) -> Result<()> {
+    in_progress.ensure_vocabulary(&Definition {
+            name: kw!(:toodle/labels),
+            version: 1,
+            attributes: vec![
+                (kw!(:label/name),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
+                    .multival(false)
+                    .unique(Unique::Identity)
+                    .fulltext(true)
+                    .build()),
+                (kw!(:label/color),
+                 AttributeBuilder::new()
+                    .value_type(ValueType::String)
                     .multival(false)
                     .build()),
             ],
@@ -131,6 +172,7 @@ impl Toodle {
             let mut in_progress = store_result.begin_transaction()?;
             in_progress.verify_core_schema()?;
             transact_items_vocabulary(&mut in_progress)?;
+            transact_labels_vocabulary(&mut in_progress)?;
             in_progress.commit()?;
         }
 
@@ -150,11 +192,19 @@ impl Toodle {
             let in_progress = self.connection.begin_transaction()?;
             let mut builder = in_progress.builder().describe_tempid("item");
 
-            builder.add_kw(&kw!(:item/uuid), TypedValue::Uuid(item_uuid))?;
-            builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&item.name))?;
-
+            builder.add_kw(&kw!(:todo/uuid), TypedValue::Uuid(item_uuid))?;
+            builder.add_kw(&kw!(:todo/name), TypedValue::typed_string(&item.name))?;
+            if let Some(due_date) = item.due_date {
+                builder.add_kw(&kw!(:todo/due_date), due_date.to_typed_value())?;
+            }
             if let Some(completion_date) = item.completion_date {
-                builder.add_kw(&kw!(:item/completion_date), completion_date.to_typed_value())?;
+                builder.add_kw(&kw!(:todo/completion_date), completion_date.to_typed_value())?;
+            }
+
+            let item_labels_kw = kw!(:todo/label);
+            for label in item.labels.iter() {
+                let label_id = label.id.clone().ok_or_else(|| ErrorKind::LabelNotFound(label.name.clone()))?;
+                builder.add_kw(&item_labels_kw, TypedValue::Ref(label_id.id))?;
             }
 
             builder.commit()?;
@@ -165,6 +215,7 @@ impl Toodle {
     pub fn update_item_by_uuid(&mut self,
                                uuid_string: &str,
                                name: Option<String>,
+                               due_date: Option<Timespec>,
                                completion_date: Option<Timespec>)
                                -> Result<Item> {
         let uuid = Uuid::parse_str(&uuid_string)?;
@@ -175,7 +226,7 @@ impl Toodle {
                 .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
 
         let new_item =
-            self.update_item(&item, name, completion_date)
+            self.update_item(&item, name, due_date, completion_date, None)
                 .and_then(|_| self.fetch_item(&uuid))
                 .unwrap_or_default()
                 .ok_or_else(|| ErrorKind::ItemNotFound(uuid_string.to_string()))?;
@@ -185,23 +236,47 @@ impl Toodle {
 
     pub fn update_item(&mut self,
                        item: &Item, name: Option<String>,
-                       completion_date: Option<Timespec>) -> Result<()> {
+                       due_date: Option<Timespec>,
+                       completion_date: Option<Timespec>,
+                       labels: Option<&Vec<Label>>) -> Result<()> {
         let entid = KnownEntid(item.id.to_owned().ok_or_else(|| ErrorKind::ItemNotFound(item.uuid.hyphenated().to_string()))?.id);
+        let existing_labels = self.fetch_labels_for_item(&(item.uuid)).unwrap_or(vec![]);
         let in_progress = self.connection.begin_transaction()?;
         let mut builder = in_progress.builder().describe(entid);
 
         if let Some(name) = name {
             if item.name != name {
-                builder.add_kw(&kw!(:item/name), TypedValue::typed_string(&name))?;
+                builder.add_kw(&kw!(:todo/name), TypedValue::typed_string(&name))?;
+            }
+        }
+
+        if item.due_date != due_date {
+            let due_date_kw = kw!(:todo/due_date);
+            if let Some(date) = due_date {
+                builder.add_kw(&due_date_kw, date.to_typed_value())?;
+            } else if let Some(date) = item.due_date {
+                builder.retract_kw(&due_date_kw, date.to_typed_value())?;
             }
         }
 
         if item.completion_date != completion_date {
-            let completion_date_kw = kw!(:item/completion_date);
+            let completion_date_kw = kw!(:todo/completion_date);
             if let Some(date) = completion_date {
                 builder.add_kw(&completion_date_kw, date.to_typed_value())?;
             } else if let Some(date) = item.completion_date {
                 builder.retract_kw(&completion_date_kw, date.to_typed_value())?;
+            }
+        }
+
+        if let Some(new_labels) = labels {
+            let item_labels_kw = kw!(:todo/label);
+            for label in new_labels {
+                builder.add_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id))?;
+            }
+            for label in existing_labels {
+                if !new_labels.contains(&label) && label.id.is_some() {
+                    builder.retract_kw(&item_labels_kw, TypedValue::Ref(label.id.clone().unwrap().id))?;
+                }
             }
         }
 
@@ -213,8 +288,8 @@ impl Toodle {
     pub fn fetch_items(&mut self) -> Result<Items> {
         let query = r#"[:find ?eid ?uuid ?name
                         :where
-                        [?eid :item/uuid ?uuid]
-                        [?eid :item/name ?name]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
         ]"#;
 
         let rows;
@@ -232,8 +307,8 @@ impl Toodle {
         let query = r#"[:find [?eid ?uuid ?name]
                         :in ?uuid
                         :where
-                        [?eid :item/uuid ?uuid]
-                        [?eid :item/name ?name]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
         ]"#;
         let rows;
         {
@@ -253,8 +328,8 @@ impl Toodle {
         let query = r#"[:find ?date .
             :in ?uuid
             :where
-            [?eid :item/uuid ?uuid]
-            [?eid :item/completion_date ?date]
+            [?eid :todo/uuid ?uuid]
+            [?eid :todo/completion_date ?date]
         ]"#;
 
         let in_progress_read = self.connection.begin_read()?;
@@ -262,6 +337,21 @@ impl Toodle {
         return_date_field(
             in_progress_read
             .q_once(query, args))
+    }
+
+    fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>> {
+        let query = r#"[:find ?date .
+            :in ?uuid
+            :where
+            [?eid :todo/uuid ?uuid]
+            [?eid :todo/due_date ?date]
+        ]"#;
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(var!(?uuid), item_id.to_typed_value())]);
+        let date = return_date_field(
+            in_progress_read
+            .q_once(query, args));
+        date
     }
 
     fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
@@ -272,8 +362,9 @@ impl Toodle {
                 id: row[0].clone().to_inner(),
                 uuid: uuid,
                 name: row[2].clone().to_inner(),
+                due_date: self.fetch_due_date_for_item(&uuid).unwrap_or(None),
                 completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
-                labels: Vec::new(),
+                labels: self.fetch_labels_for_item(&uuid).unwrap_or(vec![]),
             }
         }
         item
@@ -283,6 +374,90 @@ impl Toodle {
         let item_uuid = self.create_item(&item)?;
         let item = self.fetch_item(&item_uuid);
         item
+    }
+
+
+    pub fn create_label(&mut self, name: String, color: String) -> Result<Option<Label>> {
+        {
+            let in_progress = self.connection.begin_transaction()?;
+            let mut builder = in_progress.builder().describe_tempid("label");
+
+            builder.add_kw(&kw!(:label/name), TypedValue::typed_string(&name))?;
+            builder.add_kw(&kw!(:label/color), TypedValue::typed_string(&color))?;
+
+            builder.commit()?;
+        }
+        self.fetch_label(&name)
+    }
+
+    pub fn fetch_label(&mut self, name: &String) -> Result<Option<Label>> {
+        let query = r#"[:find [?eid ?name ?color]
+                        :in ?name
+                        :where
+                        [?eid :label/name ?name]
+                        [?eid :label/color ?color]
+        ]"#;
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(var!(?name), name.to_typed_value())]);
+        in_progress_read
+            .q_once(query, args)
+            .into_tuple_result()
+            .map(|o| o.as_ref().and_then(Label::from_row))
+            .map_err(|e| e.into())
+    }
+
+    pub fn fetch_labels(&mut self) -> Result<Vec<Label>> {
+        let query = r#"[:find ?eid ?name ?color
+                        :where
+                        [?eid :label/name ?name]
+                        [?eid :label/color ?color]
+        ]"#;
+        let in_progress_read = self.connection.begin_read()?;
+        in_progress_read
+            .q_once(query, None)
+            .into_rel_result()
+            .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
+            .map_err(|e| e.into())
+    }
+
+    pub fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
+        let query = r#"[:find ?l ?name ?color
+                        :in ?item_uuid
+                        :where
+                        [?i :todo/uuid ?item_uuid]
+                        [?i :todo/label ?l]
+                        [?l :label/name ?name]
+                        [?l :label/color ?color]
+        ]"#;
+        let in_progress_read = self.connection.begin_read()?;
+        let args = QueryInputs::with_value_sequence(vec![(var!(?item_uuid), item_uuid.to_typed_value())]);
+        in_progress_read
+            .q_once(query, args)
+            .into_rel_result()
+            .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
+            .map_err(|e| e.into())
+    }
+
+
+    pub fn fetch_items_with_label(&mut self, label: &Label) -> Result<Vec<Item>> {
+        let query = r#"[:find ?eid ?uuid ?name
+                        :in ?label
+                        :where
+                        [?l :label/name ?label]
+                        [?eid :todo/label ?l]
+                        [?eid :todo/uuid ?uuid]
+                        [?eid :todo/name ?name]
+        ]"#;
+        let rows;
+        {
+            let in_progress_read = self.connection.begin_read()?;
+            let args = QueryInputs::with_value_sequence(vec![(var!(?label), label.name.to_typed_value())]);
+            rows = in_progress_read
+                .q_once(query, args)
+                .into_rel_result()
+                .map_err(|e| e.into());
+        }
+        rows.map(|rows| rows.into_iter().map(|r| self.item_row_to_item(r)).collect())
     }
 }
 

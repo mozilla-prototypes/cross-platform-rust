@@ -37,6 +37,10 @@ error_chain! {
             description("Item not found")
             display("Item {} not found", uuid)
         }
+        LabelNotFound(name: String) {
+            description("Label not found")
+            display("Label {} not found", name)
+        }
         UnexpectedResultType(message: String) {
             description("An unexpected Result type was encountered")
             display("{}", message)
