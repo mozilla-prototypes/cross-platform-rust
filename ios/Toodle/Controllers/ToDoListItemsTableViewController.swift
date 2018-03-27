@@ -4,22 +4,32 @@
 
 import UIKit
 
-protocol ToDoListItemsViewControllerDelegate {
-    func itemCreated(item: Item)
-    func itemUpdated(item: Item)
-}
-
 class ToDoListItemsTableViewController: UITableViewController {
+
+    lazy var syncToRefresh: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(sync), for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.red
+        return refreshControl
+    }()
 
     var items: [Item]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.tableView.addSubview(self.syncToRefresh)
+
         self.items = ToodleLib.sharedInstance.allItems()
+        let attrs = [":todo/uuid", ":todo/name", ":todo/due_date", ":todo/completion_date"]
+        ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
         self.title = "All Items"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(newItem))
+    }
+
+    deinit {
+        ToodleLib.sharedInstance.unregister(key: "ToDoListItemsTableViewController")
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,7 +51,13 @@ class ToDoListItemsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "ItemCell")
         let item = self.items[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.dueDateAsString()
+        if let completionDateString = item.completionDateAsString() {
+            cell.detailTextLabel?.text = "Completed: \(completionDateString)"
+        } else if let dueDateString = item.dueDateAsString() {
+            cell.detailTextLabel?.text = "Due: \(dueDateString)"
+        } else {
+            cell.detailTextLabel?.text = ""
+        }
 
         return cell
     }
@@ -49,30 +65,34 @@ class ToDoListItemsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = self.items[indexPath.row]
         let itemVC = ItemViewController(item: item)
-        itemVC.delegate = self
         self.navigationController?.pushViewController(itemVC, animated: true)
     }
 
     @objc fileprivate func newItem() {
         let itemVC = ItemViewController()
-        itemVC.delegate = self
         let navController = UINavigationController(rootViewController: itemVC)
         self.present(navController, animated: true, completion: nil)
     }
 
-}
-
-extension ToDoListItemsTableViewController: ToDoListItemsViewControllerDelegate {
-    func itemCreated(item: Item) {
-        self.items.append(item)
-        self.tableView.reloadData()
+    @objc func sync() {
+        let success = ToodleLib.sharedInstance.sync_now()
+        if success {
+            print("Sync succeeded")
+            self.syncToRefresh.endRefreshing()
+        } else {
+            print("Sync failed")
+            self.syncToRefresh.endRefreshing()
+        }
     }
 
-    func itemUpdated(item: Item) {
-        guard let index = self.items.index(where: { i in item.uuid == i.uuid }) else {
-            return itemCreated(item: item)
+}
+
+extension ToDoListItemsTableViewController: Observing {
+    func transactionDidOccur(key: String, reports: [TxReport]) {
+        print("transaction did occur \(key)")
+        DispatchQueue.main.async {
+            self.items = ToodleLib.sharedInstance.allItems()
+            self.tableView.reloadData()
         }
-        self.items[index] = self.items[index]
-        self.tableView.reloadData()
     }
 }

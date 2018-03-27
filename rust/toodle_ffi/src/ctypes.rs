@@ -19,14 +19,14 @@ use mentat::{
     Uuid,
 };
 
+use mentat_ffi::utils::strings::{
+    c_char_to_string,
+    string_to_c_char,
+};
+
 use toodle::items::{
     Item,
     Items,
-};
-
-use utils::strings::{
-    string_to_c_char,
-    c_char_to_string,
 };
 
 #[repr(C)]

@@ -94,7 +94,18 @@ class Item {
             return nil
         }
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
         return dateFormatter.string(from: dueDate)
+    }
+
+    func completionDateAsString() -> String? {
+        guard let completionDate = self.completionDate else {
+            return nil
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: completionDate)
     }
 }

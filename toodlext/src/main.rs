@@ -11,7 +11,7 @@ use std::io::{self, Read, StdinLock, StdoutLock, Write};
 use std::iter::FromIterator;
 
 use byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
-use toodle::{Timespec, Toodle, Uuid};
+use toodle::{Store, Timespec, Toodle, Uuid};
 use toodle::items::Item;
 use toodle::labels::Label;
 
@@ -192,7 +192,7 @@ enum ResponseBody {
     RemoveLabel { name: String },
 }
 
-fn update_item_labels(toodle: &mut Toodle,
+fn update_item_labels(toodle: &mut Store,
                       uuid: &str,
                       to_add: Vec<String>,
                       to_remove: Vec<String>)
@@ -250,7 +250,7 @@ fn from_millis(millis: i64) -> Timespec {
 }
 
 fn main() {
-    let mut toodle = Toodle::new("./toodlext.sqlite".to_owned()).unwrap();
+    let mut toodle = Store::open("./toodlext.sqlite").unwrap();
 
     let stdin = io::stdin();
     let stdout = io::stdout();

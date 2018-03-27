@@ -87,14 +87,10 @@ public class Item {
     }
 
     void create(Context context) {
-        try (final Toodle toodle = new Toodle(context)) {
-            toodle.createItem(this);
-        }
+        Toodle.getSharedInstance(context).createItem(this);
     }
 
     void update(Context context) {
-        try (final Toodle toodle = new Toodle(context)) {
-            toodle.updateItem(this);
-        }
+        Toodle.getSharedInstance(context).updateItem(this);
     }
 }

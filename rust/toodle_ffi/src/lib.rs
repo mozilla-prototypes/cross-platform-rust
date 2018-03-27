@@ -10,21 +10,37 @@
 
 extern crate libc;
 extern crate mentat;
+extern crate mentat_ffi;
 extern crate time;
 extern crate toodle;
 
-#[doc(hidden)]
-pub mod android_ffi;
 mod ctypes;
 mod utils;
 
 use libc::{ c_int, size_t, time_t };
-use mentat::Uuid;
 use std::ffi::CString;
 use std::os::raw::{
     c_char,
 };
+
 use time::Timespec;
+
+pub use mentat::{
+    Store,
+    Uuid,
+};
+
+pub use mentat_ffi::{
+    store_destroy,
+    store_entid_for_attribute,
+    store_register_observer,
+    store_unregister_observer,
+};
+use mentat_ffi::utils::log;
+use mentat_ffi::utils::strings::{
+    c_char_to_string,
+    string_to_c_char,
+};
 
 use toodle::{
     Item,
@@ -34,46 +50,43 @@ use toodle::{
 use ctypes::{
     ItemC,
     ItemsC,
-    ItemCList
+    ItemCList,
 };
-use utils::strings::{
-    c_char_to_string,
+use utils::time::{
     optional_timespec,
-    string_to_c_char,
 };
-use utils::log;
-
-
-// TODO this is pretty horrible and rather crafty, but I couldn't get this to live
-// inside a Toodle struct and be able to mutate it...
-static mut CHANGED_CALLBACK: Option<extern fn()> = None;
 
 #[no_mangle]
-pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Toodle {
+pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
     let uri = c_char_to_string(uri);
-    let toodle = Toodle::new(uri).expect("expected a toodle");
-    Box::into_raw(Box::new(toodle))
+    log::d(&format!("db uri: {:?}", uri));
+    let mut store = Store::open(&uri).expect("expected a store");
+    store.initialize().expect("Expected store to initialize");
+    log::d(&format!("init the store, schema: {:?}", store.conn().current_schema()));
+    Box::into_raw(Box::new(store))
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_destroy(toodle: *mut Toodle) {
+pub unsafe extern "C" fn toodle_destroy(toodle: *mut Store) {
     let _ = Box::from_raw(toodle);
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_get_all_labels(manager: *mut Toodle) -> *mut Vec<Label> {
+pub unsafe extern "C" fn toodle_get_all_labels(manager: *mut Store) -> *mut Vec<Label> {
     let manager = &mut*manager;
     let label_list = Box::new(manager.fetch_labels().unwrap_or(vec![]));
     Box::into_raw(label_list)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_create_item(manager: *mut Toodle, name: *const c_char, due_date: *const time_t) -> *mut ItemC {
+pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_char, due_date: *const time_t) -> *mut ItemC {
     let name = c_char_to_string(name);
     log::d(&format!("Creating item: {:?}, {:?}, {:?}", name, due_date, manager)[..]);
 
     let manager = &mut*manager;
     let mut item = Item::default();
+
+    log::d(&format!("toodle_create_item default item: {:?}", item));
 
     item.name = name;
     let due: Option<Timespec>;
@@ -84,25 +97,18 @@ pub unsafe extern "C" fn toodle_create_item(manager: *mut Toodle, name: *const c
         due = None;
     }
     item.due_date = due;
+    log::d(&format!("toodle_create_item due item: {:?}", item));
     let item = manager.create_and_fetch_item(&item).expect("expected an item");
-    if let Some(callback) = CHANGED_CALLBACK {
-        callback();
-    }
+    log::d(&format!("toodle_create_item create_and_fetch_item: {:?}", item));
     if let Some(i) = item {
         return Box::into_raw(Box::new(i.into()));
     }
     return std::ptr::null_mut();
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn toodle_on_items_changed(callback: extern fn()) {
-    CHANGED_CALLBACK = Some(callback);
-    callback();
-}
-
 // TODO: figure out callbacks in swift such that we can use `toodle_all_items` instead.
 #[no_mangle]
-pub unsafe extern "C" fn toodle_get_all_items(manager: *mut Toodle) -> *mut ItemCList {
+pub unsafe extern "C" fn toodle_get_all_items(manager: *mut Store) -> *mut ItemCList {
     let manager = &mut *manager;
     let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
     let count = items.vec.len();
@@ -129,7 +135,7 @@ pub unsafe extern "C" fn item_list_count(item_list: *mut ItemCList) -> c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_all_items(manager: *mut Toodle, callback: extern "C" fn(Option<&ItemCList>)) {
+pub unsafe extern "C" fn toodle_all_items(manager: *mut Store, callback: extern "C" fn(Option<&ItemCList>)) {
     let manager = &mut*manager;
     let items: ItemsC = manager.fetch_items().map(|item| item.into()).expect("all items");
 
@@ -168,7 +174,7 @@ pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const c_char) -> *mut ItemC {
+pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Store, uuid: *const c_char) -> *mut ItemC {
     let uuid_string = c_char_to_string(uuid);
     let uuid = Uuid::parse_str(&uuid_string).unwrap();
     let manager = &mut*manager;
@@ -181,7 +187,7 @@ pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Toodle, uuid: *const
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t, labels: *const Vec<Label>) {
+pub unsafe extern "C" fn toodle_update_item(manager: *mut Store, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t, labels: *const Vec<Label>) {
     let name = c_char_to_string(name);
     let manager = &mut*manager;
     let item = &*item;
@@ -196,7 +202,7 @@ pub unsafe extern "C" fn toodle_update_item(manager: *mut Toodle, item: *const I
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
+pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Store, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
     let name = c_char_to_string(name);
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
@@ -205,13 +211,13 @@ pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Toodle, uuid: 
                                         optional_timespec(due_date),
                                         optional_timespec(completion_date));
 
-    if let Some(callback) = CHANGED_CALLBACK {
-        callback();
-    }
+    // if let Some(callback) = CHANGED_CALLBACK {
+    //     callback();
+    // }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_create_label(manager: *mut Toodle, name: *const c_char, color: *const c_char) -> *mut Option<Label> {
+pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c_char, color: *const c_char) -> *mut Option<Label> {
     let manager = &mut*manager;
     let name = c_char_to_string(name);
     let color = c_char_to_string(color);
@@ -288,3 +294,4 @@ pub unsafe extern "C" fn item_label_at(label_list: *const Vec<Label>, index: siz
     let label = Box::new(label_list[index].clone());
     Box::into_raw(label)
 }
+

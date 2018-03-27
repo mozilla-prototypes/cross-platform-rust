@@ -6,8 +6,6 @@ import UIKit
 
 class ItemViewController: UIViewController {
 
-    var delegate: ToDoListItemsViewControllerDelegate?
-
     lazy var itemDescriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Description:"
@@ -87,7 +85,7 @@ class ItemViewController: UIViewController {
             self.dueDateButton.setTitle(self.dateAsString(date: dueDate), for: .normal)
             self.dueDatePicker.date = dueDate
         }
-        self.markComplete(isComplete: false)
+        self.markComplete(isComplete: item.completionDate != nil)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -173,11 +171,11 @@ class ItemViewController: UIViewController {
 
     func markComplete(isComplete: Bool) {
         if isComplete {
-            self.completeButton.isEnabled = false
             self.statusValueLabel.text = "Complete"
             self.statusValueLabel.textColor = .green
+            self.completeButton.isHidden = true
         } else {
-            self.completeButton.isEnabled = true
+            self.completeButton.isHidden = false
             self.statusValueLabel.text = "Not yet complete"
         }
     }
@@ -220,19 +218,17 @@ class ItemViewController: UIViewController {
         if self.dueDateButton.titleLabel?.text != "Set" {
             dueDate = self.dueDatePicker.date
         }
+
+        let completionDate: Date? = self.completeButton.isHidden ? Date() : nil
+
         let labels: [Label] = []
 
         guard let currentItem = self.item else {
-            if let item = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: nil, labels: labels) {
-                self.delegate?.itemCreated(item: item)
-            }
+            let _ = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: completionDate, labels: labels)
             return
         }
 
-        ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: nil, labels: labels)
-        if let new_item = ToodleLib.sharedInstance.item(withUuid: currentItem.uuid!) {
-            self.delegate?.itemUpdated(item: new_item)
-        }
+        ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: completionDate, labels: labels)
     }
 
 }

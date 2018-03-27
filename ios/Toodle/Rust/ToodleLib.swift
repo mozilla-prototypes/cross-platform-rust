@@ -5,7 +5,19 @@
 import Foundation
 import UIKit
 
-class ToodleLib: RustObject {
+protocol Observing {
+    // define functions for store observation
+    func transactionDidOccur(key: String, reports: [TxReport])
+}
+
+protocol Observable {
+    func register(key: String, observer: Observing, attributes: [String])
+    func unregister(key: String)
+}
+
+class ToodleLib {
+
+    var observers: [String: Observing]
 
     class var sharedInstance: ToodleLib {
         struct Static {
@@ -18,6 +30,7 @@ class ToodleLib: RustObject {
 
     required init(raw: OpaquePointer) {
         self.raw = raw
+        self.observers = [:]
     }
 
     func intoRaw() -> OpaquePointer {
@@ -28,12 +41,13 @@ class ToodleLib: RustObject {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let documentsURL = paths[0]
         let storeURI = documentsURL.appendingPathComponent("todolist.db", isDirectory: false).absoluteString
+
         self.init(raw: new_toodle(storeURI))
     }
 
-        deinit {
-            toodle_destroy(raw)
-        }
+    deinit {
+        toodle_destroy(raw)
+    }
 
     fileprivate func toPointerArray(list: [RustObject]) -> OpaquePointer {
         var pointerArray = list.map({ $0.intoRaw() })
@@ -50,16 +64,6 @@ class ToodleLib: RustObject {
         return allItems
     }
 
-    //    func allLabels() -> [Label] {
-    //        let labels = list_manager_get_all_labels(self.raw)
-    //        var allLabels: [Label] = []
-    //        for index in 0..<label_list_count(labels) {
-    //            let label = Label(raw: label_list_entry_at(labels, index))
-    //            allLabels.append(label)
-    //        }
-    //        return allLabels
-    //    }
-
     func createLabel(withName name: String, color: UIColor) -> Label {
         return Label(raw: toodle_create_label(self.raw, name, color.toHex()!))
     }
@@ -70,11 +74,12 @@ class ToodleLib: RustObject {
             var d = due.asInt64Timestamp()
             dd = UnsafeMutablePointer<Int64>(&d)
         }
-        var pointerArray = self.toPointerArray(list: labels as [RustObject])
-        return Item(raw: toodle_create_item(self.raw,
-                                                  name,
-                                                  dd,
-                                                  UnsafeMutablePointer<OpaquePointer>(&pointerArray))!)
+
+        if let item_raw = toodle_create_item(self.raw, name, dd) {
+            return Item(raw: item_raw)
+        }
+
+        return nil
     }
 
     func item(withUuid uuid: String) -> Item? {
@@ -107,7 +112,73 @@ class ToodleLib: RustObject {
                                UnsafeMutablePointer<OpaquePointer>(&pointerArray))
         }
     }
+
+    func entidForAttribute(attribute: String) -> Int64 {
+        return Int64(store_entid_for_attribute(self.raw, attribute))
+    }
+
+    func sync_now() -> Bool {
+        let err = store_sync(self.raw, "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1")
+        if let error = err.pointee.error {
+            let str = String(cString: error)
+            print("Sync error \(str)")
+            return false
+        }
+
+        return true
+    }
+}
+
+extension ToodleLib: Observable {
+    func register(key: String, observer: Observing, attributes: [String]) {
+        let attrEntIds = attributes.map({ (kw) -> Int64 in
+            let entid = Int64(self.entidForAttribute(attribute: kw));
+            print("entid for \(kw) is \(entid)")
+            return entid
+        })
+
+        print("registering observer for entids \(attrEntIds)")
+
+        let ptr = UnsafeMutablePointer<Int64>.allocate(capacity: attrEntIds.count)
+        let entidPointer = UnsafeMutableBufferPointer(start: ptr, count: attrEntIds.count)
+        var _ = entidPointer.initialize(from: attrEntIds)
+
+        guard let firstElement = entidPointer.baseAddress else {
+            return
+        }
+        self.observers[key] = observer
+        store_register_observer(self.raw, key, firstElement, Int64(attributes.count), transactionObserverCallback)
+
+    }
+
+    func unregister(key: String) {
+        store_unregister_observer(self.raw, key)
+    }
+
+    func transactionObserverCalled(key: String, reports: [TxReport]) {
+        let observer = self.observers[key]
+        observer?.transactionDidOccur(key: key, reports: reports)
+    }
 }
 
 class Singleton {
+}
+
+private func transactionObserverCallback(key: UnsafePointer<CChar>, reports: UnsafePointer<TxReportList>) {
+    // needs to be done in the same thread as the calling thread otherwise the TxReportList might be released before
+    // we can reference it.
+    let len = Int(reports.pointee.len)
+    var txReports = [TxReport]()
+    for i in 0..<len {
+        let raw = tx_report_list_entry_at(reports, i)
+        let report = TxReport(raw: raw!)
+        txReports.append(report)
+    }
+    DispatchQueue.global(qos: .background).async {
+        ToodleLib.sharedInstance.transactionObserverCalled(key: String(cString: key), reports: txReports)
+    }
+}
+
+private func destroy(obj: UnsafeMutableRawPointer) {
+    let _ = Unmanaged<AnyObject>.fromOpaque(UnsafeRawPointer(obj)).takeRetainedValue()
 }
