@@ -1,3 +1,8 @@
+/* -*- Mode: Java; c-basic-offset: 4; tab-width: 20; indent-tabs-mode: nil; -*-
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package com.mozilla.toodle.rust;
 
 import android.util.Log;
@@ -14,7 +19,7 @@ public class ResultRow extends RustObject {
 
     public TypedValue get(Integer index) {
         Pointer pointer = JNA.INSTANCE.value_at_index(this.rawPointer, index);
-        if(pointer == null) {
+        if (pointer == null) {
             return null;
         }
         return new TypedValue(pointer);
@@ -55,7 +60,7 @@ public class ResultRow extends RustObject {
     @Override
     public void close() {
         Log.i("ResultRow", "close");
-        if(this.rawPointer != null) {
+        if (this.rawPointer != null) {
             JNA.INSTANCE.typed_value_list_destroy(this.rawPointer);
         }
     }

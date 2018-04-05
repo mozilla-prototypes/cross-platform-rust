@@ -28,6 +28,7 @@ import com.mozilla.toodle.rust.Toodle;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
@@ -120,7 +121,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Item item = dataset.get(position);
         ((TextView) holder.itemView.findViewById(R.id.itemTitle)).setText(item.name());
-        final Long dueDate = item.dueDate();
+        final Long dueDate = item.dueDate().getTime();
         if (dueDate != null) {
             ((TextView) holder.itemView.findViewById(R.id.itemDueDate)).setText(
                     context.getResources().getString(
@@ -129,22 +130,25 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                     )
             );
         }
-        final Long completionDate = item.completionDate();
-        final CheckBox itemDoneCheckbox = holder.itemView.findViewById(R.id.itemDone);
-        itemDoneCheckbox.setChecked(completionDate != null);
-        itemDoneCheckbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean currentState = ((CheckBox) v).isChecked();
-                final Item item = dataset.get(holder.getAdapterPosition());
-                if (currentState) {
-                    item.completionDate(System.currentTimeMillis());
-                } else {
-                    item.completionDate(null);
+        Date date = item.completionDate();
+        if (date != null) {
+            final Long completionDate = date.getTime();
+            final CheckBox itemDoneCheckbox = holder.itemView.findViewById(R.id.itemDone);
+            itemDoneCheckbox.setChecked(completionDate != null);
+            itemDoneCheckbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean currentState = ((CheckBox) v).isChecked();
+                    final Item item = dataset.get(holder.getAdapterPosition());
+                    if (currentState) {
+                        item.completionDate(System.currentTimeMillis());
+                    } else {
+                        item.completionDate(null);
+                    }
+                    item.update(context);
                 }
-                item.update(context);
-            }
-        });
+            });
+        }
     }
 
     @Override

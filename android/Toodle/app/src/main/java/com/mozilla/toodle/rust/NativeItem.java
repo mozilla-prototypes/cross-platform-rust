@@ -35,7 +35,7 @@ public class NativeItem extends Structure implements Closeable {
     @Override
     public void close() {
         Log.i("NativeItem", "close");
-        if(this.getPointer() != null) {
+        if (this.getPointer() != null) {
             JNA.INSTANCE.destroy(this.getPointer());
         }
     }

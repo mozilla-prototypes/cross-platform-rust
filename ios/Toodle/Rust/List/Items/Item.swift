@@ -11,21 +11,21 @@ class Item {
     var name: String
     var dueDate: Date? {
         get {
-            return ToodleLib.sharedInstance.value(forAttribute: ":todo/due_date", onEntity: self.id!)?.asDate()
+            return ToodleLib.sharedInstance.value(forAttribute: ":todo/due_date", ofEntity: self.id!)?.asDate()
         }
         set {
             if let date = newValue {
-                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/due_date", date.asInt64Timestamp())
+                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/due_date", date.toMicroseconds())
             }
         }
     }
     var completionDate: Date? {
         get {
-            return ToodleLib.sharedInstance.value(forAttribute: ":todo/completion_date", onEntity: self.id!)?.asDate()
+            return ToodleLib.sharedInstance.value(forAttribute: ":todo/completion_date", ofEntity: self.id!)?.asDate()
         }
         set {
             if let date = newValue {
-                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/completion_date", date.asInt64Timestamp())
+                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/completion_date", date.toMicroseconds())
             }
         }
     }

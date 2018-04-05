@@ -47,14 +47,14 @@ public class Toodle extends Store {
         JNA.INSTANCE.toodle_create_item(
                 this.rawPointer,
                 item.name(),
-                new NativeLongByReference(new NativeLong(item.dueDate()))
+                new NativeLongByReference(new NativeLong(item.dueDate().getTime()))
         );
     }
 
     public void updateItem(Item item) {
         final NativeLongByReference completionDateRef;
         if (item.completionDate() != null) {
-            completionDateRef = new NativeLongByReference(new NativeLong(item.completionDate()));
+            completionDateRef = new NativeLongByReference(new NativeLong(item.completionDate().getTime()));
         } else {
             completionDateRef = null;
         }
@@ -63,29 +63,35 @@ public class Toodle extends Store {
                 this.rawPointer,
                 item.uuid().toString(),
                 item.name(),
-                new NativeLongByReference(new NativeLong(item.dueDate())),
+                new NativeLongByReference(new NativeLong(item.dueDate().getTime())),
                 completionDateRef
         );
     }
 
     public void getAllItems(final ItemsCallback callback) {
-        String allItemsSQL = "[:find ?eid ?uuid ?name " +
+        final String allItemsSQL = "[:find ?eid ?uuid ?name " +
                              ":where "+
                              "[?eid :todo/uuid ?uuid] "+
                              "[?eid :todo/name ?name]]";
-        Query query = this.query(allItemsSQL);
-        query.execute(new QueryResultRowsHandler() {
+        final Query query = query(allItemsSQL);
+        new Thread(new Runnable() {
             @Override
-            public void handleRows(ResultRows rows) {
-                ArrayList<Item> itemsList = new ArrayList<Item>();
-                for(ResultRow row: rows) {
-                    Item item = new Item(row.asEntid(0), row.asUUID(1), row.asString(2));
-                    itemsList.add(item);
-                }
+            public void run() {
+                query.execute(new QueryResultRowsHandler() {
+                    @Override
+                    public void handleRows(ResultRows rows) {
+                        ArrayList<Item> itemsList = new ArrayList<Item>();
+                        for(ResultRow row: rows) {
+                            Item item = new Item(row.asEntid(0), row.asUUID(1), row.asString(2));
+                            itemsList.add(item);
+                        }
 
-                callback.items(itemsList);
+                        callback.items(itemsList);
+                    }
+                });
             }
-        });
+        }).start();
+
     }
 }
 

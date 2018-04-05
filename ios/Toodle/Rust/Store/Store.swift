@@ -57,7 +57,7 @@ class Store: RustObject {
         return Query(raw: store_query(self.raw, sql))
     }
 
-    func value(forAttribute attribute: String, onEntity entid: Int64) -> TypedValue? {
+    func value(forAttribute attribute: String, ofEntity entid: Int64) -> TypedValue? {
         let result = store_value_for_attribute(self.raw, entid, attribute).pointee
         guard let success = result.ok else {
             if let error = result.err {

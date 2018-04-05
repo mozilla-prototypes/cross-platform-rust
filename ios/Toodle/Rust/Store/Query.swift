@@ -70,7 +70,7 @@ class Query: OptionalRustObject {
         guard let r = self.raw else {
             throw QueryError.builderConsumed
         }
-        query_builder_bind_timestamp(r, varName, value.asInt64Timestamp())
+        query_builder_bind_timestamp(r, varName, value.toMicroseconds())
     }
 
     func bind(varName: String, toString value: String) throws {

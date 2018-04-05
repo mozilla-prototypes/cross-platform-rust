@@ -21,8 +21,8 @@ public class Item {
     private long id;
     private UUID uuid;
     private String name;
-    private Long dueDate;
-    private Long completionDate;
+    private Date dueDate;
+    private Date completionDate;
 
     public String name() {
         return name;
@@ -47,21 +47,21 @@ public class Item {
         return uuid;
     }
 
-    public Long dueDate() {
-        if(this.dueDate == null) {
+    public Date dueDate() {
+        if (this.dueDate == null) {
             TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/due_date", this.id);
-            if(value != null) {
-                this.dueDate = value.asDate().getTime();
+            if (value != null) {
+                this.dueDate = value.asDate();
             }
         }
         return this.dueDate;
     }
 
-    public Long completionDate() {
-        if(this.completionDate == null) {
+    public Date completionDate() {
+        if (this.completionDate == null) {
             TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/completion_date", this.id);
-            if(value != null) {
-                this.completionDate = value.asDate().getTime();
+            if (value != null) {
+                this.completionDate = value.asDate();
             }
         }
         return this.completionDate;
@@ -71,7 +71,7 @@ public class Item {
         if (timestamp == null) {
             completionDate = null;
         } else {
-            completionDate = timestamp / 1000;
+            completionDate = new Date(timestamp / 1000);
         }
         return this;
     }
@@ -79,7 +79,7 @@ public class Item {
     Item dueDate(final int year, final int month, final int date) {
         final Calendar cal = Calendar.getInstance();
         cal.set(year, month, date);
-        dueDate = cal.getTimeInMillis() / 1000;
+        dueDate = new Date(cal.getTimeInMillis() / 1000);
         return this;
     }
 
@@ -88,15 +88,19 @@ public class Item {
         item.uuid = UUID.fromString(nativeItem.uuid);
         item.name = nativeItem.itemName;
         if (nativeItem.dueDate != null) {
-            item.dueDate = nativeItem.dueDate.getValue().longValue();
-            if (item.dueDate == 0) {
+            long timestamp = nativeItem.dueDate.getValue().longValue();
+            if (timestamp == 0) {
                 item.dueDate = null;
+            } else {
+                item.dueDate = new Date(timestamp);
             }
         }
         if (nativeItem.completionDate != null) {
-            item.completionDate = nativeItem.completionDate.getValue().longValue();
-            if (item.completionDate == 0) {
+            long timestamp = nativeItem.completionDate.getValue().longValue();
+            if (timestamp == 0) {
                 item.completionDate = null;
+            } else {
+                item.completionDate = new Date(timestamp);
             }
         }
         return item;

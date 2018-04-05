@@ -50,7 +50,7 @@ class ToodleLib {
     static func createItem(withName name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) {
         var dd: UnsafeMutablePointer<Int64>? = nil
         if let due = dueDate {
-            var d = due.asInt64Timestamp()
+            var d = due.toMicroseconds()
             dd = UnsafeMutablePointer<Int64>(&d)
         }
 
@@ -60,12 +60,12 @@ class ToodleLib {
     static func update(item: Item, name: String, dueDate: Date?, completionDate: Date?, labels: [Label]) {
         var dd: AutoreleasingUnsafeMutablePointer<Int64>? = nil
         if let due = dueDate{
-            var d = due.asInt64Timestamp()
+            var d = due.toMicroseconds()
             dd = AutoreleasingUnsafeMutablePointer<Int64>(&d)
         }
         var cd: AutoreleasingUnsafeMutablePointer<Int64>? = nil
         if let completion = completionDate {
-            var c = completion.asInt64Timestamp()
+            var c = completion.toMicroseconds()
             cd = AutoreleasingUnsafeMutablePointer<Int64>(&c)
         }
         if let uuid = item.uuid {

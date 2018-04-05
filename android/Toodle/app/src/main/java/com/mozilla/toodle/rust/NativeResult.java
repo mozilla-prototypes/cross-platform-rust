@@ -40,7 +40,7 @@ public class NativeResult extends Structure implements Closeable {
     public void close() throws IOException {
         // TODO do we need to make sure the error string is memory managed properly?
 
-        if(this.getPointer() != null) {
+        if (this.getPointer() != null) {
             JNA.INSTANCE.destroy(this.getPointer());
         }
     }
