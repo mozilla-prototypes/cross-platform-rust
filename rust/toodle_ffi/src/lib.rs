@@ -31,7 +31,6 @@ pub use mentat::{
 };
 
 pub use mentat_ffi::{
-    store_destroy,
     store_entid_for_attribute,
     store_register_observer,
     store_unregister_observer,
@@ -64,11 +63,6 @@ pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
     store.initialize().expect("Expected store to initialize");
     log::d(&format!("init the store, schema: {:?}", store.conn().current_schema()));
     Box::into_raw(Box::new(store))
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn toodle_destroy(toodle: *mut Store) {
-    let _ = Box::from_raw(toodle);
 }
 
 #[no_mangle]
@@ -157,22 +151,6 @@ pub unsafe extern "C" fn toodle_all_items(manager: *mut Store, callback: extern 
     callback(res);
 }
 
-
-// TODO this is pretty crafty... Currently this setup means that ItemJNA could only be used
-// together with something like toodle_all_items - a function that will clear up ItemJNA itself.
-#[no_mangle]
-pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
-    let item = Box::from_raw(item);
-
-    // Reclaim our strings and let Rust clear up their memory.
-    let _ = CString::from_raw(item.uuid);
-    let _ = CString::from_raw(item.name);
-
-    // Prevent Rust from clearing out item itself. It's already managed by toodle_all_items.
-    // If we'll let Rust clean up entirely here, we'll get an NPE in toodle_all_items.
-    Box::into_raw(item)
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Store, uuid: *const c_char) -> *mut ItemC {
     let uuid_string = c_char_to_string(uuid);
@@ -223,11 +201,6 @@ pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c
     let color = c_char_to_string(color);
     let label = Box::new(manager.create_label(name, color).unwrap_or(None));
     Box::into_raw(label)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn label_destroy(label: *mut Label) {
-    let _ = Box::from_raw(label);
 }
 
 #[no_mangle]
