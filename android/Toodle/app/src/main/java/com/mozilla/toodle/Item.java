@@ -9,13 +9,17 @@ import android.content.Context;
 
 import com.mozilla.toodle.rust.NativeItem;
 import com.mozilla.toodle.rust.Toodle;
+import com.mozilla.toodle.rust.TypedValue;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
+import java.util.Date;
 
 public class Item {
-    private String uuid;
+    private long id;
+    private UUID uuid;
     private String name;
     private Long dueDate;
     private Long completionDate;
@@ -29,16 +33,38 @@ public class Item {
         return this;
     }
 
-    public String uuid() {
+    Item() {
+
+    }
+
+    public Item(long id, UUID uuid, String name) {
+        this.id = id;
+        this.uuid = uuid;
+        this.name = name;
+    }
+
+    public UUID uuid() {
         return uuid;
     }
 
     public Long dueDate() {
-        return dueDate;
+        if(this.dueDate == null) {
+            TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/due_date", this.id);
+            if(value != null) {
+                this.dueDate = value.asDate().getTime();
+            }
+        }
+        return this.dueDate;
     }
 
     public Long completionDate() {
-        return completionDate;
+        if(this.completionDate == null) {
+            TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/completion_date", this.id);
+            if(value != null) {
+                this.completionDate = value.asDate().getTime();
+            }
+        }
+        return this.completionDate;
     }
 
     Item completionDate(Long timestamp) {
@@ -59,7 +85,7 @@ public class Item {
 
     private static Item fromNativeItem(NativeItem nativeItem) {
         final Item item = new Item();
-        item.uuid = nativeItem.uuid;
+        item.uuid = UUID.fromString(nativeItem.uuid);
         item.name = nativeItem.itemName;
         if (nativeItem.dueDate != null) {
             item.dueDate = nativeItem.dueDate.getValue().longValue();

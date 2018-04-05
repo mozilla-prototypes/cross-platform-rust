@@ -6,15 +6,22 @@
 package com.mozilla.toodle.rust;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.mozilla.toodle.Item;
+import com.mozilla.toodle.ItemsCallback;
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
-public class Toodle extends RustObject {
+import java.io.Closeable;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class Toodle extends Store {
     static {
         System.loadLibrary("toodle");
     }
@@ -24,9 +31,8 @@ public class Toodle extends RustObject {
     private static Toodle sharedInstance;
 
     private Toodle(Context context) {
-        this.rawPointer = JNA.INSTANCE.new_toodle(
-                context.getDatabasePath(DB_NAME).getAbsolutePath()
-        );
+        super();
+        rawPointer = JNA.INSTANCE.new_toodle(context.getDatabasePath(DB_NAME).getAbsolutePath());
     }
 
     public static Toodle getSharedInstance(Context context) {
@@ -37,9 +43,9 @@ public class Toodle extends RustObject {
     }
 
     public void createItem(Item item) {
-        Log.i(LOG_TAG, "sync pointer: " + rawPointer);
+        Log.i(LOG_TAG, "sync pointer: " + this.rawPointer);
         JNA.INSTANCE.toodle_create_item(
-                rawPointer,
+                this.rawPointer,
                 item.name(),
                 new NativeLongByReference(new NativeLong(item.dueDate()))
         );
@@ -54,45 +60,32 @@ public class Toodle extends RustObject {
         }
 
         JNA.INSTANCE.toodle_update_item_by_uuid(
-                rawPointer,
-                item.uuid(),
+                this.rawPointer,
+                item.uuid().toString(),
                 item.name(),
                 new NativeLongByReference(new NativeLong(item.dueDate())),
                 completionDateRef
         );
     }
 
-    public void getAllItems(NativeItemsCallback callback) {
-        JNA.INSTANCE.toodle_all_items(rawPointer, callback);
-    }
+    public void getAllItems(final ItemsCallback callback) {
+        String allItemsSQL = "[:find ?eid ?uuid ?name " +
+                             ":where "+
+                             "[?eid :todo/uuid ?uuid] "+
+                             "[?eid :todo/name ?name]]";
+        Query query = this.query(allItemsSQL);
+        query.execute(new QueryResultRowsHandler() {
+            @Override
+            public void handleRows(ResultRows rows) {
+                ArrayList<Item> itemsList = new ArrayList<Item>();
+                for(ResultRow row: rows) {
+                    Item item = new Item(row.asEntid(0), row.asUUID(1), row.asString(2));
+                    itemsList.add(item);
+                }
 
-    public NativeResult sync() {
-        Log.i(LOG_TAG, "sync pointer: " + rawPointer);
-        return JNA.INSTANCE.store_sync(rawPointer, "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1");
-    }
-
-    public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {
-        // turn string array into int array
-        long[] attrEntids = new long[attributes.length];
-        for(int i = 0; i < attributes.length; i++) {
-            attrEntids[i] = JNA.INSTANCE.store_entid_for_attribute(rawPointer, attributes[i]);
-        }
-        Log.i(LOG_TAG, "Registering observer {" + key + "} for attributes:");
-        for (int i = 0; i < attrEntids.length; i++) {
-            Log.i(LOG_TAG, "entid: " + attrEntids[i]);
-        }
-        final Pointer entidsNativeArray = new Memory(8 * attrEntids.length);
-        entidsNativeArray.write(0, attrEntids, 0, attrEntids.length);
-        JNA.INSTANCE.store_register_observer(rawPointer, key, entidsNativeArray, attrEntids.length, callback);
-    }
-
-    public void unregisterObserver(String key) {
-        JNA.INSTANCE.store_unregister_observer(rawPointer, key);
-    }
-
-    @Override
-    public void close() {
-        Log.i("Toodle", "close");
-        JNA.INSTANCE.toodle_destroy(rawPointer);
+                callback.items(itemsList);
+            }
+        });
     }
 }
+

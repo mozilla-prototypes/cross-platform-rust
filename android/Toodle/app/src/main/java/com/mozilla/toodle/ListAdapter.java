@@ -86,23 +86,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private void fetchItems() {
         final WeakReference<ListAdapter> listAdapterWeakReference = new WeakReference<>(this);
-        toodle.getAllItems(new NativeItemsCallback() {
+        toodle.getAllItems(new ItemsCallback() {
             @Override
-            public void items(@Nullable NativeItemSet.ByReference itemSet) {
+            public void items(ArrayList<Item> itemSet) {
                 Log.i(LOG_TAG, "fetchItems: items");
                 final ListAdapter listAdapter = listAdapterWeakReference.get();
                 if (listAdapter == null) {
                     Log.i(LOG_TAG, "fetchItems: no listadapter");
                     return;
                 }
-
-                if (itemSet == null) {
-                    Log.i(LOG_TAG, "Got no items!");
-                    listAdapter.dataset = new ArrayList<>(0);
-                    return;
-                }
-                Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
-                listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
+                listAdapter.dataset = itemSet;
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
@@ -110,8 +103,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         listAdapter.notifyDataSetChanged();
                     }
                 });
-
-                itemSet.close();
             }
         });
     }

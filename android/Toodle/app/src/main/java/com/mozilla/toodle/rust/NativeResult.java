@@ -5,6 +5,7 @@
 
 package com.mozilla.toodle.rust;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 import java.io.Closeable;
@@ -19,15 +20,28 @@ public class NativeResult extends Structure implements Closeable {
     public static class ByValue extends NativeItem implements Structure.ByValue {
     }
 
-    public String error;
+    public Pointer ok;
+    public String err;
+
+    public boolean isSuccess() {
+        return this.ok != null;
+    }
+
+    public boolean isFailure() {
+        return this.err != null;
+    }
 
     @Override
     protected List<String> getFieldOrder() {
-        return Arrays.asList("error");
+        return Arrays.asList("ok", "err");
     }
 
     @Override
     public void close() throws IOException {
         // TODO do we need to make sure the error string is memory managed properly?
+
+        if(this.getPointer() != null) {
+            JNA.INSTANCE.destroy(this.getPointer());
+        }
     }
 }

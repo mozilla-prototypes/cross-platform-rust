@@ -38,5 +38,9 @@ public class NativeAttributeList extends Structure implements Closeable {
     @Override
     public void close() {
         Log.i("NativeAttributeList", "close");
+
+        if(this.getPointer() != null) {
+            JNA.INSTANCE.destroy(this.getPointer());
+        }
     }
 }
