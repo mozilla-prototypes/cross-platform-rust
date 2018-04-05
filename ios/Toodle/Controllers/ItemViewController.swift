@@ -224,11 +224,16 @@ class ItemViewController: UIViewController {
         let labels: [Label] = []
 
         guard let currentItem = self.item else {
-            let _ = ToodleLib.sharedInstance.createItem(withName: description, dueDate: dueDate, completionDate: completionDate, labels: labels)
-            return
+            return ToodleLib.createItem(withName: description, dueDate: dueDate, completionDate: completionDate, labels: labels)
         }
 
-        ToodleLib.sharedInstance.update(item: currentItem, name: description, dueDate: dueDate, completionDate: completionDate, labels: labels)
+        if let date = dueDate {
+            currentItem.dueDate = date
+        }
+
+        if let date = completionDate {
+            currentItem.completionDate = date
+        }
     }
 
 }

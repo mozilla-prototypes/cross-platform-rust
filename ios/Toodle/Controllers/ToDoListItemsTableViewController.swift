@@ -13,14 +13,19 @@ class ToDoListItemsTableViewController: UITableViewController {
         return refreshControl
     }()
 
-    var items: [Item]!
+    var items = [Item]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.tableView.addSubview(self.syncToRefresh)
 
-        self.items = ToodleLib.sharedInstance.allItems()
+        ToodleLib.allItems(completion: { (items) in
+            DispatchQueue.main.async {
+                self.items = items
+                self.tableView.reloadData()
+            }
+        })
         let attrs = [":todo/uuid", ":todo/name", ":todo/due_date", ":todo/completion_date"]
         ToodleLib.sharedInstance.register(key: "ToDoListItemsTableViewController", observer: self, attributes: attrs)
 
@@ -90,9 +95,11 @@ class ToDoListItemsTableViewController: UITableViewController {
 extension ToDoListItemsTableViewController: Observing {
     func transactionDidOccur(key: String, reports: [TxReport]) {
         print("transaction did occur \(key)")
-        DispatchQueue.main.async {
-            self.items = ToodleLib.sharedInstance.allItems()
-            self.tableView.reloadData()
-        }
+        ToodleLib.allItems(completion: { (items) in
+            DispatchQueue.main.async {
+                self.items = items
+                self.tableView.reloadData()
+            }
+        })
     }
 }

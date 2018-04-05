@@ -6,27 +6,14 @@ import Foundation
 import UIKit
 
 class Label: RustObject {
-    var raw: OpaquePointer
-
-    required init(raw: OpaquePointer) {
-        self.raw = raw
-    }
-
-    func intoRaw() -> OpaquePointer {
-        return self.raw
-    }
-
-    deinit {
-        label_destroy(raw)
-    }
 
     var name: String {
-        return String(cString: label_get_name(raw))
+        return String(cString: label_get_name(self.raw))
     }
 
     var color: UIColor {
         get {
-            return UIColor(hex: String(cString: label_get_color(raw))) ?? UIColor.gray
+            return UIColor(hex: String(cString: label_get_color(self.raw))) ?? UIColor.gray
         }
         set {
             if let hex = newValue.toHex() {

@@ -6,6 +6,6 @@ import Foundation
 
 extension Date {
     func asInt64Timestamp() -> Int64 {
-        return Int64(self.timeIntervalSince1970)
+        return Int64(self.timeIntervalSince1970 * 1000000)
     }
 }

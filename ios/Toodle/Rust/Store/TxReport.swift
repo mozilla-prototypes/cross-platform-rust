@@ -15,7 +15,7 @@ class TxReport {
         return self.raw
     }
 
-//    deinit {
-//        item_c_destroy(raw)
-//    }
+    deinit {
+        destroy(UnsafeMutableRawPointer(mutating: raw))
+    }
 }

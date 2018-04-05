@@ -5,69 +5,42 @@
 import Foundation
 
 class Item {
-    var raw: UnsafePointer<CItem>
-
-    required init(raw: UnsafePointer<CItem>) {
-        self.raw = raw
-    }
-
-    func intoRaw() -> UnsafePointer<CItem> {
-        return self.raw
-    }
-
-    deinit {
-        item_c_destroy(raw)
-    }
-
-    var uuid: String? {
-        if let uuid = raw.pointee.uuid {
-            return String(cString: uuid)
-        }
-        return nil
-    }
-
-    var name: String {
-        get {
-            return String(cString: raw.pointee.name)
-        }
-        set {
-            item_set_name(UnsafeMutablePointer<CItem>(mutating: raw), newValue)
-        }
-    }
-
+    var raw: OpaquePointer?
+    var id: Int64?
+    var uuid: UUID?
+    var name: String
     var dueDate: Date? {
         get {
-            guard let date = raw.pointee.dueDate else {
-                return nil
-            }
-            return Date(timeIntervalSince1970: Double(date.pointee))
+            return ToodleLib.sharedInstance.value(forAttribute: ":todo/due_date", onEntity: self.id!)?.asDate()
         }
         set {
-            if let d = newValue {
-                let timestamp = d.timeIntervalSince1970
-                var date = Int64(timestamp)
-                item_set_due_date(UnsafeMutablePointer<CItem>(mutating: raw), AutoreleasingUnsafeMutablePointer<Int64>(&date))
+            if let date = newValue {
+                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/due_date", date.asInt64Timestamp())
             }
         }
     }
-
     var completionDate: Date? {
         get {
-            guard let date = raw.pointee.completionDate else {
-                return nil
-            }
-            return Date(timeIntervalSince1970: Double(date.pointee))
+            return ToodleLib.sharedInstance.value(forAttribute: ":todo/completion_date", onEntity: self.id!)?.asDate()
         }
         set {
-            if let d = newValue {
-                let timestamp = d.timeIntervalSince1970
-                var date = Int64(timestamp)
-                item_set_completion_date(UnsafeMutablePointer<CItem>(mutating: raw), AutoreleasingUnsafeMutablePointer<Int64>(&date))
+            if let date = newValue {
+                store_set_timestamp_for_attribute_on_entid(ToodleLib.sharedInstance.intoRaw(), self.id!, ":todo/completion_date", date.asInt64Timestamp())
             }
         }
     }
 
     fileprivate var _labels: [Label]?
+
+    init(name: String) {
+        self.name = name
+    }
+
+    init(id: Int64, uuid: UUID, name: String) {
+        self.name = name
+        self.uuid = uuid
+        self.id = id
+    }
 
     var labels: [Label] {
         get {
