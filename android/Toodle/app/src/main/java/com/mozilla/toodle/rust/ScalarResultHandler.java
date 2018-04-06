@@ -5,9 +5,6 @@
 
 package com.mozilla.toodle.rust;
 
-import com.sun.jna.Callback;
-import com.sun.jna.Pointer;
-
-public interface NativeTxObserverCallback extends Callback {
-    void transactionObserverCalled(String key, NativeTxReportList.ByReference reports);
+public interface ScalarResultHandler {
+    void handleValue(TypedValue value);
 }

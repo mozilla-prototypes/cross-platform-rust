@@ -45,9 +45,9 @@ public class ToodleActivity extends Activity {
             public void onRefresh() {
                 NativeResult result = Toodle.getSharedInstance(getApplicationContext()).sync();
                 Log.i(LOG_TAG, "Sync result: " + result);
-                if (!TextUtils.isEmpty(result.error)) {
-                    Log.i(LOG_TAG, "Sync error: " + result.error);
-                    UiUtils.showError(ToodleActivity.this, result.error);
+                if (result.isFailure()) {
+                    Log.i(LOG_TAG, "Sync error: " + result.err);
+                    UiUtils.showError(ToodleActivity.this, result.err);
                 }
                 refreshWrapper.setRefreshing(false);
             }

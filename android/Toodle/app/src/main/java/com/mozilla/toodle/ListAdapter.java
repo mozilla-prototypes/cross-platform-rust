@@ -28,6 +28,7 @@ import com.mozilla.toodle.rust.Toodle;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
@@ -86,23 +87,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private void fetchItems() {
         final WeakReference<ListAdapter> listAdapterWeakReference = new WeakReference<>(this);
-        toodle.getAllItems(new NativeItemsCallback() {
+        toodle.getAllItems(new ItemsCallback() {
             @Override
-            public void items(@Nullable NativeItemSet.ByReference itemSet) {
+            public void items(ArrayList<Item> itemSet) {
                 Log.i(LOG_TAG, "fetchItems: items");
                 final ListAdapter listAdapter = listAdapterWeakReference.get();
                 if (listAdapter == null) {
                     Log.i(LOG_TAG, "fetchItems: no listadapter");
                     return;
                 }
-
-                if (itemSet == null) {
-                    Log.i(LOG_TAG, "Got no items!");
-                    listAdapter.dataset = new ArrayList<>(0);
-                    return;
-                }
-                Log.i(LOG_TAG, "Got " + itemSet.size() + " items!");
-                listAdapter.dataset = Item.fromNativeItems(itemSet.getItems());
+                listAdapter.dataset = itemSet;
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
@@ -110,8 +104,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         listAdapter.notifyDataSetChanged();
                     }
                 });
-
-                itemSet.close();
             }
         });
     }
@@ -129,16 +121,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Item item = dataset.get(position);
         ((TextView) holder.itemView.findViewById(R.id.itemTitle)).setText(item.name());
-        final Long dueDate = item.dueDate();
+        final Date dueDate = item.dueDate();
         if (dueDate != null) {
             ((TextView) holder.itemView.findViewById(R.id.itemDueDate)).setText(
                     context.getResources().getString(
                             R.string.due_date,
-                            SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(dueDate * 1000)
+                            SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(dueDate.getTime() * 1000)
                     )
             );
         }
-        final Long completionDate = item.completionDate();
+        Date completionDate = item.completionDate();
         final CheckBox itemDoneCheckbox = holder.itemView.findViewById(R.id.itemDone);
         itemDoneCheckbox.setChecked(completionDate != null);
         itemDoneCheckbox.setOnClickListener(new View.OnClickListener() {

@@ -9,6 +9,12 @@ import com.sun.jna.Pointer;
 
 import java.io.Closeable;
 
-/* package-private */ abstract class RustObject implements Closeable {
+abstract class RustObject implements Closeable {
     Pointer rawPointer;
+
+    void validate() {
+        if (this.rawPointer == null) {
+            throw new NullPointerException(this.getClass() + " consumed");
+        }
+    }
 }
