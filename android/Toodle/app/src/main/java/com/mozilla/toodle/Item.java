@@ -49,7 +49,7 @@ public class Item {
 
     public Date dueDate() {
         if (this.dueDate == null) {
-            TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/due_date", this.id);
+            TypedValue value = Toodle.getSharedInstance().valueForAttributeOnEntity(":todo/due_date", this.id);
             if (value != null) {
                 this.dueDate = value.asDate();
             }
@@ -59,7 +59,7 @@ public class Item {
 
     public Date completionDate() {
         if (this.completionDate == null) {
-            TypedValue value = Toodle.getSharedInstance(null).valueForAttributeOnEntity(":todo/completion_date", this.id);
+            TypedValue value = Toodle.getSharedInstance().valueForAttributeOnEntity(":todo/completion_date", this.id);
             if (value != null) {
                 this.completionDate = value.asDate();
             }
@@ -79,7 +79,7 @@ public class Item {
     Item dueDate(final int year, final int month, final int date) {
         final Calendar cal = Calendar.getInstance();
         cal.set(year, month, date);
-        dueDate = new Date(cal.getTimeInMillis() / 1000);
+        dueDate = new Date(cal.getTimeInMillis());
         return this;
     }
 

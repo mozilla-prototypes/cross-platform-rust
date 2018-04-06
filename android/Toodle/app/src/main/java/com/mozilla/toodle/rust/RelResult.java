@@ -9,37 +9,37 @@ import android.util.Log;
 
 import com.sun.jna.Pointer;
 
-import java.util.Iterator;
 
+public class RelResult extends RustObject implements Iterable<TupleResult> {
 
-public class ResultRows extends RustObject implements Iterable<ResultRow> {
-
-    public ResultRows(Pointer pointer) {
+    public RelResult(Pointer pointer) {
         this.rawPointer = pointer;
     }
 
-    public ResultRow rowAtIndex(int index) {
+    public TupleResult rowAtIndex(int index) {
+        this.validate();
         Pointer pointer = JNA.INSTANCE.row_at_index(this.rawPointer, index);
         if (pointer == null) {
             return null;
         }
 
-        return new ResultRow(pointer);
+        return new TupleResult(pointer);
     }
 
     @Override
-    public ResultRowsIterator iterator() {
+    public RelResultIterator iterator() {
+        this.validate();
         Pointer iterPointer = JNA.INSTANCE.rows_iter(this.rawPointer);
         this.rawPointer = null;
         if (iterPointer == null) {
             return null;
         }
-        return new ResultRowsIterator(iterPointer);
+        return new RelResultIterator(iterPointer);
     }
 
     @Override
     public void close() {
-        Log.i("ResultRows", "close");
+        Log.i("RelResult", "close");
 
         if (this.rawPointer != null) {
             JNA.INSTANCE.typed_value_result_set_destroy(this.rawPointer);

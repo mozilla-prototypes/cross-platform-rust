@@ -15,14 +15,14 @@ class ToodleLib {
     static var sharedInstance = Store.sharedInstance
 
     static func allItems(completion: @escaping ([Item]) -> ()) {
-        let allItemsSQL = """
+        let allItemsQuery = """
                             [:find ?eid ?uuid ?name
                             :where
                             [?eid :todo/uuid ?uuid]
                             [?eid :todo/name ?name]]
                           """
         do {
-            try Store.sharedInstance.query(sql: allItemsSQL).execute { (result) in
+            try Store.sharedInstance.query(query: allItemsQuery).execute { (result) in
                 switch result {
                     case .success(let rows):
                         guard let rows = rows else {

@@ -11,11 +11,11 @@ import com.sun.jna.Pointer;
 
 import java.util.Iterator;
 
-public class ResultRowsIterator extends RustObject implements Iterator {
+public class RelResultIterator extends RustObject implements Iterator {
 
     Pointer nextPointer;
 
-    ResultRowsIterator(Pointer iterator) {
+    RelResultIterator(Pointer iterator) {
         this.rawPointer = iterator;
     }
 
@@ -30,19 +30,19 @@ public class ResultRowsIterator extends RustObject implements Iterator {
     }
 
     @Override
-    public ResultRow next() {
+    public TupleResult next() {
         Pointer next = this.nextPointer == null ? getNextPointer() : this.nextPointer;
         if (next == null) {
             return null;
         }
 
-        return new ResultRow(next);
+        return new TupleResult(next);
     }
 
 
     @Override
     public void close() {
-        Log.i("ResultRow", "close");
+        Log.i("TupleResult", "close");
         if (this.rawPointer != null) {
             JNA.INSTANCE.typed_value_result_set_iter_destroy(this.rawPointer);
         }

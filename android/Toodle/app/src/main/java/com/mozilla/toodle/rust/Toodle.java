@@ -6,20 +6,14 @@
 package com.mozilla.toodle.rust;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 import com.mozilla.toodle.Item;
 import com.mozilla.toodle.ItemsCallback;
-import com.sun.jna.Memory;
 import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
-import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Toodle extends Store {
     static {
@@ -39,6 +33,10 @@ public class Toodle extends Store {
         if (sharedInstance == null) {
             sharedInstance = new Toodle(context);
         }
+        return sharedInstance;
+    }
+
+    public static Toodle getSharedInstance() {
         return sharedInstance;
     }
 
@@ -69,19 +67,18 @@ public class Toodle extends Store {
     }
 
     public void getAllItems(final ItemsCallback callback) {
-        final String allItemsSQL = "[:find ?eid ?uuid ?name " +
-                             ":where "+
-                             "[?eid :todo/uuid ?uuid] "+
-                             "[?eid :todo/name ?name]]";
-        final Query query = query(allItemsSQL);
+        final String allItemsQuery = "[:find ?eid ?uuid ?name " +
+                                      ":where [?eid :todo/uuid ?uuid] "+
+                                             "[?eid :todo/name ?name]]";
+        final Query query = query(allItemsQuery);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                query.execute(new QueryResultRowsHandler() {
+                query.execute(new RelResultHandler() {
                     @Override
-                    public void handleRows(ResultRows rows) {
+                    public void handleRows(RelResult rows) {
                         ArrayList<Item> itemsList = new ArrayList<Item>();
-                        for(ResultRow row: rows) {
+                        for(TupleResult row: rows) {
                             Item item = new Item(row.asEntid(0), row.asUUID(1), row.asString(2));
                             itemsList.add(item);
                         }

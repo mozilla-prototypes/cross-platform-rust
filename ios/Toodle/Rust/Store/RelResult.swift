@@ -8,7 +8,7 @@ enum QueryResultError: Error {
     case resultsConsumed
 }
 
-class ResultRows: OptionalRustObject {
+class RelResult: OptionalRustObject {
     private func getRaw() throws -> OpaquePointer {
         guard let r = self.raw else {
             throw QueryResultError.resultsConsumed
@@ -16,11 +16,11 @@ class ResultRows: OptionalRustObject {
         return r
     }
 
-    func row(index: Int32) throws -> ResultRow? {
+    func row(index: Int32) throws -> TupleResult? {
         guard let row = row_at_index(try self.getRaw(), index) else {
             return nil
         }
-        return ResultRow(raw: row)
+        return TupleResult(raw: row)
     }
 
     override func cleanup(pointer: OpaquePointer) {
@@ -28,8 +28,8 @@ class ResultRows: OptionalRustObject {
     }
 }
 
-class ResultRowsIterator: OptionalRustObject, IteratorProtocol  {
-    typealias Element = ResultRow
+class RelResultIterator: OptionalRustObject, IteratorProtocol  {
+    typealias Element = TupleResult
 
     init(iter: OpaquePointer?) {
         super.init(raw: iter)
@@ -40,7 +40,7 @@ class ResultRowsIterator: OptionalRustObject, IteratorProtocol  {
             let rowPtr = rows_iter_next(iter) else {
             return nil
         }
-        return ResultRow(raw: rowPtr)
+        return TupleResult(raw: rowPtr)
     }
 
     override func cleanup(pointer: OpaquePointer) {
@@ -48,14 +48,14 @@ class ResultRowsIterator: OptionalRustObject, IteratorProtocol  {
     }
 }
 
-extension ResultRows: Sequence {
-    func makeIterator() -> ResultRowsIterator {
+extension RelResult: Sequence {
+    func makeIterator() -> RelResultIterator {
         do {
             let rowIter = rows_iter(try self.getRaw())
             self.raw = nil
-            return ResultRowsIterator(iter: rowIter)
+            return RelResultIterator(iter: rowIter)
         } catch {
-            return ResultRowsIterator(iter: nil)
+            return RelResultIterator(iter: nil)
         }
     }
 }

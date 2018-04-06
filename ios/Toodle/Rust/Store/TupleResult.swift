@@ -4,7 +4,7 @@
 
 import Foundation
 
-class ResultRow: OptionalRustObject {
+class TupleResult: OptionalRustObject {
 
     func get(index: Int32) -> TypedValue {
         return TypedValue(raw: value_at_index(self.raw!, index))
@@ -47,10 +47,10 @@ class ResultRow: OptionalRustObject {
     }
 }
 
-class ResultList: ResultRow {
+class ColResult: TupleResult {
 }
 
-class ResultListIterator: OptionalRustObject, IteratorProtocol  {
+class ColResultIterator: OptionalRustObject, IteratorProtocol  {
     typealias Element = TypedValue
 
     init(iter: OpaquePointer?) {
@@ -70,13 +70,13 @@ class ResultListIterator: OptionalRustObject, IteratorProtocol  {
     }
 }
 
-extension ResultList: Sequence {
-    func makeIterator() -> ResultListIterator {
+extension ColResult: Sequence {
+    func makeIterator() -> ColResultIterator {
         guard let raw = self.raw else {
             print("list pointer destroyed")
-            return ResultListIterator(iter: nil)
+            return ColResultIterator(iter: nil)
         }
         let rowIter = values_iter(raw)
-        return ResultListIterator(iter: rowIter)
+        return ColResultIterator(iter: rowIter)
     }
 }

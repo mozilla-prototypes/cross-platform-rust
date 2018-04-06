@@ -11,9 +11,9 @@ import com.sun.jna.Pointer;
 import java.util.Date;
 import java.util.UUID;
 
-public class ResultRow extends RustObject {
+public class TupleResult extends RustObject {
 
-    public ResultRow(Pointer pointer) {
+    public TupleResult(Pointer pointer) {
         this.rawPointer = pointer;
     }
 
@@ -59,7 +59,7 @@ public class ResultRow extends RustObject {
 
     @Override
     public void close() {
-        Log.i("ResultRow", "close");
+        Log.i("TupleResult", "close");
         if (this.rawPointer != null) {
             JNA.INSTANCE.typed_value_list_destroy(this.rawPointer);
         }

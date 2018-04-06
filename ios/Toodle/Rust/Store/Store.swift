@@ -53,8 +53,8 @@ class Store: RustObject {
         return true
     }
 
-    func query(sql: String) -> Query {
-        return Query(raw: store_query(self.raw, sql))
+    func query(query: String) -> Query {
+        return Query(raw: store_query(self.raw, query))
     }
 
     func value(forAttribute attribute: String, ofEntity entid: Int64) -> TypedValue? {

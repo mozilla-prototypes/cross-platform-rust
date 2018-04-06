@@ -87,7 +87,7 @@ class Query: OptionalRustObject {
         query_builder_bind_uuid(r, varName, value.uuidString)
     }
 
-    func executeMap(map: @escaping (QueryResult<ResultRow>) -> Void) throws {
+    func executeMap(map: @escaping (QueryResult<TupleResult>) -> Void) throws {
         guard let r = self.raw else {
             throw QueryError.builderConsumed
         }
@@ -104,14 +104,14 @@ class Query: OptionalRustObject {
             guard let rowsPtr = result.pointee.ok else {
                 return
             }
-            let rows = ResultRows(raw: rowsPtr)
+            let rows = RelResult(raw: rowsPtr)
             for row in rows {
                 map(QueryResult.success(row))
             }
         }
     }
 
-    func execute(callback: @escaping (QueryResult<ResultRows?>) -> Void) throws {
+    func execute(callback: @escaping (QueryResult<RelResult?>) -> Void) throws {
         guard let r = self.raw else {
             throw QueryError.builderConsumed
         }
@@ -129,7 +129,7 @@ class Query: OptionalRustObject {
                 callback(QueryResult.success(nil))
                 return
             }
-            callback(QueryResult.success(ResultRows(raw: results)))
+            callback(QueryResult.success(RelResult(raw: results)))
         }
     }
 
@@ -154,7 +154,7 @@ class Query: OptionalRustObject {
         }
     }
 
-    func executeColl(callback: @escaping (QueryResult<ResultList?>) -> Void) throws {
+    func executeColl(callback: @escaping (QueryResult<ColResult?>) -> Void) throws {
         guard let r = self.raw else {
             throw QueryError.builderConsumed
         }
@@ -171,7 +171,7 @@ class Query: OptionalRustObject {
                 callback(QueryResult.success(nil))
                 return
             }
-            callback(QueryResult.success(ResultList(raw: results)))
+            callback(QueryResult.success(ColResult(raw: results)))
         }
     }
 
@@ -192,14 +192,14 @@ class Query: OptionalRustObject {
             guard let cols = result.pointee.ok else {
                 return
             }
-            let rowList = ResultList(raw: cols)
+            let rowList = ColResult(raw: cols)
             for row in rowList {
                 map(QueryResult.success(row))
             }
         }
     }
 
-    func executeTuple(callback: @escaping (QueryResult<ResultRow?>) -> Void) throws {
+    func executeTuple(callback: @escaping (QueryResult<TupleResult?>) -> Void) throws {
         guard let r = self.raw else {
             throw QueryError.builderConsumed
         }
@@ -216,7 +216,7 @@ class Query: OptionalRustObject {
                 callback(QueryResult.success(nil))
                 return
             }
-            callback(QueryResult.success(ResultRow(raw: OpaquePointer(results))))
+            callback(QueryResult.success(TupleResult(raw: OpaquePointer(results))))
         }
     }
 

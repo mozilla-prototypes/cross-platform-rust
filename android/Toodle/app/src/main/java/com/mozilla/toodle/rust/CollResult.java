@@ -9,15 +9,15 @@ import android.util.Log;
 
 import com.sun.jna.Pointer;
 
-public class ResultList extends ResultRow implements Iterable<TypedValue> {
+public class CollResult extends TupleResult implements Iterable<TypedValue> {
 
-    public ResultList(Pointer pointer) {
+    public CollResult(Pointer pointer) {
         super(pointer);
     }
 
     @Override
     public void close() {
-        Log.i("ResultList", "close");
+        Log.i("CollResult", "close");
 
         if (this.rawPointer != null) {
             JNA.INSTANCE.destroy(this.rawPointer);
@@ -25,12 +25,12 @@ public class ResultList extends ResultRow implements Iterable<TypedValue> {
     }
 
     @Override
-    public ResultListIterator iterator() {
+    public ColResultIterator iterator() {
         Pointer iterPointer = JNA.INSTANCE.values_iter(this.rawPointer);
         this.rawPointer = null;
         if (iterPointer == null) {
             return null;
         }
-        return new ResultListIterator(iterPointer);
+        return new ColResultIterator(iterPointer);
     }
 }

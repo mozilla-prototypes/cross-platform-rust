@@ -5,16 +5,6 @@
 
 package com.mozilla.toodle.rust;
 
-import com.sun.jna.Pointer;
-
-import java.io.Closeable;
-
-abstract class RustObject implements Closeable {
-    Pointer rawPointer;
-
-    void validate() {
-        if (this.rawPointer == null) {
-            throw new NullPointerException(this.getClass() + " consumed");
-        }
-    }
+public interface RelResultHandler {
+    void handleRows(RelResult rows);
 }

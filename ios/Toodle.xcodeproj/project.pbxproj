@@ -10,8 +10,8 @@
 		7B030344206E780D00F2EB1B /* OptionalRustObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B030343206E780D00F2EB1B /* OptionalRustObject.swift */; };
 		7B09857D206A9E6B00D15EFC /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09857C206A9E6B00D15EFC /* Query.swift */; };
 		7B09857F206AA87A00D15EFC /* TypedValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09857E206AA87A00D15EFC /* TypedValue.swift */; };
-		7B098583206AAD9D00D15EFC /* ResultRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B098582206AAD9D00D15EFC /* ResultRows.swift */; };
-		7B098585206AB07300D15EFC /* ResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B098584206AB07300D15EFC /* ResultRow.swift */; };
+		7B098583206AAD9D00D15EFC /* RelResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B098582206AAD9D00D15EFC /* RelResult.swift */; };
+		7B098585206AB07300D15EFC /* TupleResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B098584206AB07300D15EFC /* TupleResult.swift */; };
 		7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */; };
 		7B2BA8C71F97B24E0093D191 /* ToDoListItemsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */; };
 		7B332361202BBA9700C67ABD /* libtoodle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 285DB5891FD8955E00154A8B /* libtoodle.a */; };
@@ -36,8 +36,8 @@
 		7B030343206E780D00F2EB1B /* OptionalRustObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalRustObject.swift; sourceTree = "<group>"; };
 		7B09857C206A9E6B00D15EFC /* Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
 		7B09857E206AA87A00D15EFC /* TypedValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedValue.swift; sourceTree = "<group>"; };
-		7B098582206AAD9D00D15EFC /* ResultRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRows.swift; sourceTree = "<group>"; };
-		7B098584206AB07300D15EFC /* ResultRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRow.swift; sourceTree = "<group>"; };
+		7B098582206AAD9D00D15EFC /* RelResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelResult.swift; sourceTree = "<group>"; };
+		7B098584206AB07300D15EFC /* TupleResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TupleResult.swift; sourceTree = "<group>"; };
 		7B1F2D6F1FB0D379000246C9 /* ToodleLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToodleLib.swift; sourceTree = "<group>"; };
 		7B2BA8C61F97B24E0093D191 /* ToDoListItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItemsTableViewController.swift; sourceTree = "<group>"; };
 		7B2D0B802036F0F8009EB2CA /* toodle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toodle.h; path = Toodle/Rust/toodle.h; sourceTree = SOURCE_ROOT; };
@@ -83,8 +83,8 @@
 			children = (
 				7B030343206E780D00F2EB1B /* OptionalRustObject.swift */,
 				7B09857C206A9E6B00D15EFC /* Query.swift */,
-				7B098584206AB07300D15EFC /* ResultRow.swift */,
-				7B098582206AAD9D00D15EFC /* ResultRows.swift */,
+				7B098584206AB07300D15EFC /* TupleResult.swift */,
+				7B098582206AAD9D00D15EFC /* RelResult.swift */,
 				7BB220531F8FA72500ACD7AF /* RustObject.swift */,
 				7B99185220457CEC00C9A842 /* store.h */,
 				7BDB967A2073F7EC009D0651 /* Store.swift */,
@@ -268,14 +268,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BB220541F8FA72500ACD7AF /* RustObject.swift in Sources */,
-				7B098585206AB07300D15EFC /* ResultRow.swift in Sources */,
+				7B098585206AB07300D15EFC /* TupleResult.swift in Sources */,
 				7B99185420459D6700C9A842 /* TxReport.swift in Sources */,
 				7BDB967B2073F7EC009D0651 /* Store.swift in Sources */,
 				7BB2204D1F8F976C00ACD7AF /* Item.swift in Sources */,
 				7B8992331FE176C6007B0BE2 /* NSLayoutConstraint+Utils.swift in Sources */,
 				7B1F2D701FB0D379000246C9 /* ToodleLib.swift in Sources */,
 				7B030344206E780D00F2EB1B /* OptionalRustObject.swift in Sources */,
-				7B098583206AAD9D00D15EFC /* ResultRows.swift in Sources */,
+				7B098583206AAD9D00D15EFC /* RelResult.swift in Sources */,
 				7B47BBDE1F9A518D00FCA5AA /* ItemViewController.swift in Sources */,
 				7B09857F206AA87A00D15EFC /* TypedValue.swift in Sources */,
 				7B8992341FE176C6007B0BE2 /* Date+Int64.swift in Sources */,
