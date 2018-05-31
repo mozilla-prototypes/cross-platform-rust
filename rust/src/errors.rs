@@ -12,7 +12,7 @@ use rusqlite;
 
 use mentat::errors as mentat;
 use mentat::edn::UuidParseError;
-use mentat::NamespacedKeyword;
+use mentat::Keyword;
 
 error_chain! {
     types {
@@ -29,7 +29,7 @@ error_chain! {
     }
 
     errors {
-        UnknownAttribute(keyword: NamespacedKeyword) {
+        UnknownAttribute(keyword: Keyword) {
             description("Keyword not found")
             display("Keyword {} not found", keyword)
         }
