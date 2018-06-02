@@ -7,6 +7,13 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
+use std::os::raw::{
+    c_char,
+};
+use mentat_ffi::utils::strings::{
+    c_char_to_string as mentat_c_char_to_string,
+};
+
 pub mod time {
     use time::Timespec;
     use libc::time_t;
@@ -17,4 +24,8 @@ pub mod time {
             false => Some(Timespec::new(unsafe { *timestamp as i64 }, 0))
         }
     }
+}
+
+pub fn c_char_to_string(cchar: *const c_char) -> String {
+    mentat_c_char_to_string(cchar).to_string()
 }

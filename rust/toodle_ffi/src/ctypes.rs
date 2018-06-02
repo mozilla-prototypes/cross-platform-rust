@@ -11,6 +11,8 @@
 use std::os::raw::c_char;
 use std::ptr;
 
+use utils::c_char_to_string;
+
 use time::{
     Timespec,
 };
@@ -20,7 +22,6 @@ use mentat::{
 };
 
 use mentat_ffi::utils::strings::{
-    c_char_to_string,
     string_to_c_char,
 };
 
