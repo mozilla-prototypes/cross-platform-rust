@@ -21,7 +21,7 @@ use std::fmt::{
 use time::Timespec;
 
 use mentat::{
-    NamespacedKeyword,
+    Keyword,
     Entid,
     TypedValue,
     Uuid,
@@ -72,7 +72,7 @@ impl Into<Entid> for Entity {
     }
 }
 
-impl ToTypedValue for NamespacedKeyword {
+impl ToTypedValue for Keyword {
     fn to_typed_value(&self) -> TypedValue {
         self.clone().into()
     }
@@ -98,7 +98,7 @@ impl ToTypedValue for f64 {
 
 impl ToTypedValue for Timespec {
     fn to_typed_value(&self) -> TypedValue {
-        let micro_seconds = (self.sec * 1_000_000) + i64::from((self.nsec / 1_000));
+        let micro_seconds = (self.sec * 1_000_000) + i64::from(self.nsec / 1_000);
         TypedValue::instant(micro_seconds)
     }
 }

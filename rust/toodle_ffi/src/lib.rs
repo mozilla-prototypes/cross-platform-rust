@@ -17,6 +17,8 @@ extern crate toodle;
 mod ctypes;
 mod utils;
 
+use utils::c_char_to_string;
+
 use libc::{ c_int, size_t, time_t };
 use std::ffi::CString;
 use std::os::raw::{
@@ -26,7 +28,6 @@ use std::os::raw::{
 use time::Timespec;
 
 pub use mentat::{
-    Store,
     Uuid,
 };
 
@@ -38,7 +39,6 @@ pub use mentat_ffi::{
 };
 use mentat_ffi::utils::log;
 use mentat_ffi::utils::strings::{
-    c_char_to_string,
     string_to_c_char,
 };
 
@@ -46,6 +46,7 @@ use toodle::{
     Item,
     Label,
     Toodle,
+    Store
 };
 use ctypes::{
     ItemC,
