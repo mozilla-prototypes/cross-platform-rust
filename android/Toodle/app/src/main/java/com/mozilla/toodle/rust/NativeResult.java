@@ -5,6 +5,7 @@
 
 package com.mozilla.toodle.rust;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 import java.io.Closeable;
@@ -19,11 +20,12 @@ public class NativeResult extends Structure implements Closeable {
     public static class ByValue extends NativeItem implements Structure.ByValue {
     }
 
+    public Pointer okRawPtr;
     public String error;
 
     @Override
     protected List<String> getFieldOrder() {
-        return Arrays.asList("error");
+        return Arrays.asList("okRawPtr", "error");
     }
 
     @Override

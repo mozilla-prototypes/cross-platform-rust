@@ -4,21 +4,21 @@ version = "0.1.0"
 authors = ["Emily Toop <etoop@mozilla.com>"]
 
 [lib]
-name = "toodle"
+name = "toodle_ffi"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-libc = "0.2.32"
-time = "0.1.38"
+libc = "=0.2.40"
+time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "grisha/sync-downloader"
 
 [dependencies.mentat_ffi]
 git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+branch = "grisha/sync-downloader"
 
 [dependencies.toodle]
 path = "../"

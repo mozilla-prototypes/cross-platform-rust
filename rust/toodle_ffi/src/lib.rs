@@ -28,6 +28,7 @@ use time::Timespec;
 pub use mentat::{
     Store,
     Uuid,
+    Syncable,
 };
 
 pub use mentat_ffi::{
@@ -61,9 +62,26 @@ pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
     let uri = c_char_to_string(uri);
     log::d(&format!("db uri: {:?}", uri));
     let mut store = Store::open(&uri).expect("expected a store");
-    store.initialize().expect("Expected store to initialize");
-    log::d(&format!("init the store, schema: {:?}", store.conn().current_schema()));
-    Box::into_raw(Box::new(store))
+    log::d(&format!("opened db!"));
+    let init_result = store.initialize();
+    match init_result {
+        Ok(_) => {
+            log::d(&format!("init the store, schema: {:?}", store.conn().current_schema()));
+            Box::into_raw(Box::new(store))
+        },
+        Err(e) => {
+            log::d(&format!("could not init store: {:?}", e));
+            panic!("could not init store")
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn toodle_sync(manager: *mut Store, user_uuid: *const c_char, server_uri: *const c_char) -> *mut ctypes::ResultC {
+    let manager = &mut*manager;
+    let user_uuid = c_char_to_string(user_uuid).to_string();
+    let server_uri = c_char_to_string(server_uri).to_string();
+    Box::into_raw(Box::new(manager.sync(&server_uri, &user_uuid).into()))
 }
 
 #[no_mangle]
@@ -80,7 +98,7 @@ pub unsafe extern "C" fn toodle_get_all_labels(manager: *mut Store) -> *mut Vec<
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_create_item(manager: *mut Store, name: *const c_char, due_date: *const time_t) -> *mut ItemC {
-    let name = c_char_to_string(name);
+    let name = c_char_to_string(name).to_string();
     log::d(&format!("Creating item: {:?}, {:?}, {:?}", name, due_date, manager)[..]);
 
     let manager = &mut*manager;
@@ -175,7 +193,7 @@ pub unsafe extern "C" fn item_c_destroy(item: *mut ItemC) -> *mut ItemC {
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Store, uuid: *const c_char) -> *mut ItemC {
-    let uuid_string = c_char_to_string(uuid);
+    let uuid_string = c_char_to_string(uuid).to_string();
     let uuid = Uuid::parse_str(&uuid_string).unwrap();
     let manager = &mut*manager;
 
@@ -188,7 +206,7 @@ pub unsafe extern "C" fn toodle_item_for_uuid(manager: *mut Store, uuid: *const 
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_update_item(manager: *mut Store, item: *const Item, name: *const c_char, due_date: *const time_t, completion_date: *const time_t, labels: *const Vec<Label>) {
-    let name = c_char_to_string(name);
+    let name = c_char_to_string(name).to_string();
     let manager = &mut*manager;
     let item = &*item;
     let labels = &*labels;
@@ -203,10 +221,10 @@ pub unsafe extern "C" fn toodle_update_item(manager: *mut Store, item: *const It
 
 #[no_mangle]
 pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Store, uuid: *const c_char, name: *const c_char, due_date: *const time_t, completion_date: *const time_t) {
-    let name = c_char_to_string(name);
+    let name = c_char_to_string(name).to_string();
     let manager = &mut*manager;
     // TODO proper error handling, see https://github.com/mozilla-prototypes/sync-storage-prototype/pull/6
-    let _ = manager.update_item_by_uuid(c_char_to_string(uuid).as_str(),
+    let _ = manager.update_item_by_uuid(c_char_to_string(uuid).to_string().as_str(),
                                         Some(name),
                                         optional_timespec(due_date),
                                         optional_timespec(completion_date));
@@ -219,8 +237,8 @@ pub unsafe extern "C" fn toodle_update_item_by_uuid(manager: *mut Store, uuid: *
 #[no_mangle]
 pub unsafe extern "C" fn toodle_create_label(manager: *mut Store, name: *const c_char, color: *const c_char) -> *mut Option<Label> {
     let manager = &mut*manager;
-    let name = c_char_to_string(name);
-    let color = c_char_to_string(color);
+    let name = c_char_to_string(name).to_string();
+    let color = c_char_to_string(color).to_string();
     let label = Box::new(manager.create_label(name, color).unwrap_or(None));
     Box::into_raw(label)
 }
@@ -245,13 +263,13 @@ pub unsafe extern "C" fn label_get_color(label: *const Label) -> *mut c_char {
 #[no_mangle]
 pub unsafe extern "C" fn label_set_color(label: *mut Label, color: *const c_char) {
     let label = &mut*label;
-    label.color = c_char_to_string(color);
+    label.color = c_char_to_string(color).to_string();
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn item_set_name(item: *mut Item, name: *const c_char) {
     let item = &mut*item;
-    item.name = c_char_to_string(name);
+    item.name = c_char_to_string(name).to_string();
 }
 
 #[no_mangle]

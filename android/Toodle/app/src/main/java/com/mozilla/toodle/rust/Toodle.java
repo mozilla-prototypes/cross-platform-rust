@@ -16,7 +16,7 @@ import com.sun.jna.ptr.NativeLongByReference;
 
 public class Toodle extends RustObject {
     static {
-        System.loadLibrary("toodle");
+        System.loadLibrary("toodle_ffi");
     }
     private static final String LOG_TAG = "Toodle";
 
@@ -68,7 +68,7 @@ public class Toodle extends RustObject {
 
     public NativeResult sync() {
         Log.i(LOG_TAG, "sync pointer: " + rawPointer);
-        return JNA.INSTANCE.store_sync(rawPointer, "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1");
+        return JNA.INSTANCE.toodle_sync(rawPointer, "00000000-0000-0000-0000-000000000996", "http://mentat.dev.lcip.org/mentatsync/0.1");
     }
 
     public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {

@@ -12,7 +12,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 
 public interface JNA extends Library {
-    String JNA_LIBRARY_NAME = "toodle";
+    String JNA_LIBRARY_NAME = "toodle_ffi";
     NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(JNA_LIBRARY_NAME);
 
     JNA INSTANCE = (JNA) Native.loadLibrary(JNA_LIBRARY_NAME, JNA.class);
@@ -29,5 +29,5 @@ public interface JNA extends Library {
     void store_unregister_observer(Pointer Store, String key);
     long store_entid_for_attribute(Pointer Store, String attr);
 
-    NativeResult store_sync(Pointer toodle, String userUuid, String serverUri);
+    NativeResult toodle_sync(Pointer toodle, String userUuid, String serverUri);
 }
