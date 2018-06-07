@@ -8,17 +8,17 @@ name = "toodle_ffi"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-libc = "0.2.41"
+libc = "=0.2.40"
 time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+git = "https://github.com/ncalexan/mentat.git"
+branch = "grisha/sync-downloader"
 
 [dependencies.mentat_ffi]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+git = "https://github.com/ncalexan/mentat.git"
+branch = "grisha/sync-downloader"
 
 [dependencies.toodle]
 path = "../"

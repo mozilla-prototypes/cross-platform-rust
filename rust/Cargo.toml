@@ -18,21 +18,21 @@ crate-type = ["lib", "staticlib", "cdylib"]
 
 [dependencies]
 error-chain = { git = "https://github.com/rnewman/error-chain", branch = "rnewman/sync" }
-libc = "=0.2.41" # newer versions of libc cause arm64 builds to fail (see net2-rs issue: https://github.com/rust-lang-nursery/net2-rs/issues/73)
+libc = "=0.2.40" # newer versions of libc cause arm64 builds to fail (see net2-rs issue: https://github.com/rust-lang-nursery/net2-rs/issues/73)
 time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+git = "https://github.com/ncalexan/mentat.git"
+branch = "grisha/sync-downloader"
 
 [dependencies.mentat_core]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+git = "https://github.com/ncalexan/mentat.git"
+branch = "grisha/sync-downloader"
 
 [dependencies.mentat_ffi]
-git = "https://github.com/mozilla/mentat.git"
-branch = "master"
+git = "https://github.com/ncalexan/mentat.git"
+branch = "grisha/sync-downloader"
 
 [dependencies.rusqlite]
 version = "0.13"
