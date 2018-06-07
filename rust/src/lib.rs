@@ -22,12 +22,14 @@ extern crate time;
 extern crate uuid;
 
 use mentat::{
+    Binding,
     IntoResult,
     Queryable,
     QueryExecutionResult,
     QueryInputs,
     TypedValue,
     ValueType,
+    Syncable,
 };
 
 pub use mentat::{
@@ -88,13 +90,13 @@ fn create_uuid() -> Uuid {
 
 fn return_date_field(results: QueryExecutionResult) -> Result<Option<Timespec>> {
     results.into_scalar_result()
-           .map(|o| o.and_then(|ts| ts.to_inner()))
+           .map(|o| o.and_then(|b| b.val()).and_then(|ts| ts.to_inner()))
            .map_err(|e| e.into())
 }
 
 pub trait Toodle {
     fn initialize(&mut self) -> Result<()>;
-    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item;
+    fn item_row_to_item(&mut self, row: Vec<Binding>) -> Item;
     fn fetch_completion_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
     fn fetch_due_date_for_item(&mut self, item_id: &Uuid) -> Result<Option<Timespec>>;
 
@@ -125,66 +127,70 @@ impl Toodle for Store {
     fn initialize(&mut self) -> Result<()> {
         //println!("initializing Toodle");
         let mut in_progress = self.begin_transaction()?;
+        log::d(&format!("ensuring vocab..."));
         in_progress.ensure_vocabulary(&Definition {
             name: kw!(:toodle/list),
             version: 1,
+            pre: Definition::no_op,
+            post: Definition::no_op,
             attributes: vec![
                 (kw!(:todo/uuid),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::Uuid)
                     .multival(false)
                     .unique(Unique::Value)
                     .index(true)
                     .build()),
                 (kw!(:todo/name),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::String)
                     .multival(false)
                     .build()),
                 (kw!(:todo/due_date),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::Instant)
                     .multival(false)
                     .build()),
                 (kw!(:todo/completion_date),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::Instant)
                     .multival(false)
                     .build()),
                 (kw!(:todo/label),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::Ref)
                     .multival(true)
                     .build()),
                 (kw!(:label/name),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::String)
                     .multival(false)
                     .unique(Unique::Identity)
+                    .index(true)
                     .fulltext(true)
                     .build()),
                 (kw!(:label/color),
-                AttributeBuilder::new()
+                AttributeBuilder::default()
                     .value_type(ValueType::String)
                     .multival(false)
                     .build()),
             ],
         })?;
-        //println!("committing Toodle schema");
+        log::d(&format!("comitting vocab"));
         in_progress.commit()
-        .map_err(|e| e.into())
-        .and(Ok(()))
+            .map_err(|e| e.into())
+            .and(Ok(()))
     }
 
-    fn item_row_to_item(&mut self, row: Vec<TypedValue>) -> Item {
+    fn item_row_to_item(&mut self, row: Vec<Binding>) -> Item {
         //println!("Toodle::item_row_to_item");
-        let uuid = row[1].clone().to_inner();
+        let uuid = row[1].clone().val().expect("typed value").to_inner();
         let item;
         {
             item = Item {
-                id: row[0].clone().to_inner(),
+                id: row[0].clone().val().expect("typed value").to_inner(),
                 uuid: uuid,
-                name: row[2].clone().to_inner(),
+                name: row[2].clone().val().expect("typed value").to_inner(),
                 due_date: self.fetch_due_date_for_item(&uuid).unwrap_or(None),
                 completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
                 labels: self.fetch_labels_for_item(&uuid).unwrap_or(vec![]),
@@ -235,7 +241,7 @@ impl Toodle for Store {
         in_progress_read
             .q_once(query, None)
             .into_rel_result()
-            .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
+            .map(|rows| rows.into_iter().filter_map(|row| Label::from_row(&row)).collect())
             .map_err(|e| e.into())
     }
 
@@ -254,7 +260,7 @@ impl Toodle for Store {
         in_progress_read
             .q_once(query, args)
             .into_rel_result()
-            .map(|rows| rows.iter().filter_map(|row| Label::from_row(&row)).collect())
+            .map(|rows| rows.into_iter().filter_map(|row| Label::from_row(&row)).collect())
             .map_err(|e| e.into())
     }
 
@@ -513,7 +519,7 @@ mod test {
             edn::Value::Map(m) => {
                 let mut found = false;
                 for (key, val) in &m {
-                    if let edn::Value::NamespacedKeyword(ref kw) = *key {
+                    if let edn::Value::Keyword(ref kw) = *key {
                         if kw.namespace == "db" && kw.name == "ident" {
                             found = assert_ident_present(val.clone(), namespace, name);
                             if found { break; }
@@ -524,7 +530,7 @@ mod test {
                 }
                 found
             },
-            edn::Value::NamespacedKeyword(kw) => kw.namespace == namespace && kw.name == name,
+            edn::Value::Keyword(kw) => kw.namespace == namespace && kw.name == name,
             _ => false
         }
     }

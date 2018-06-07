@@ -9,7 +9,7 @@
 // specific language governing permissions and limitations under the License.
 
 use mentat::{
-    TypedValue,
+    Binding,
 };
 
 use utils::{
@@ -25,11 +25,11 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn from_row(row: &Vec<TypedValue>) -> Option<Label> {
+    pub fn from_row(row: &Vec<Binding>) -> Option<Label> {
         Some(Label {
-            id: row[0].clone().to_inner(),
-            name: row[1].clone().to_inner(),
-            color: row[2].clone().to_inner()
+            id: None,
+            name: row[0].clone().val().map(|v| v.to_inner()).expect("typed value"),
+            color: row[1].clone().val().map(|v| v.to_inner()).expect("typed value")
         })
     }
 }

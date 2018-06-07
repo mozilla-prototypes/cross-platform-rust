@@ -4,12 +4,12 @@ version = "0.1.0"
 authors = ["Emily Toop <etoop@mozilla.com>"]
 
 [lib]
-name = "toodle"
+name = "toodle_ffi"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-libc = "0.2.32"
-time = "0.1.38"
+libc = "0.2.41"
+time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
