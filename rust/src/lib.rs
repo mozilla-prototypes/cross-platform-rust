@@ -29,7 +29,6 @@ use mentat::{
     QueryInputs,
     TypedValue,
     ValueType,
-    Syncable,
 };
 
 pub use mentat::{
