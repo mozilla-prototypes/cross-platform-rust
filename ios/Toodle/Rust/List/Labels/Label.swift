@@ -5,33 +5,26 @@
 import Foundation
 import UIKit
 
+import Mentat
+
 class Label: RustObject {
-    var raw: OpaquePointer
-
-    required init(raw: OpaquePointer) {
-        self.raw = raw
-    }
-
-    func intoRaw() -> OpaquePointer {
-        return self.raw
-    }
-
-    deinit {
-        label_destroy(raw)
-    }
 
     var name: String {
-        return String(cString: label_get_name(raw))
+        return String(cString: label_get_name(self.getRaw()))
     }
 
     var color: UIColor {
         get {
-            return UIColor(hex: String(cString: label_get_color(raw))) ?? UIColor.gray
+            return UIColor(hex: String(cString: label_get_color(self.getRaw()))) ?? UIColor.gray
         }
         set {
             if let hex = newValue.toHex() {
-                label_set_color(raw, hex)
+                label_set_color(self.getRaw(), hex)
             }
         }
+    }
+    
+    override func cleanup(pointer: OpaquePointer) {
+        label_destroy(self.getRaw())
     }
 }

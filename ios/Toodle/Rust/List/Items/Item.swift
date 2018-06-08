@@ -16,7 +16,7 @@ class Item {
     }
 
     deinit {
-        item_c_destroy(raw)
+        destroy(UnsafeMutableRawPointer(mutating: raw))
     }
 
     var uuid: String? {
