@@ -136,7 +136,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "edn"
 version = "0.1.0"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -347,23 +347,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "mentat"
 version = "0.7.0"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_db 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_parser_utils 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_projector 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_pull 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_translator 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_tolstoy 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_pull 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -373,10 +373,10 @@ dependencies = [
 [[package]]
 name = "mentat_core"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "enum-set 0.0.6 (git+https://github.com/rnewman/enum-set)",
  "indexmap 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -390,16 +390,16 @@ dependencies = [
 [[package]]
 name = "mentat_db"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
- "edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "indexmap 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "num 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "ordered-float 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "petgraph 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -411,106 +411,106 @@ dependencies = [
 [[package]]
 name = "mentat_ffi"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.7.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat 0.7.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
 ]
 
 [[package]]
 name = "mentat_parser_utils"
 version = "0.1.0"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "combine 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "itertools 0.7.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
- "edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
 ]
 
 [[package]]
 name = "mentat_query_algebrizer"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
 ]
 
 [[package]]
 name = "mentat_query_projector"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "indexmap 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_db 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_pull 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_pull 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query_pull"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_db 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query_sql"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "regex 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "mentat_query_translator"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_projector 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_query_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
 ]
 
 [[package]]
 name = "mentat_sql"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "ordered-float 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -518,14 +518,14 @@ dependencies = [
 [[package]]
 name = "mentat_tolstoy"
 version = "0.0.1"
-source = "git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader#4b57ec738a413803aef29d61b55f06338546b9f9"
+source = "git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader#4fc5e47396a784cad05b937fbb20867783efa508"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "futures 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_db 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.66 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_cbor 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1096,9 +1096,9 @@ version = "0.1.0"
 dependencies = [
  "error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)",
  "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.7.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_ffi 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat 0.7.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_ffi 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "rusqlite 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1109,8 +1109,8 @@ name = "toodle_ffi"
 version = "0.1.0"
 dependencies = [
  "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "mentat 0.7.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
- "mentat_ffi 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)",
+ "mentat 0.7.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
+ "mentat_ffi 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)",
  "time 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "toodle 0.1.0",
  "uuid 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1260,7 +1260,7 @@ dependencies = [
 "checksum crossbeam-epoch 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "9b4e2817eb773f770dcb294127c011e22771899c21d18fce7dd739c0b9832e81"
 "checksum crossbeam-utils 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d636a8b3bcc1b409d7ffd3facef8f21dcb4009626adbd0c5e6c4305c07253c7b"
 "checksum dtoa 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "09c3753c3db574d215cba4ea76018483895d7bff25a31b49ba45db21c48e50ab"
-"checksum edn 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum edn 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
 "checksum either 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3be565ca5c557d7f59e7cfcf1844f9e3033650c929c6566f511e8005f205c1d0"
 "checksum enum-set 0.0.6 (git+https://github.com/rnewman/enum-set)" = "<none>"
 "checksum error-chain 0.11.0 (git+https://github.com/rnewman/error-chain?branch=rnewman/sync)" = "<none>"
@@ -1288,19 +1288,19 @@ dependencies = [
 "checksum lru-cache 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4d06ff7ff06f729ce5f4e227876cb88d10bc59cd4ae1e09fbb2bde15c850dc21"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
 "checksum memoffset 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0f9dc261e2b62d7a622bf416ea3c5245cdd5d9a7fcc428c0d06804dfce1775b3"
-"checksum mentat 0.7.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_core 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_db 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_ffi 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_parser_utils 0.1.0 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query_algebrizer 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query_projector 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query_pull 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_query_translator 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_sql 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
-"checksum mentat_tolstoy 0.0.1 (git+https://github.com/ncalexan/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat 0.7.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_core 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_db 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_ffi 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_parser_utils 0.1.0 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query_algebrizer 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query_projector 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query_pull 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_query_translator 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_sql 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
+"checksum mentat_tolstoy 0.0.1 (git+https://github.com/mozilla/mentat.git?branch=grisha/sync-downloader)" = "<none>"
 "checksum mime 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "0b28683d0b09bbc20be1c9b3f6f24854efb1356ffcffee08ea3f6e65596e85fa"
 "checksum mio 0.6.14 (registry+https://github.com/rust-lang/crates.io-index)" = "6d771e3ef92d58a8da8df7d6976bfca9371ed1de6619d9d5a5ce5b1f29b85bfe"
 "checksum miow 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f2f3b1cf331de6896aabf6e9d55dca90356cc9960cca7eaaf408a355ae919"

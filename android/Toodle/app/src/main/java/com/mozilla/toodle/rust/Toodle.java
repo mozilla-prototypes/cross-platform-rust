@@ -68,7 +68,7 @@ public class Toodle extends RustObject {
 
     public NativeResult sync() {
         Log.i(LOG_TAG, "sync pointer: " + rawPointer);
-        return JNA.INSTANCE.toodle_sync(rawPointer, "00000000-0000-0000-0000-000000000998", "http://mentat.dev.lcip.org/mentatsync/0.1");
+        return JNA.INSTANCE.toodle_sync(rawPointer, "00000000-0000-0000-0000-000000000996", "http://mentat.dev.lcip.org/mentatsync/0.1");
     }
 
     public void registerObserver(String key, String[] attributes, NativeTxObserverCallback callback) {

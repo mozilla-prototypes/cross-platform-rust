@@ -13,11 +13,11 @@ time = "0.1"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
-git = "https://github.com/ncalexan/mentat.git"
+git = "https://github.com/mozilla/mentat.git"
 branch = "grisha/sync-downloader"
 
 [dependencies.mentat_ffi]
-git = "https://github.com/ncalexan/mentat.git"
+git = "https://github.com/mozilla/mentat.git"
 branch = "grisha/sync-downloader"
 
 [dependencies.toodle]
