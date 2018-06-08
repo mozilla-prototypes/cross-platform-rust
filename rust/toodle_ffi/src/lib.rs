@@ -32,6 +32,7 @@ pub use mentat::{
 };
 
 pub use mentat_ffi::{
+    ExternResult,
     store_destroy,
     store_entid_for_attribute,
     store_register_observer,
@@ -77,7 +78,7 @@ pub extern "C" fn new_toodle(uri: *const c_char) -> *mut Store {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn toodle_sync(manager: *mut Store, user_uuid: *const c_char, server_uri: *const c_char) -> *mut ctypes::ResultC {
+pub unsafe extern "C" fn toodle_sync(manager: *mut Store, user_uuid: *const c_char, server_uri: *const c_char) -> *mut ExternResult {
     let manager = &mut*manager;
     let user_uuid = c_char_to_string(user_uuid).to_string();
     let server_uri = c_char_to_string(server_uri).to_string();

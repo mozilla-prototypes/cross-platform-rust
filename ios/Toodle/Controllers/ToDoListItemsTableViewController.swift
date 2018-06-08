@@ -4,6 +4,8 @@
 
 import UIKit
 
+import Mentat
+
 class ToDoListItemsTableViewController: UITableViewController {
 
     lazy var syncToRefresh: UIRefreshControl = {
@@ -88,7 +90,8 @@ class ToDoListItemsTableViewController: UITableViewController {
 }
 
 extension ToDoListItemsTableViewController: Observing {
-    func transactionDidOccur(key: String, reports: [TxReport]) {
+    
+    func transactionDidOccur(key: String, reports: [TxChange]) {
         print("transaction did occur \(key)")
         DispatchQueue.main.async {
             self.items = ToodleLib.sharedInstance.allItems()

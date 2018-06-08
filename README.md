@@ -33,7 +33,13 @@ cd rust
 cargo lipo --release
 ```
 
-Open `ios/Toodle/Toodle.xcodeproj` in Xcode. Select the Toodle project from the project navigator, and then ensure the Toodle target is selected. Open the `General` tab. Scroll down to the `Linked Frameworks and Libraries` section. Import your `libtoodle.a` library by either dragging it in from Finder, or clicking the `+` at the bottom of the list, clicking 'Add other…' and navigating to `rust/target/universal/release/`. Select `libtoodle.a` and then click `Open`.
+We are now using [Carthage](https://github.com/Carthage/Carthage) to import external dependencies. Install Carthage using the [instructions](https://github.com/Carthage/Carthage#installing-carthage) on their site. Once installed, open a terminal and navigate to the iOS project root. To install the project dependencies, run the following command:
+
+```
+carthage update
+```
+
+Open `ios/Toodle/Toodle.xcodeproj` in Xcode. Select the Toodle project from the project navigator, and then ensure the Toodle target is selected. Open the `General` tab. Scroll down to the `Linked Frameworks and Libraries` section. Import your `libtoodle_ffi.a` library by either dragging it in from Finder, or clicking the `+` at the bottom of the list, clicking 'Add other…' and navigating to `rust/target/universal/release/`. Select `libtoodle_ffi.a` and then click `Open`.
 
 You should now be able to build and run your iOS app.
 

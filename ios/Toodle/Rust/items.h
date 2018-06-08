@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef items_h
 #define items_h
 
