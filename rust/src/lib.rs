@@ -182,8 +182,10 @@ impl Toodle for Store {
     }
 
     fn item_row_to_item(&mut self, row: Vec<Binding>) -> Item {
-        //println!("Toodle::item_row_to_item");
+        println!("Toodle::item_row_to_item");
         let uuid = row[1].clone().val().expect("typed value").to_inner();
+        let labels = self.fetch_labels_for_item(&uuid).unwrap_or(vec![]);
+        println!("fetched labels {:?}", labels);
         let item;
         {
             item = Item {
@@ -192,7 +194,7 @@ impl Toodle for Store {
                 name: row[2].clone().val().expect("typed value").to_inner(),
                 due_date: self.fetch_due_date_for_item(&uuid).unwrap_or(None),
                 completion_date: self.fetch_completion_date_for_item(&uuid).unwrap_or(None),
-                labels: self.fetch_labels_for_item(&uuid).unwrap_or(vec![]),
+                labels: labels,
             }
         }
         item
@@ -245,7 +247,7 @@ impl Toodle for Store {
     }
 
     fn fetch_labels_for_item(&mut self, item_uuid: &Uuid) -> Result<Vec<Label>> {
-        //println!("Toodle::fetch_labels_for_item");
+        println!("Toodle::fetch_labels_for_item");
         let query = r#"[:find ?l ?name ?color
                         :in ?item_uuid
                         :where
@@ -380,6 +382,11 @@ impl Toodle for Store {
                 log::d(&format!("create_item builder completion_date"));
             }
 
+            for label in item.labels.iter() {
+                builder.add_kw(&kw!(:todo/label), label.id.clone().unwrap().to_typed_value())?;
+                log::d(&format!("create_item builder label"));
+            }
+
             log::d(&format!("create_item builder pre commit"));
             builder.commit()?;
             log::d(&format!("create_item builder post commit"));
@@ -484,9 +491,9 @@ impl Toodle for Store {
 #[cfg(test)]
 mod test {
     use super::{
-        Toodle,
-        Label,
         Item,
+        Label,
+        Toodle,
         create_uuid,
     };
 
@@ -496,11 +503,14 @@ mod test {
 
     use mentat::{
         Uuid,
+        Store,
     };
     use mentat::edn;
 
     fn toodle() -> Store {
-        Store::open(String::new()).expect("Expected a Toodle")
+        let mut store = Store::open("").expect("Expected a Toodle");
+        store.initialize().expect("expected initialize to work");
+        store
     }
 
     fn assert_ident_present(edn: edn::Value, namespace: &str, name: &str) -> bool {
@@ -519,7 +529,7 @@ mod test {
                 let mut found = false;
                 for (key, val) in &m {
                     if let edn::Value::Keyword(ref kw) = *key {
-                        if kw.namespace == "db" && kw.name == "ident" {
+                        if kw.namespace() == Some("db") && kw.name() == "ident" {
                             found = assert_ident_present(val.clone(), namespace, name);
                             if found { break; }
                         } else {
@@ -529,7 +539,7 @@ mod test {
                 }
                 found
             },
-            edn::Value::Keyword(kw) => kw.namespace == namespace && kw.name == name,
+            edn::Value::Keyword(kw) => kw.namespace() == Some(namespace) && kw.name() == name,
             _ => false
         }
     }
@@ -537,7 +547,7 @@ mod test {
     #[test]
     fn test_new_toodle() {
         let manager = toodle();
-        let conn = manager.connection.conn();
+        let conn = manager.conn();
         let schema = conn.current_schema().to_edn_value();
         assert_ident_present(schema.clone(), "label", "name");
         assert_ident_present(schema, "list", "name");
@@ -821,6 +831,7 @@ mod test {
         let label = manager.create_label("label1".to_string(), "#000000".to_string()).expect("expected a label option").unwrap();
         let label2 = manager.create_label("label2".to_string(), "#000000".to_string()).expect("expected a label option").unwrap();
         let label3 = manager.create_label("label3".to_string(), "#000000".to_string()).expect("expected a label option").unwrap();
+        println!("labels created");
 
         let item1 = Item {
             id: None,
@@ -832,8 +843,12 @@ mod test {
         };
 
         let mut created_item = manager.create_and_fetch_item(&item1).expect("expected an item option").expect("expected an item");
+        println!("item created");
         let mut new_labels = created_item.labels.clone();
+        println!("new labels cloned");
+
         new_labels.remove(2);
+        println!("removed two labels");
 
         match manager.update_item(&created_item, None, None, None, Some(&new_labels)) {
             Ok(()) => (),
