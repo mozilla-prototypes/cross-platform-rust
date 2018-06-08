@@ -90,7 +90,11 @@ class ToodleLib: Mentat {
 
     func sync_now() -> Bool {
         let err = toodle_sync(self.getRaw(), "00000000-0000-0000-0000-000000000117", "http://mentat.dev.lcip.org/mentatsync/0.1")
+<<<<<<< HEAD
         if let error = err.pointee.err {
+=======
+        if let error = err.err {
+>>>>>>> b0b1d3c... Update Toodle iOS to work with current Mentat, including using Carthage to import Mental SDK
             let str = String(cString: error)
             print("Sync error \(str)")
             return false

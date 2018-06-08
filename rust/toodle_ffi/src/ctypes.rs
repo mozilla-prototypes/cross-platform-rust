@@ -19,8 +19,6 @@ use mentat::{
     Uuid,
 };
 
-use mentat::errors::Error as MentatError;
-
 use mentat_ffi::utils::strings::{
     c_char_to_string,
     string_to_c_char,
@@ -30,27 +28,6 @@ use toodle::items::{
     Item,
     Items,
 };
-
-pub struct ResultC {
-    pub error: *const c_char,
-}
-
-impl From<Result<(), MentatError>> for ResultC {
-    fn from(result: Result<(), MentatError>) -> Self {
-        match result {
-            Ok(_) => {
-                ResultC {
-                    error: ::std::ptr::null(),
-                }
-            },
-            Err(e) => {
-                ResultC {
-                    error: string_to_c_char(e.description())
-                }
-            }
-        }
-    }
-}
 
 #[repr(C)]
 #[derive(Debug, Clone)]
