@@ -1,1 +1,1 @@
-git "file:///Users/emilytoop/Development/mentat" "grisha/sync-downloader"
+github "mozilla/mentat" "grisha/sync-downloader"
