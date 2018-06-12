@@ -27,9 +27,9 @@ pub struct Label {
 impl Label {
     pub fn from_row(row: &Vec<Binding>) -> Option<Label> {
         Some(Label {
-            id: row[0].clone().val().map(|v| v.to_inner()).expect("typed value"),
-            name: row[1].clone().val().map(|v| v.to_inner()).expect("typed value"),
-            color: row[2].clone().val().map(|v| v.to_inner()).expect("typed value")
+            id: None,
+            name: row[0].clone().val().map(|v| v.to_inner()).expect("typed value"),
+            color: row[1].clone().val().map(|v| v.to_inner()).expect("typed value")
         })
     }
 }
