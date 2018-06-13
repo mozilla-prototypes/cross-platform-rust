@@ -24,15 +24,15 @@ uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.mentat]
 git = "https://github.com/mozilla/mentat.git"
-branch = "grisha/sync-downloader"
+rev = "92d1550" # branch "grisha/sync-downloader"
 
 [dependencies.mentat_core]
 git = "https://github.com/mozilla/mentat.git"
-branch = "grisha/sync-downloader"
+rev = "92d1550" # branch "grisha/sync-downloader"
 
 [dependencies.mentat_ffi]
 git = "https://github.com/mozilla/mentat.git"
-branch = "grisha/sync-downloader"
+rev = "92d1550" # branch "grisha/sync-downloader"
 
 [dependencies.rusqlite]
 version = "0.13"
