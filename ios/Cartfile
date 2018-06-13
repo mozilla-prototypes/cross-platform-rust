@@ -1,1 +1,13 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 github "mozilla/mentat" "grisha/sync-downloader"
+=======
+git "file:///Users/emilytoop/Development/mentat" "grisha/sync-downloader"
+>>>>>>> b0b1d3c... Update Toodle iOS to work with current Mentat, including using Carthage to import Mental SDK
+=======
+github "mozilla/mentat" "grisha/sync-downloader"
+>>>>>>> 32f8896... Update Cartfile to grab repo from github
+=======
+github "mozilla/mentat" "grisha/sync-downloader"
+>>>>>>> 706acdf64fb1ef2a5a7f73f58d1ea1b20f5e08a1
